@@ -1,40 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+import '../core/controller/local_controller.dart';
+import '../core/controller/theme_controller.dart';
+import '../core/utils/app_translations.dart';
 import 'routes/app_pages.dart';
 import 'routes/app_routes.dart';
-import 'theme/app_colors.dart';
-import 'theme/app_text_styles.dart';
+import 'theme/app_themes.dart';
 
 class KajAcheApp extends StatelessWidget {
   const KajAcheApp({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final themeController  = Get.put(ThemeController(),  permanent: true);
+    final localeController = Get.put(LocaleController(), permanent: true);
+
     return GetMaterialApp(
       title: 'Kaj Ache',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
-        scaffoldBackgroundColor: AppColors.background,
-        fontFamily: AppTextStyles.fontFamily,
-        appBarTheme: const AppBarTheme(
-          backgroundColor: AppColors.primary,
-          foregroundColor: AppColors.white,
-          elevation: 0,
-          centerTitle: true,
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primary,
-            foregroundColor: AppColors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-        ),
-      ),
+
+      // ── Theme ───────────────────────────────────────────────────────────────
+      theme:     AppThemes.light,
+      darkTheme: AppThemes.dark,
+      themeMode: themeController.themeMode,
+
+      // ── Localization ────────────────────────────────────────────────────────
+      translations:   AppTranslations(),
+      locale:         localeController.locale,
+      fallbackLocale: const Locale('en', 'US'),
+      supportedLocales: const [
+        Locale('en', 'US'),
+        Locale('bn', 'BD'),
+      ],
+
+      // ── Routing ─────────────────────────────────────────────────────────────
       initialRoute: AppRoutes.splash,
-      getPages: AppPages.pages,
+      getPages:     AppPages.pages,
     );
   }
 }

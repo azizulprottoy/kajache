@@ -6,7 +6,7 @@ class AppRoutes {
   static const login         = '/login';
   static const register      = '/register';
   static const otp           = '/otp';
-
+  static const onboarding = '/onboarding';
   // Main
   static const home          = '/home';
 

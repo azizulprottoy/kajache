@@ -39,11 +39,11 @@ class AppPages {
 
   static final pages = [
     // ── Auth ──────────────────────────────────────────────────────────────────
-    // GetPage(
-    //   name: AppRoutes.splash,
-    //   page: () => const SplashPage(),
-    //   binding: AuthBinding(),
-    // ),
+    GetPage(
+      name: AppRoutes.splash,
+      page: () => const SplashPage(),
+      binding: AuthBinding(),
+    ),
     // GetPage(
     //   name: AppRoutes.login,
     //   page: () => const LoginPage(),
