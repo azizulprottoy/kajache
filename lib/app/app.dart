@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
+import 'package:flutter_localizations/flutter_localizations.dart';
 import '../core/controller/local_controller.dart';
 import '../core/controller/theme_controller.dart';
 import '../core/utils/app_translations.dart';
@@ -14,27 +14,30 @@ class KajAcheApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeController  = Get.put(ThemeController(),  permanent: true);
-    final localeController = Get.put(LocaleController(), permanent: true);
+    Get.put(LocaleController(), permanent: true); // ← just register it; it calls
+    //   Get.updateLocale() in onInit
 
     return GetMaterialApp(
       title: 'Kaj Ache',
       debugShowCheckedModeBanner: false,
 
-      // ── Theme ───────────────────────────────────────────────────────────────
-      theme:     AppThemes.light,
-      darkTheme: AppThemes.dark,
-      themeMode: themeController.themeMode,
-
-      // ── Localization ────────────────────────────────────────────────────────
+      // ── Localization ───────────────────────────────────────────────────────
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,    // ← fixes "No MaterialLocalizations"
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,   // ← fixes "No CupertinoLocalizations"
+      ],
       translations:   AppTranslations(),
-      locale:         localeController.locale,
       fallbackLocale: const Locale('en', 'US'),
       supportedLocales: const [
         Locale('en', 'US'),
         Locale('bn', 'BD'),
       ],
 
-      // ── Routing ─────────────────────────────────────────────────────────────
+      // ── Theme / Routing (unchanged) ───────────────────────────────────────
+      theme:        AppThemes.light,
+      darkTheme:    AppThemes.dark,
+      themeMode:    themeController.themeMode,
       initialRoute: AppRoutes.splash,
       getPages:     AppPages.pages,
     );

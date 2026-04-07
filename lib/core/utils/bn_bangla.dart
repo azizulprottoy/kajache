@@ -21,26 +21,25 @@ const Map<String, String> bnBD = {
   TKeys.seeAll:            'সব দেখুন',
 
   // Auth
-  TKeys.login:             'লগইন',
-  TKeys.logout:            'লগআউট',
-  TKeys.register:          'নিবন্ধন',
-  TKeys.fullName:          'পূর্ণ নাম',
-  TKeys.phoneNumber:       'ফোন নম্বর',
-  TKeys.password:          'পাসওয়ার্ড',
-  TKeys.confirmPassword:   'পাসওয়ার্ড নিশ্চিত করুন',
-  TKeys.forgotPassword:    'পাসওয়ার্ড ভুলে গেছেন?',
-  TKeys.dontHaveAccount:   'অ্যাকাউন্ট নেই?',
-  TKeys.alreadyHaveAccount:'ইতিমধ্যে অ্যাকাউন্ট আছে?',
-  TKeys.otpSent:           'আপনার নম্বরে OTP পাঠানো হয়েছে',
-  TKeys.enterOtp:          'OTP লিখুন',
-  TKeys.resendOtp:         'OTP পুনরায় পাঠান',
-  TKeys.verifyOtp:         'OTP যাচাই করুন',
-  TKeys.loginAsCustomer:   'গ্রাহক হিসেবে লগইন',
-  TKeys.loginAsWorker:     'কর্মী হিসেবে লগইন',
+  TKeys.welcomeBack:      'স্বাগতম',
+  TKeys.loginSubtitle:    'চালিয়ে যেতে সাইন ইন করুন',
+  TKeys.email:            'ইমেইল',
+  TKeys.phone:            'ফোন',
+  TKeys.password:         'পাসওয়ার্ড',
+  TKeys.phoneNumber:      'ফোন নম্বর',
+  TKeys.forgotPassword:   'পাসওয়ার্ড ভুলে গেছেন?',
+  TKeys.login:            'লগইন',
+  TKeys.noAccount:        'অ্যাকাউন্ট নেই?',
+  TKeys.signUp:           'সাইন আপ',
+  TKeys.emailOrPhone:     'ইমেইল বা ফোন',
+  TKeys.emailOrPhoneHint: 'আপনার ইমেইল বা ফোন নম্বর দিন',
+  TKeys.inputRequired:    'এই ঘরটি পূরণ করা আবশ্যক',
+  TKeys.inputInvalid:     'সঠিক ইমেইল বা ফোন নম্বর দিন',
+  TKeys.passwordRequired: 'পাসওয়ার্ড দেওয়া আবশ্যক',
+  TKeys.passwordMin:      'সর্বনিম্ন ৬টি অক্ষর',
 
   // Home
   TKeys.home:              'হোম',
-  TKeys.welcomeBack:       'স্বাগতম!',
   TKeys.whatService:       'আপনার কী সেবা দরকার?',
   TKeys.popularServices:   'জনপ্রিয় সেবাসমূহ',
   TKeys.allCategories:     'সব ক্যাটাগরি',
@@ -110,4 +109,7 @@ const Map<String, String> bnBD = {
   TKeys.darkMode:          'ডার্ক মোড',
   TKeys.lightMode:         'লাইট মোড',
   TKeys.settings:          'সেটিংস',
+
+
+
 };

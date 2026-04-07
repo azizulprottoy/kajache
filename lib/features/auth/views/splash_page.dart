@@ -81,7 +81,6 @@ class _SplashPageState extends State<SplashPage>
               return Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // ── Logo ──────────────────────────────────────────────────
                   ScaleTransition(
                     scale: _scaleAnim,
                     child: FadeTransition(
@@ -91,8 +90,6 @@ class _SplashPageState extends State<SplashPage>
                   ),
 
                   const SizedBox(height: 24),
-
-                  // ── App Name ──────────────────────────────────────────────
                   SlideTransition(
                     position: _slideAnim,
                     child: FadeTransition(
@@ -106,8 +103,6 @@ class _SplashPageState extends State<SplashPage>
           ),
         ),
       ),
-
-      // ── Version at bottom ─────────────────────────────────────────────────
       bottomNavigationBar: FadeTransition(
         opacity: _fadeAnim,
         child: const Padding(
@@ -126,8 +121,6 @@ class _SplashPageState extends State<SplashPage>
     );
   }
 }
-
-// ── Logo Widget ───────────────────────────────────────────────────────────────
 class _LogoIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {

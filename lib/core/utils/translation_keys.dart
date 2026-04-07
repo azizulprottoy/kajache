@@ -20,26 +20,25 @@ class TKeys {
   static const seeAll         = 'see_all';
 
   // ── Auth ────────────────────────────────────────────────────────────────────
-  static const login          = 'login';
-  static const logout         = 'logout';
-  static const register       = 'register';
-  static const fullName       = 'full_name';
-  static const phoneNumber    = 'phone_number';
-  static const password       = 'password';
-  static const confirmPassword = 'confirm_password';
-  static const forgotPassword = 'forgot_password';
-  static const dontHaveAccount = 'dont_have_account';
-  static const alreadyHaveAccount = 'already_have_account';
-  static const otpSent        = 'otp_sent';
-  static const enterOtp       = 'enter_otp';
-  static const resendOtp      = 'resend_otp';
-  static const verifyOtp      = 'verify_otp';
-  static const loginAsCustomer = 'login_as_customer';
-  static const loginAsWorker  = 'login_as_worker';
+  static const welcomeBack      = 'welcome_back';
+  static const loginSubtitle    = 'login_subtitle';
+  static const email            = 'email';
+  static const phone            = 'phone';
+  static const password         = 'password';
+  static const phoneNumber      = 'phone_number';
+  static const forgotPassword   = 'forgot_password';
+  static const login            = 'login';
+  static const noAccount        = 'no_account';
+  static const signUp           = 'sign_up';
+  static const emailOrPhone     = 'email_or_phone';
+  static const emailOrPhoneHint = 'email_or_phone_hint';
+  static const inputRequired    = 'input_required';
+  static const inputInvalid     = 'input_invalid';
+  static const passwordRequired = 'password_required';
+  static const passwordMin      = 'password_min';
 
   // ── Home ────────────────────────────────────────────────────────────────────
   static const home           = 'home';
-  static const welcomeBack    = 'welcome_back';
   static const whatService    = 'what_service';
   static const popularServices = 'popular_services';
   static const allCategories  = 'all_categories';
