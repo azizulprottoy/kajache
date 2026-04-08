@@ -15,6 +15,7 @@ class BannerSlider extends GetView<HomeController> {
         SizedBox(
           height: 180,
           child: PageView.builder(
+            controller: controller.bannerPageController,
             itemCount: controller.banners.length,
             onPageChanged: controller.onBannerPageChanged,
             itemBuilder: (context, index) {

@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class HomeController extends GetxController {
@@ -24,16 +26,19 @@ class HomeController extends GetxController {
     ),
   ];
 
+  late PageController bannerPageController;
+  Timer? _bannerTimer;
+
   // ── Categories ───────────────────────────────────────────────────────────────
   final categories = [
-    CategoryModel(title: 'plumbing',          icon: '🔧'),
-    CategoryModel(title: 'stove_fixing',       icon: '🔥'),
-    CategoryModel(title: 'bathroom_cleaning',  icon: '🚿'),
-    CategoryModel(title: 'painting',           icon: '🎨'),
-    CategoryModel(title: 'electrician',        icon: '⚡'),
-    CategoryModel(title: 'carpentry',          icon: '🪚'),
-    CategoryModel(title: 'ac_repair',          icon: '❄️'),
-    CategoryModel(title: 'gardening',          icon: '🌿'),
+    CategoryModel(title: 'plumbing', icon: '🔧'),
+    CategoryModel(title: 'stove_fixing', icon: '🔥'),
+    CategoryModel(title: 'bathroom_cleaning', icon: '🚿'),
+    CategoryModel(title: 'painting', icon: '🎨'),
+    CategoryModel(title: 'electrician', icon: '⚡'),
+    CategoryModel(title: 'carpentry', icon: '🪚'),
+    CategoryModel(title: 'ac_repair', icon: '❄️'),
+    CategoryModel(title: 'gardening', icon: '🌿'),
   ];
 
   // ── Popular Services ─────────────────────────────────────────────────────────
@@ -42,13 +47,14 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    bannerPageController = PageController();
     fetchPopularServices();
+    startBannerAutoSlide();
   }
 
   Future<void> fetchPopularServices() async {
     isLoading.value = true;
     try {
-      // TODO: replace with your actual API call
       await Future.delayed(const Duration(seconds: 1));
       popularServices.assignAll([
         ServiceModel(
@@ -89,14 +95,49 @@ class HomeController extends GetxController {
         ),
       ]);
     } catch (e) {
-      Get.snackbar('error'.tr, e.toString(),
-          snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(
+        'error'.tr,
+        e.toString(),
+        snackPosition: SnackPosition.BOTTOM,
+      );
     } finally {
       isLoading.value = false;
     }
   }
 
-  void onBannerPageChanged(int index) => currentBannerIndex.value = index;
+  void onBannerPageChanged(int index) {
+    currentBannerIndex.value = index;
+  }
+
+  void startBannerAutoSlide() {
+    _bannerTimer?.cancel();
+
+    _bannerTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
+      if (!bannerPageController.hasClients || banners.isEmpty) return;
+
+      int nextPage = currentBannerIndex.value + 1;
+      if (nextPage >= banners.length) {
+        nextPage = 0;
+      }
+
+      bannerPageController.animateToPage(
+        nextPage,
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeInOut,
+      );
+    });
+  }
+
+  void stopBannerAutoSlide() {
+    _bannerTimer?.cancel();
+  }
+
+  @override
+  void onClose() {
+    _bannerTimer?.cancel();
+    bannerPageController.dispose();
+    super.onClose();
+  }
 
   void onCategoryTap(CategoryModel category) {
     // TODO: navigate to category services page
@@ -113,13 +154,22 @@ class BannerModel {
   final String title;
   final String subtitle;
   final String imageUrl;
-  BannerModel({required this.title, required this.subtitle, required this.imageUrl});
+
+  BannerModel({
+    required this.title,
+    required this.subtitle,
+    required this.imageUrl,
+  });
 }
 
 class CategoryModel {
   final String title;
   final String icon;
-  CategoryModel({required this.title, required this.icon});
+
+  CategoryModel({
+    required this.title,
+    required this.icon,
+  });
 }
 
 class ServiceModel {
@@ -130,6 +180,7 @@ class ServiceModel {
   final int reviews;
   final double price;
   final String imageUrl;
+
   ServiceModel({
     required this.id,
     required this.title,

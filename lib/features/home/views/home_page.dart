@@ -6,24 +6,40 @@ import 'package:kaj_ache/features/home/views/widgets/popular_services_list.dart'
 import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/common_app_bar.dart';
 import '../controllers/home_controller.dart';
-
+import '../../../shared/widgets/common_nav_bar.dart';
 
 class HomePage extends GetView<HomeController> {
   const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final theme       = Theme.of(context);
+    final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
       appBar: CommonAppBar(
-      title: 'app_name',
-      showLanguageToggle: true,
-
-    ),
-      body: RefreshIndicator(
+        title: 'app_name',
+        showLanguageToggle: true,
+      ),
+      bottomNavigationBar:  CommonBottomNavBar(
+        currentIndex: 0,
+        onTap: (index) {
+          switch (index) {
+            case 0:
+              break;
+            case 1:
+            // Get.toNamed(AppRoutes.categories);
+              break;
+            case 2:
+            // Get.toNamed(AppRoutes.bookings);
+              break;
+            case 3:
+            // Get.toNamed(AppRoutes.profile);
+              break;
+          }
+        },
+      ),  body: RefreshIndicator(
         onRefresh: controller.fetchPopularServices,
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
@@ -32,7 +48,6 @@ class HomePage extends GetView<HomeController> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 12),
-
               TextField(
                 readOnly: true,
                 onTap: () {},
@@ -51,7 +66,6 @@ class HomePage extends GetView<HomeController> {
               const SizedBox(height: 20),
               const BannerSlider(),
               const SizedBox(height: 6),
-
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -64,8 +78,10 @@ class HomePage extends GetView<HomeController> {
                   ),
                   TextButton(
                     onPressed: () {},
-                    child: Text(TKeys.seeAll.tr,
-                        style: TextStyle(color: colorScheme.primary)),
+                    child: Text(
+                      TKeys.seeAll.tr,
+                      style: TextStyle(color: colorScheme.primary),
+                    ),
                   ),
                 ],
               ),
@@ -83,8 +99,10 @@ class HomePage extends GetView<HomeController> {
                   ),
                   TextButton(
                     onPressed: () {},
-                    child: Text(TKeys.seeAll.tr,
-                        style: TextStyle(color: colorScheme.primary)),
+                    child: Text(
+                      TKeys.seeAll.tr,
+                      style: TextStyle(color: colorScheme.primary),
+                    ),
                   ),
                 ],
               ),
