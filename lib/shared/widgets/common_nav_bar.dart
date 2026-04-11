@@ -24,22 +24,18 @@ class CommonBottomNavBar extends StatelessWidget {
         NavigationDestination(
           icon: Icon(Icons.home_outlined),
           selectedIcon: Icon(Icons.home),
-          label: 'Home',
         ),
         NavigationDestination(
           icon: Icon(Icons.category_outlined),
           selectedIcon: Icon(Icons.category),
-          label: 'Categories',
         ),
         NavigationDestination(
           icon: Icon(Icons.bookmark_border),
           selectedIcon: Icon(Icons.bookmark),
-          label: 'Bookings',
         ),
         NavigationDestination(
           icon: Icon(Icons.person_outline),
           selectedIcon: Icon(Icons.person),
-          label: 'Profile',
         ),
       ],
     );
