@@ -13,33 +13,20 @@ class HomePage extends GetView<HomeController> {
 
   @override
   Widget build(BuildContext context) {
+    final index = 1;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-
     return Scaffold(
       backgroundColor: colorScheme.surface,
       appBar: CommonAppBar(
         title: 'app_name',
         showLanguageToggle: true,
       ),
-      bottomNavigationBar:  CommonBottomNavBar(
-        currentIndex: 0,
-        onTap: (index) {
-          switch (index) {
-            case 0:
-              break;
-            case 1:
-            // Get.toNamed(AppRoutes.categories);
-              break;
-            case 2:
-            // Get.toNamed(AppRoutes.bookings);
-              break;
-            case 3:
-            // Get.toNamed(AppRoutes.profile);
-              break;
-          }
-        },
-      ),  body: RefreshIndicator(
+      bottomNavigationBar: CommonBottomNavBar(
+        currentIndex: controller.currentIndex.value,
+        onTap: controller.changeNavIndex,
+      ),
+      body: RefreshIndicator(
         onRefresh: controller.fetchPopularServices,
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),

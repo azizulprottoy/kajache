@@ -4,8 +4,19 @@ import 'package:get/get.dart';
 
 class HomeController extends GetxController {
   RxBool isLoading = false.obs;
+  final RxInt currentIndex = 1.obs;
 
-  // ── Banner ───────────────────────────────────────────────────────────────────
+  void changeNavIndex(int index) {
+    currentIndex.value = index;
+
+    if (index == 0) {
+      // History page
+    } else if (index == 1) {
+      // Home page
+    } else if (index == 2) {
+      // Profile page
+    }
+  }  // ── Banner ───────────────────────────────────────────────────────────────────
   final RxInt currentBannerIndex = 0.obs;
 
   final banners = [

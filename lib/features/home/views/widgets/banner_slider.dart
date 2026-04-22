@@ -75,7 +75,6 @@ class BannerSlider extends GetView<HomeController> {
           ),
         ),
 
-        // ── Dots indicator ───────────────────────────────────────────────────
         const SizedBox(height: 10),
         Obx(() => Row(
           mainAxisAlignment: MainAxisAlignment.center,
