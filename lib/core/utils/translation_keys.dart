@@ -73,7 +73,7 @@ class TKeys {
   static const workerOnTheWay = 'worker_on_the_way';
 
   // ── Chat ────────────────────────────────────────────────────────────────────
-  static const chat           = 'chat';
+  static const chat           = 'menu';
   static const messages       = 'messages';
   static const typeMessage    = 'type_message';
   static const send           = 'send';

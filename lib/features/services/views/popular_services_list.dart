@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:kaj_ache/app/theme/app_colors.dart';
-import 'package:kaj_ache/core/utils/translation_keys.dart';
-import '../../../../shared/widgets/custom_button.dart';
-import '../../controllers/home_controller.dart';
+
+import '../../../app/theme/app_colors.dart';
+import '../../../core/utils/translation_keys.dart';
+import '../../../shared/widgets/custom_button.dart';
+import '../../home/controllers/home_controller.dart';
+
 
 class PopularServicesList extends GetView<HomeController> {
   const PopularServicesList({super.key});
@@ -112,7 +114,7 @@ class PopularServicesList extends GetView<HomeController> {
                           variant: ButtonVariant.primary,
 
                           size: ButtonSize.sm,
-                          isFullWidth: true,            // ← now safe, parent has fixed width
+                          isFullWidth: true,
                         ),
                       ],
                     ),

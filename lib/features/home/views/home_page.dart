@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kaj_ache/features/home/views/widgets/banner_slider.dart';
 import 'package:kaj_ache/features/home/views/widgets/category_grid.dart';
-import 'package:kaj_ache/features/home/views/widgets/popular_services_list.dart';
+import '../../../core/controller/local_controller.dart';
 import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/common_app_bar.dart';
+import '../../services/views/popular_services_list.dart';
 import '../controllers/home_controller.dart';
 import '../../../shared/widgets/common_nav_bar.dart';
 
@@ -13,9 +14,10 @@ class HomePage extends GetView<HomeController> {
 
   @override
   Widget build(BuildContext context) {
-    final index = 1;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final localeController = Get.find<LocaleController>();
+
     return Scaffold(
       backgroundColor: colorScheme.surface,
       appBar: CommonAppBar(
@@ -23,8 +25,8 @@ class HomePage extends GetView<HomeController> {
         showLanguageToggle: true,
       ),
       bottomNavigationBar: CommonBottomNavBar(
-        currentIndex: controller.currentIndex.value,
-        onTap: controller.changeNavIndex,
+        currentIndex: localeController.currentIndex.value,
+        onTap: localeController.changeNavIndex,
       ),
       body: RefreshIndicator(
         onRefresh: controller.fetchPopularServices,

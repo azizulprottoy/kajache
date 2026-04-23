@@ -28,7 +28,7 @@ class AppRoutes {
 //
 //   // Chat
 //   static const conversations = '/conversations';
-//   static const chat          = '/chat';
+//   static const menu          = '/menu';
 //
 //   // Payments
 //   static const payment       = '/payment';

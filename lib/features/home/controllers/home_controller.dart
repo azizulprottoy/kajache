@@ -1,22 +1,14 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:kaj_ache/features/home/views/home_page.dart';
+
+import '../../menu/views/menu_page.dart';
 
 class HomeController extends GetxController {
   RxBool isLoading = false.obs;
   final RxInt currentIndex = 1.obs;
 
-  void changeNavIndex(int index) {
-    currentIndex.value = index;
-
-    if (index == 0) {
-      // History page
-    } else if (index == 1) {
-      // Home page
-    } else if (index == 2) {
-      // Profile page
-    }
-  }  // ── Banner ───────────────────────────────────────────────────────────────────
   final RxInt currentBannerIndex = 0.obs;
 
   final banners = [

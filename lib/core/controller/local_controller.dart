@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/storage/local_storage_service.dart';
+import '../../features/home/views/home_page.dart';
+import '../../features/menu/views/menu_page.dart';
 
 class LocaleController extends GetxController {
   final _storage = Get.find<LocalStorageService>();
+  final RxInt currentIndex = 1.obs;
 
   final _locale = const Locale('en', 'US').obs;
   Locale get locale => _locale.value;
@@ -48,6 +51,31 @@ class LocaleController extends GetxController {
     _storage.setLanguage(code);
   }
 
+  void changeNavIndex(int index) {
+    if (currentIndex.value == index) return;
+
+    currentIndex.value = index;
+
+    if (index == 0) {
+      // Get.off(
+      //       () => const AllServices(),
+      //   transition: Transition.leftToRight,
+      //   duration: const Duration(milliseconds: 300),
+      // );
+    } else if (index == 1) {
+      Get.off(
+            () => const HomePage(),
+        transition: Transition.leftToRight,
+        duration: const Duration(milliseconds: 300),
+      );
+    } else if (index == 2) {
+      Get.off(
+            () => const MenuPage(),
+        transition: Transition.rightToLeft,
+        duration: const Duration(milliseconds: 300),
+      );
+    }
+  }
   String get currentLanguageCode => _locale.value.languageCode;
 
   bool get isBengali => currentLanguageCode == 'bn';

@@ -96,7 +96,7 @@ class AppPages {
     //   binding: ChatBinding(),
     // ),
     // GetPage(
-    //   name: AppRoutes.chat,
+    //   name: AppRoutes.menu,
     //   page: () => const ChatPage(),
     //   binding: ChatBinding(),
     // ),
