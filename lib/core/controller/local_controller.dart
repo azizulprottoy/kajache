@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../../../core/storage/local_storage_service.dart';
 import '../../features/home/views/home_page.dart';
 import '../../features/menu/views/menu_page.dart';
+import '../../features/services/views/all_services_list.dart';
 
 class LocaleController extends GetxController {
   final _storage = Get.find<LocalStorageService>();
@@ -57,23 +58,11 @@ class LocaleController extends GetxController {
     currentIndex.value = index;
 
     if (index == 0) {
-      // Get.off(
-      //       () => const AllServices(),
-      //   transition: Transition.leftToRight,
-      //   duration: const Duration(milliseconds: 300),
-      // );
+      Get.offNamed('/all-services');
     } else if (index == 1) {
-      Get.off(
-            () => const HomePage(),
-        transition: Transition.leftToRight,
-        duration: const Duration(milliseconds: 300),
-      );
+      Get.offNamed('/home');
     } else if (index == 2) {
-      Get.off(
-            () => const MenuPage(),
-        transition: Transition.rightToLeft,
-        duration: const Duration(milliseconds: 300),
-      );
+      Get.offNamed('/menu');
     }
   }
   String get currentLanguageCode => _locale.value.languageCode;

@@ -1,10 +1,14 @@
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:kaj_ache/features/services/views/all_services_list.dart';
 
 import '../../features/auth/bindings/auth_binding.dart';
 import '../../features/auth/views/login_page.dart';
 import '../../features/auth/views/splash_page.dart';
 import '../../features/home/bindings/home_binding.dart';
 import '../../features/home/views/home_page.dart';
+import '../../features/menu/views/menu_page.dart';
+import '../../features/services/bindings/service_binding.dart';
 import 'app_routes.dart';
 
 class AppPages {
@@ -22,38 +26,52 @@ class AppPages {
       page: () => LoginPage(),
       binding: AuthBinding(),
     ),
-    GetPage(
-      name: AppRoutes.home,
-      page: () =>  HomePage(),
-      binding: HomeBinding(),
-    ),
-    ];
-}
-    // GetPage(
-    //   name: AppRoutes.register,
-    //   page: () => const RegisterPage(),
-    //   binding: AuthBinding(),
-    // ),
-    // GetPage(
-    //   name: AppRoutes.otp,
-    //   page: () => const OtpPage(),
-    //   binding: AuthBinding(),
-    // ),
-    //
-    // // ── Home ──────────────────────────────────────────────────────────────────
 
-    //
-    // // ── Services ──────────────────────────────────────────────────────────────
-    // GetPage(
-    //   name: AppRoutes.categories,
-    //   page: () => const CategoriesPage(),
-    //   binding: ServiceBinding(),
-    // ),
-    // GetPage(
-    //   name: AppRoutes.serviceList,
-    //   page: () => const ServiceListPage(),
-    //   binding: ServiceBinding(),
-    // ),
+    GetPage(
+      name: '/all-services',
+      page: () =>  AllServices(),
+      binding: ServiceBinding(),
+
+    ),
+    GetPage(
+      name: '/home',
+      page: () => const HomePage(),
+      binding: HomeBinding(),
+
+    ),
+    GetPage(
+      name: '/menu',
+      page: () =>  MenuPage(),
+
+    ),
+
+    GetPage(
+      name: AppRoutes.services,
+      page: () =>  AllServices(),
+      binding: ServiceBinding(),
+    ),
+  ];
+}
+// GetPage(
+//   name: AppRoutes.register,
+//   page: () => const RegisterPage(),
+//   binding: AuthBinding(),
+// ),
+// GetPage(
+//   name: AppRoutes.otp,
+//   page: () => const OtpPage(),
+//   binding: AuthBinding(),
+// ),
+//
+// // ── Home ──────────────────────────────────────────────────────────────────
+
+//
+// // ── Services ──────────────────────────────────────────────────────────────
+// GetPage(
+//   name: AppRoutes.categories,
+//   page: () => const CategoriesPage(),
+//   binding: ServiceBinding(),
+// ),
     // GetPage(
     //   name: AppRoutes.serviceDetail,
     //   page: () => const ServiceDetailPage(),

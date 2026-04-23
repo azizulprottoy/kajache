@@ -18,7 +18,7 @@ class MenuPage extends StatelessWidget {
       backgroundColor: colorScheme.surface,
       appBar: const CommonAppBar(
         title: 'Menu',
-        showLanguageToggle: false,
+        showLanguageToggle: true,
       ),
       bottomNavigationBar: CommonBottomNavBar(
         currentIndex: localeController.currentIndex.value,
