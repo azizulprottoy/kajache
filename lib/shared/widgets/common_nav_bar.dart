@@ -16,9 +16,8 @@ class CommonBottomNavBar extends StatelessWidget {
 
     return Container(
       height: 60,
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.white,
-
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,

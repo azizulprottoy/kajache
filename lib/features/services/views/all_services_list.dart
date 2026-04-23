@@ -11,7 +11,7 @@ import '../controllers/all_services_controller.dart';
 
 
 class AllServices extends GetView<AllServicesController> {
- AllServices({super.key});
+ const AllServices({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -22,11 +22,6 @@ class AllServices extends GetView<AllServicesController> {
           title: 'Menu',
           showLanguageToggle: true,
         ),
-        bottomNavigationBar: CommonBottomNavBar(
-          currentIndex: localeController.currentIndex.value,
-          onTap: localeController.changeNavIndex,
-        ),
-
         body: Obx(() {
       if (controller.isLoading.value) {
         return const Center(child: CircularProgressIndicator());

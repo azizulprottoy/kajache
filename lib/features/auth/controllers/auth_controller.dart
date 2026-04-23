@@ -50,11 +50,11 @@ class AuthController extends GetxController {
       await Future.delayed(const Duration(seconds: 1));
 
       await _secureStorage.saveToken('your_token_here');
-      Get.toNamed(AppRoutes.home);
+      Get.toNamed(AppRoutes.main);
     } catch (e) {
       Get.snackbar('error'.tr, e.toString(),
           snackPosition: SnackPosition.BOTTOM);
-      Get.toNamed(AppRoutes.home);
+      Get.toNamed(AppRoutes.main);
 
     } finally {
       isLoading.value = false;

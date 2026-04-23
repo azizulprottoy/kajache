@@ -20,10 +20,7 @@ class MenuPage extends StatelessWidget {
         title: 'Menu',
         showLanguageToggle: true,
       ),
-      bottomNavigationBar: CommonBottomNavBar(
-        currentIndex: localeController.currentIndex.value,
-        onTap: localeController.changeNavIndex,
-      ),
+
 
       body: SafeArea(
         child: ListView(

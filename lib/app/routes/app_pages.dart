@@ -7,6 +7,8 @@ import '../../features/auth/views/login_page.dart';
 import '../../features/auth/views/splash_page.dart';
 import '../../features/home/bindings/home_binding.dart';
 import '../../features/home/views/home_page.dart';
+import '../../features/main/binding/main_binding.dart';
+import '../../features/main/view/main_page.dart';
 import '../../features/menu/views/menu_page.dart';
 import '../../features/services/bindings/service_binding.dart';
 import 'app_routes.dart';
@@ -16,6 +18,11 @@ class AppPages {
 
   static final pages = [
     // ── Auth ──────────────────────────────────────────────────────────────────
+    GetPage(
+      name: AppRoutes.main,
+      page: () => const MainPage(),
+      binding: MainBinding(),
+    ),
     GetPage(
       name: AppRoutes.splash,
       page: () =>  SplashPage(),

@@ -24,10 +24,6 @@ class HomePage extends GetView<HomeController> {
         title: 'app_name',
         showLanguageToggle: true,
       ),
-      bottomNavigationBar: CommonBottomNavBar(
-        currentIndex: localeController.currentIndex.value,
-        onTap: localeController.changeNavIndex,
-      ),
       body: RefreshIndicator(
         onRefresh: controller.fetchPopularServices,
         child: SingleChildScrollView(

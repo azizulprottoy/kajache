@@ -14,18 +14,16 @@ class KajAcheApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeController  = Get.put(ThemeController(),  permanent: true);
-    Get.put(LocaleController(), permanent: true); // ← just register it; it calls
-    //   Get.updateLocale() in onInit
+    Get.put(LocaleController(), permanent: true);
 
     return GetMaterialApp(
       title: 'Kaj Ache',
       debugShowCheckedModeBanner: false,
 
-      // ── Localization ───────────────────────────────────────────────────────
       localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,    // ← fixes "No MaterialLocalizations"
+        GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,   // ← fixes "No CupertinoLocalizations"
+        GlobalCupertinoLocalizations.delegate,
       ],
       translations:   AppTranslations(),
       fallbackLocale: const Locale('en', 'US'),
@@ -34,7 +32,6 @@ class KajAcheApp extends StatelessWidget {
         Locale('bn', 'BD'),
       ],
 
-      // ── Theme / Routing (unchanged) ───────────────────────────────────────
       theme:        AppThemes.light,
       darkTheme:    AppThemes.dark,
       themeMode:    themeController.themeMode,
