@@ -1,9 +1,12 @@
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:kaj_ache/features/auth/views/forgot_password.dart';
+import 'package:kaj_ache/features/auth/views/otp_page.dart';
 import 'package:kaj_ache/features/services/views/all_services_list.dart';
 
 import '../../features/auth/bindings/auth_binding.dart';
 import '../../features/auth/views/login_page.dart';
+import '../../features/auth/views/register_page.dart';
 import '../../features/auth/views/splash_page.dart';
 import '../../features/home/bindings/home_binding.dart';
 import '../../features/home/views/home_page.dart';
@@ -33,6 +36,14 @@ class AppPages {
       page: () => LoginPage(),
       binding: AuthBinding(),
     ),
+    GetPage(
+      name: AppRoutes.register,
+      page: () => RegisterPage(),
+      binding: AuthBinding(),
+    ),
+    GetPage(name: AppRoutes.forgotPassword, page: () => ForgotPassword(),),
+
+    GetPage(name: AppRoutes.otpPage, page: () => OtpPage(),),
 
     GetPage(
       name: '/all-services',

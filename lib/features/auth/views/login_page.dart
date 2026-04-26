@@ -147,28 +147,46 @@ class LoginPage extends GetView<AuthController> {
                   ),
                 ),
               )),
-
-              const SizedBox(height: 24),
-
-              // ── Sign up ──────────────────────────────────────────────────
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'no_account'.tr,
+                    TKeys.forgotPassword.tr,
                     style: TextStyle(
                         color: colorScheme.onSurface.withOpacity(0.6)),
                   ),
-                  // TextButton(
-                  //   onPressed: () => Get.toNamed(AppRoutes.register),
-                  //   child: Text(
-                  //     'sign_up'.tr,
-                  //     style: TextStyle(
-                  //       color: colorScheme.primary,
-                  //       fontWeight: FontWeight.w600,
-                  //     ),
-                  //   ),
-                  // ),
+                  TextButton(
+                    onPressed: () => Get.toNamed(AppRoutes.register),
+                    child: Text(
+                      TKeys.resetPassword.tr,
+                      style: TextStyle(
+                        color: colorScheme.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    TKeys.noAccount.tr,
+                    style: TextStyle(
+                        color: colorScheme.onSurface.withOpacity(0.6)),
+                  ),
+                  TextButton(
+                    onPressed: () => Get.toNamed(AppRoutes.register),
+                    child: Text(
+                      TKeys.signUp.tr,
+                      style: TextStyle(
+                        color: colorScheme.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 16),

@@ -6,26 +6,20 @@ class AppRoutes {
   static const login = '/login';
   static const home  = '/home';
   static const services  = '/services';
-static const main = '/mainpage';
+  static const main = '/mainpage';
+  static const register = '/register';
+  static const otpPage = '/otpPage';
+  static const forgotPassword = '/forgotPassword';
+
 }
-//   static const register      = '/register';
-//   static const otp           = '/otp';
 //   static const onboarding = '/onboarding';
 //   // Main
 //
-//   // Services
-//   static const categories    = '/categories';
-//   static const serviceList   = '/service-list';
-//   static const serviceDetail = '/service-detail';
-//   static const booking       = '/booking';
-//   static const bookingConfirm = '/booking-confirm';
-//
+
 //   // Orders
 //   static const orders        = '/orders';
 //   static const orderDetail   = '/order-detail';
-//
-//   // Tracking
-//   static const tracking      = '/tracking';
+
 //
 //   // Chat
 //   static const conversations = '/conversations';

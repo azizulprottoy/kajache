@@ -46,7 +46,6 @@ class AuthController extends GetxController {
       final input    = inputController.text.trim();
       final password = passwordController.text;
 
-      // TODO: replace with your actual API call
       await Future.delayed(const Duration(seconds: 1));
 
       await _secureStorage.saveToken('your_token_here');
