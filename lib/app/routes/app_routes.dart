@@ -6,6 +6,7 @@ class AppRoutes {
   static const login = '/login';
   static const home  = '/home';
   static const services  = '/services';
+  static const serviceDetails  = '/serviceDetails';
   static const main = '/mainpage';
   static const register = '/register';
   static const otpPage = '/otpPage';

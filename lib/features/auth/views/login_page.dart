@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kaj_ache/core/utils/translation_keys.dart';
+import '../arguments/otp_argument.dart';
 import '../controllers/auth_controller.dart';
 import '../../../app/routes/app_routes.dart';
 
@@ -155,8 +156,11 @@ class LoginPage extends GetView<AuthController> {
                     style: TextStyle(
                         color: colorScheme.onSurface.withOpacity(0.6)),
                   ),
+
                   TextButton(
-                    onPressed: () => Get.toNamed(AppRoutes.register),
+                    onPressed: () => Get.toNamed(AppRoutes.otpPage,  arguments:  OtpArgument(
+                       isReset:true
+                    )),
                     child: Text(
                       TKeys.resetPassword.tr,
                       style: TextStyle(

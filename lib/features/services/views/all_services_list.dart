@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../app/routes/app_routes.dart';
 import '../../../app/theme/app_colors.dart';
 import '../../../core/controller/local_controller.dart';
 import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/common_app_bar.dart';
 import '../../../shared/widgets/common_nav_bar.dart';
 import '../../../shared/widgets/custom_button.dart';
+import '../../auth/arguments/otp_argument.dart';
+import '../arguments/service_argument.dart';
 import '../controllers/all_services_controller.dart';
 
 
@@ -19,7 +22,7 @@ class AllServices extends GetView<AllServicesController> {
       final localeController = Get.find<LocaleController>();
       return Scaffold(
         appBar: const CommonAppBar(
-          title: 'Menu',
+          title: 'Services',
           showLanguageToggle: true,
         ),
         body: Obx(() {
@@ -35,7 +38,9 @@ class AllServices extends GetView<AllServicesController> {
         itemBuilder: (context, index) {
           final service = controller.popularServices[index];
           return GestureDetector(
-            onTap: () => controller.onServiceTap(service),
+            onTap: () => Get.toNamed(AppRoutes.serviceDetails,  arguments:  ServiceArgument(
+                ServiceID:'20'
+            )),
             child: Container(
               decoration: BoxDecoration(
                 color: AppColors.white,
@@ -45,7 +50,6 @@ class AllServices extends GetView<AllServicesController> {
               padding: const EdgeInsets.all(12),
               child: Row(
                 children: [
-                  // ── Image placeholder ──────────────────────────────────
                   Container(
                     width: 72,
                     height: 72,
@@ -59,7 +63,6 @@ class AllServices extends GetView<AllServicesController> {
                   ),
                   const SizedBox(width: 12),
 
-                  // ── Info ───────────────────────────────────────────────
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -102,9 +105,7 @@ class AllServices extends GetView<AllServicesController> {
                     ),
                   ),
 
-                  // ── Price ──────────────────────────────────────────────
-// ── Price column ────────────────────────────────────────────────
-                  SizedBox(                              // ← give the column a fixed width
+                  SizedBox(
                     width: 90,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.end,

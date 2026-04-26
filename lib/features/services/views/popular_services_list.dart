@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../app/routes/app_routes.dart';
 import '../../../app/theme/app_colors.dart';
 import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/custom_button.dart';
 import '../../home/controllers/home_controller.dart';
+import '../arguments/service_argument.dart';
 
 
 class PopularServicesList extends GetView<HomeController> {
@@ -18,7 +20,6 @@ class PopularServicesList extends GetView<HomeController> {
       if (controller.isLoading.value) {
         return const Center(child: CircularProgressIndicator());
       }
-
       return ListView.separated(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
@@ -27,8 +28,9 @@ class PopularServicesList extends GetView<HomeController> {
         itemBuilder: (context, index) {
           final service = controller.popularServices[index];
           return GestureDetector(
-            onTap: () => controller.onServiceTap(service),
-            child: Container(
+            onTap: () => Get.toNamed(AppRoutes.serviceDetails,  arguments:  ServiceArgument(
+                ServiceID:'20'
+            )),            child: Container(
               decoration: BoxDecoration(
                 color: AppColors.white,
                 borderRadius: BorderRadius.circular(14),
@@ -37,7 +39,6 @@ class PopularServicesList extends GetView<HomeController> {
               padding: const EdgeInsets.all(12),
               child: Row(
                 children: [
-                  // ── Image placeholder ──────────────────────────────────
                   Container(
                     width: 72,
                     height: 72,
@@ -94,9 +95,7 @@ class PopularServicesList extends GetView<HomeController> {
                     ),
                   ),
 
-                  // ── Price ──────────────────────────────────────────────
-// ── Price column ────────────────────────────────────────────────
-                  SizedBox(                              // ← give the column a fixed width
+                  SizedBox(
                     width: 90,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.end,

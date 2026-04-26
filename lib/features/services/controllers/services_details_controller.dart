@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 
 import '../../home/controllers/home_controller.dart';
 
-class AllServicesController extends GetxController {
+class ServicesDetailsController extends GetxController {
   RxBool isLoading = false.obs;
   final RxInt currentIndex = 0.obs;
 

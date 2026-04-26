@@ -23,7 +23,7 @@ class CommonBottomNavBar extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           _NavItem(
-            icon: Icons.history,
+            icon: Icons.design_services,
             isSelected: currentIndex == 0,
             onTap: () => onTap(0),
           ),
