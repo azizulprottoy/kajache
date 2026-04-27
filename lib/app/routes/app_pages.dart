@@ -1,17 +1,20 @@
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:kaj_ache/features/auth/views/forgot_password.dart';
 import 'package:kaj_ache/features/auth/views/otp_page.dart';
+import 'package:kaj_ache/features/home/bindings/shome_binding.dart';
+import 'package:kaj_ache/features/home/views/shome_page.dart';
 import 'package:kaj_ache/features/rewords/bindings/reword_binding.dart';
 import 'package:kaj_ache/features/rewords/views/reword_page.dart';
 import 'package:kaj_ache/features/services/bindings/service_details_binding.dart';
 import 'package:kaj_ache/features/services/views/all_services_list.dart';
 import 'package:kaj_ache/features/services/views/service_detail_page.dart';
+import 'package:kaj_ache/features/spash/binding/splash_binding.dart';
+import 'package:kaj_ache/features/statistics/binding/statistics_binding.dart';
+import 'package:kaj_ache/features/statistics/view/statistics_page.dart';
 
 import '../../features/auth/bindings/auth_binding.dart';
 import '../../features/auth/views/login_page.dart';
 import '../../features/auth/views/register_page.dart';
-import '../../features/auth/views/splash_page.dart';
 import '../../features/home/bindings/home_binding.dart';
 import '../../features/home/views/home_page.dart';
 import '../../features/main/binding/main_binding.dart';
@@ -24,6 +27,7 @@ import '../../features/profile/views/complete_profile_page.dart';
 import '../../features/profile/views/edit_profile_page.dart';
 import '../../features/profile/views/profile_page.dart';
 import '../../features/services/bindings/service_binding.dart';
+import '../../features/spash/view/splash_page.dart';
 import 'app_routes.dart';
 
 class AppPages {
@@ -37,8 +41,8 @@ class AppPages {
     ),
     GetPage(
       name: AppRoutes.splash,
-      page: () =>  SplashPage(),
-      binding: AuthBinding(),
+      page: () => const SplashPage(),
+      binding: SplashBinding(),
     ),
     GetPage(
       name: AppRoutes.login,
@@ -105,7 +109,16 @@ class AppPages {
       name: AppRoutes.previousOrders,
       page: () =>  PreviousOrdersPage(),
       binding: PreviousOrdersBinding(),
-
+    ),
+    GetPage(
+      name: AppRoutes.statisticsPage,
+      page: () =>  StatisticsPage(),
+      binding: StatisticsBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.shomePage,
+      page: () =>  SHomePage(),
+      binding: SHomeBinding(),
     ),
   ];
 }

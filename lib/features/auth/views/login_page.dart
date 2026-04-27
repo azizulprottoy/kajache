@@ -49,7 +49,6 @@ class LoginPage extends GetView<AuthController> {
                 child: Column(
                   children: [
 
-                    // ── Email or phone ───────────────────────────────────
                     TextFormField(
                       controller: controller.inputController,
                       keyboardType: TextInputType.emailAddress,
@@ -75,7 +74,6 @@ class LoginPage extends GetView<AuthController> {
                     ),
                     const SizedBox(height: 16),
 
-                    // ── Password ─────────────────────────────────────────
                     Obx(() => TextFormField(
                       controller: controller.passwordController,
                       obscureText: controller.obscurePassword.value,
@@ -105,21 +103,9 @@ class LoginPage extends GetView<AuthController> {
                 ),
               ),
 
-              // ── Forgot password ──────────────────────────────────────────
-              // Align(
-              //   alignment: Alignment.centerRight,
-              //   child: TextButton(
-              //     onPressed: () => Get.toNamed(AppRoutes.forgotPassword),
-              //     child: Text(
-              //       'forgot_password'.tr,
-              //       style: TextStyle(color: colorScheme.primary),
-              //     ),
-              //   ),
-              // ),
+              const SizedBox(height: 16),
 
-              const SizedBox(height: 8),
 
-              // ── Submit ───────────────────────────────────────────────────
               Obx(() => SizedBox(
                 width: double.infinity,
                 height: 52,

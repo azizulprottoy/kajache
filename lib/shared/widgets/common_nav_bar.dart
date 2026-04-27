@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 
 class CommonBottomNavBar extends StatelessWidget {
   final int currentIndex;
+  final bool isServiceProvider;
   final ValueChanged<int> onTap;
 
   const CommonBottomNavBar({
     super.key,
     required this.currentIndex,
     required this.onTap,
+    required this.isServiceProvider,
   });
 
   @override
@@ -20,7 +22,7 @@ class CommonBottomNavBar extends StatelessWidget {
         color: colorScheme.surface,
         border: Border(
           top: BorderSide(
-            color: colorScheme.outlineVariant.withOpacity(0.1),
+            color: colorScheme.outlineVariant.withOpacity(0.2),
           ),
         ),
       ),
@@ -28,7 +30,9 @@ class CommonBottomNavBar extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           _NavItem(
-            icon: Icons.design_services,
+            icon: isServiceProvider
+                ? Icons.bar_chart_rounded
+                : Icons.design_services,
             isSelected: currentIndex == 0,
             onTap: () => onTap(0),
           ),

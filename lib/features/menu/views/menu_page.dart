@@ -145,10 +145,8 @@ class MenuPage extends StatelessWidget {
             onPressed: () {
               Get.back();
 
-              // TODO: clear user session / token
-              // TODO: navigate to login page
-              // Example:
-              // Get.offAllNamed(AppRoutes.login);
+
+              Get.offAllNamed(AppRoutes.login);
             },
             child: const Text('Log Out'),
           ),

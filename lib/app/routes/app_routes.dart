@@ -17,6 +17,8 @@ class AppRoutes {
    static const completeProfile = '/completeProfile';
   static const previousOrders = '/previousOrders';
   static const rewordPage = '/rewordPage';
+  static const statisticsPage = '/statisticsPage';
+  static const shomePage = '/shomePage';
 
 }
 //   static const onboarding = '/onboarding';
