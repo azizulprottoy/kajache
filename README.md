@@ -1,11 +1,12 @@
-# kaj_ache
+1. Commplete profile page 
+2. success page 
+3. place order page
+4. add address page
+5. emergency service page 
 
-kaj ache! kaj ache . .
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-samples, guidance on mobile development, and a full API reference.
+service app 
+1. home page 
+2. bid page 
+3. request withdrawal page
+4. statistics page 
