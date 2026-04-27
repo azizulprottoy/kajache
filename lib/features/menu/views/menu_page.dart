@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../app/routes/app_routes.dart';
 import '../../../core/controller/local_controller.dart';
 import '../../../shared/widgets/common_app_bar.dart';
 import '../../../shared/widgets/common_nav_bar.dart';
+import '../../orders/bindings/order_binding.dart';
+import '../../orders/views/orders_page.dart';
+import '../../profile/models/worker_profile_model.dart';
+import '../../rewords/bindings/reword_binding.dart';
+import '../../rewords/views/reword_page.dart';
 
 class MenuPage extends StatelessWidget {
   const MenuPage({super.key});
@@ -32,15 +38,20 @@ class MenuPage extends StatelessWidget {
                   icon: Icons.person_outline,
                   title: 'My Profile',
                   onTap: () {
-                    // TODO: navigate to profile page
-                  },
+                    Get.toNamed(
+                      AppRoutes.myProfile,
+                      arguments: ProfileType.serviceProvider,
+                    );                  },
                 ),
                 _MenuDivider(),
                 _MenuTile(
                   icon: Icons.history,
                   title: 'Previous Orders',
                   onTap: () {
-                    // TODO: navigate to previous orders page
+                    Get.toNamed(
+                      AppRoutes.previousOrders,
+                    );
+
                   },
                 ),
                 _MenuDivider(),
@@ -48,7 +59,10 @@ class MenuPage extends StatelessWidget {
                   icon: Icons.card_giftcard_outlined,
                   title: 'Rewards',
                   onTap: () {
-                    // TODO: navigate to rewards page
+                    Get.toNamed(
+                      AppRoutes.rewordPage,
+                    );
+
                   },
                 ),
               ],

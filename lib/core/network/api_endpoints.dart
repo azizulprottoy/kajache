@@ -28,7 +28,7 @@ class ApiEndpoints {
   static String cancelOrder(String orderId) => '/orders/$orderId/cancel';
 
   // ── Tracking ────────────────────────────────────────────────────────────────
-  static String tracking(String orderId) => '/orders/$orderId/tracking';
+  static String tracking(String orderId) => '/orders/$orderId/rewords';
 
   // ── Chat ────────────────────────────────────────────────────────────────────
   static const String conversations   = '/conversations';

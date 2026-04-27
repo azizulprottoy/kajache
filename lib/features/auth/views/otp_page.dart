@@ -2,6 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
+import '../../../app/routes/app_routes.dart';
+import '../../../shared/widgets/success_model.dart';
+
+class OtpArgument {
+  final bool isReset;
+
+  OtpArgument({required this.isReset});
+}
+
 class OtpPage extends StatefulWidget {
   const OtpPage({super.key});
 
@@ -15,6 +24,14 @@ class _OtpPageState extends State<OtpPage> {
 
   final List<FocusNode> _focusNodes =
   List.generate(6, (_) => FocusNode());
+
+  late final OtpArgument? otpArgument;
+
+  @override
+  void initState() {
+    super.initState();
+    otpArgument = Get.arguments as OtpArgument?;
+  }
 
   @override
   void dispose() {
@@ -51,11 +68,29 @@ class _OtpPageState extends State<OtpPage> {
       return;
     }
 
-    // TODO: verify OTP
-    Get.snackbar(
-      'Success',
-      'Entered OTP: $otp',
-      snackPosition: SnackPosition.BOTTOM,
+    final isReset = otpArgument?.isReset ?? false;
+
+    if (isReset) {
+      Get.offNamed(AppRoutes.forgotPassword);
+      return;
+    }
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => SuccessModal(
+        title: 'Success',
+        message: 'Your account has been verified successfully.',
+        yesText: 'OK',
+        onYes: () {
+          Navigator.of(context).pop();
+          Get.offAllNamed(AppRoutes.login);
+        },
+        onClose: () {
+          Navigator.of(context).pop();
+          Get.offAllNamed(AppRoutes.login);
+        },
+      ),
     );
   }
 
@@ -93,7 +128,6 @@ class _OtpPageState extends State<OtpPage> {
                 ),
               ),
               const SizedBox(height: 32),
-
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: List.generate(
@@ -149,9 +183,7 @@ class _OtpPageState extends State<OtpPage> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 28),
-
               SizedBox(
                 width: double.infinity,
                 height: 52,
@@ -170,14 +202,10 @@ class _OtpPageState extends State<OtpPage> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 20),
-
               Center(
                 child: TextButton(
-                  onPressed: () {
-                    // TODO: resend OTP
-                  },
+                  onPressed: () {},
                   child: Text(
                     'Resend OTP',
                     style: TextStyle(

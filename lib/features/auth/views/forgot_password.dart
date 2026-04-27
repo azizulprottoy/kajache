@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../app/routes/app_routes.dart';
+import '../../../shared/widgets/success_model.dart';
+
 class ForgotPassword extends StatefulWidget {
   const ForgotPassword({super.key});
 
@@ -39,14 +42,23 @@ class _ForgotPasswordState extends State<ForgotPassword> {
       isLoading = false;
     });
 
-    Get.snackbar(
-      'Success',
-      'Password reset successfully',
-      snackPosition: SnackPosition.BOTTOM,
+    showDialog(
+      context: context,
+      builder: (_) => SuccessModal(
+        title: 'Success',
+        message: 'Your Password has been reset successfully .',
+        yesText: 'OK',
+
+        onYes: () {
+           Get.offAllNamed(AppRoutes.login);      },
+        onNo: () {
+          Navigator.pop(context);
+        },
+      ),
     );
 
     // TODO: navigate to login page
-    // Get.offAllNamed(AppRoutes.login);
+
   }
 
   @override

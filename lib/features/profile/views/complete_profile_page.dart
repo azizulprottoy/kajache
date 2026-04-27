@@ -5,8 +5,8 @@ import '../../../shared/widgets/common_app_bar.dart';
 import '../../../shared/widgets/custom_text_field.dart';
 import '../controllers/profile_controller.dart';
 
-class EditProfilePage extends GetView<ProfileController> {
-  const EditProfilePage({super.key});
+class CompleteProfilePage extends GetView<ProfileController> {
+  const CompleteProfilePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +15,7 @@ class EditProfilePage extends GetView<ProfileController> {
     return Scaffold(
       backgroundColor: colorScheme.surface,
       appBar: const CommonAppBar(
-        title: 'edit_profile',
+        title: 'Complete Profile',
         showBack: true,
         showLanguageToggle: true,
       ),
@@ -26,35 +26,6 @@ class EditProfilePage extends GetView<ProfileController> {
             key: controller.formKey,
             child: Column(
               children: [
-                Center(
-                  child: Stack(
-                    children: [
-                      CircleAvatar(
-                        radius: 46,
-                        backgroundColor: colorScheme.primary.withOpacity(0.12),
-                        child: Icon(
-                          Icons.person,
-                          size: 46,
-                          color: colorScheme.primary,
-                        ),
-                      ),
-                      Positioned(
-                        right: 0,
-                        bottom: 0,
-                        child: CircleAvatar(
-                          radius: 16,
-                          backgroundColor: colorScheme.primary,
-                          child: const Icon(
-                            Icons.edit,
-                            size: 16,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
                 ProfileField(
                   controller: controller.fullNameController,
                   label: 'Full Name',
@@ -111,8 +82,8 @@ class EditProfilePage extends GetView<ProfileController> {
                   width: double.infinity,
                   height: 52,
                   child: FilledButton(
-                    onPressed: controller.updateProfile,
-                    child: const Text('Save Changes'),
+                    onPressed: controller.saveProfile,
+                    child: const Text('Save Profile'),
                   ),
                 ),
               ],

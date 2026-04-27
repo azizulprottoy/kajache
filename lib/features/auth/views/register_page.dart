@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kaj_ache/core/utils/translation_keys.dart';
+import 'package:kaj_ache/features/auth/arguments/otp_argument.dart';
 import '../../../app/routes/app_routes.dart';
 import '../controllers/auth_controller.dart';
 
@@ -253,7 +254,7 @@ class RegisterPage extends GetView<AuthController> {
                       //   if (!controller.formKey.currentState!.validate()) {
                       //     return;
                       //   }
-                      onPressed: () => Get.toNamed(AppRoutes.otpPage),
+                      onPressed: () => Get.toNamed(AppRoutes.otpPage, arguments: OtpArgument(isReset: false)),
                         // TODO: call your register method
                         // Example:
                         // controller.register(

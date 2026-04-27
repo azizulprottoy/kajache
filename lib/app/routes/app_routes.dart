@@ -4,13 +4,19 @@ class AppRoutes {
   // Auth
   static const splash = '/splash';
   static const login = '/login';
-  static const home  = '/home';
+  static const homePage  = '/homePage';
+  static const menuPage  = '/menuPage';
   static const services  = '/services';
   static const serviceDetails  = '/serviceDetails';
   static const main = '/mainpage';
   static const register = '/register';
   static const otpPage = '/otpPage';
   static const forgotPassword = '/forgotPassword';
+   static const myProfile       = '/myProfile';
+   static const editProfile   = '/editProfile';
+   static const completeProfile = '/completeProfile';
+  static const previousOrders = '/previousOrders';
+  static const rewordPage = '/rewordPage';
 
 }
 //   static const onboarding = '/onboarding';
@@ -38,7 +44,5 @@ class AppRoutes {
 //   static const notifications = '/notifications';
 //
 //   // Profile
-//   static const profile       = '/profile';
-//   static const editProfile   = '/edit-profile';
-//   static const workerProfile = '/worker-profile';
+
 // }
