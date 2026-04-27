@@ -16,8 +16,13 @@ class CommonBottomNavBar extends StatelessWidget {
 
     return Container(
       height: 60,
-      decoration: const BoxDecoration(
-        color: Colors.white,
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        border: Border(
+          top: BorderSide(
+            color: colorScheme.outlineVariant.withOpacity(0.1),
+          ),
+        ),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -62,8 +67,10 @@ class _NavItem extends StatelessWidget {
       onPressed: onTap,
       icon: Icon(
         icon,
-        size: 35,
-        color: isSelected ? colorScheme.primary : Colors.grey,
+        size: 30,
+        color: isSelected
+            ? colorScheme.primary
+            : colorScheme.onSurfaceVariant,
       ),
     );
   }
