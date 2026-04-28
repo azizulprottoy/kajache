@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kaj_ache/app/theme/context_extension.dart';
 
 class CommonBottomNavBar extends StatelessWidget {
   final int currentIndex;
@@ -14,15 +15,13 @@ class CommonBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return Container(
       height: 60,
       decoration: BoxDecoration(
-        color: colorScheme.surface,
+        color: context.colors.surface,
         border: Border(
           top: BorderSide(
-            color: colorScheme.outlineVariant.withOpacity(0.2),
+            color: context.colors.outlineVariant.withOpacity(0.2),
           ),
         ),
       ),
@@ -65,16 +64,14 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return IconButton(
       onPressed: onTap,
       icon: Icon(
         icon,
         size: 30,
         color: isSelected
-            ? colorScheme.primary
-            : colorScheme.onSurfaceVariant,
+            ? context.colors.primary
+            : context.colors.onSurfaceVariant,
       ),
     );
   }
