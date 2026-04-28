@@ -9,7 +9,6 @@ class ProfileController extends GetxController {
 
   final formKey = GlobalKey<FormState>();
 
-  // Common fields
   late TextEditingController fullNameController;
   late TextEditingController emailController;
   late TextEditingController phoneController;

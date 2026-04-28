@@ -19,6 +19,11 @@ class AppRoutes {
   static const rewordPage = '/rewordPage';
   static const statisticsPage = '/statisticsPage';
   static const shomePage = '/shomePage';
+  static const portfolioPage = '/portfolio';
+  static const chatPage = '/chat';
+  static const customerSupportPage = '/customer-support';
+  static const privacyPolicyPage = '/privacy-policy';
+  static const termsConditionPage = '/terms-condition';
 
 }
 //   static const onboarding = '/onboarding';

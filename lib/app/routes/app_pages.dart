@@ -1,8 +1,14 @@
 import 'package:get/get.dart';
 import 'package:kaj_ache/features/auth/views/forgot_password.dart';
 import 'package:kaj_ache/features/auth/views/otp_page.dart';
+import 'package:kaj_ache/features/chat/binding/chat_binding.dart';
+import 'package:kaj_ache/features/chat/view/chat_page.dart';
+import 'package:kaj_ache/features/csupport/binding/csupport_binding.dart';
+import 'package:kaj_ache/features/csupport/view/csupport_page.dart';
 import 'package:kaj_ache/features/home/bindings/shome_binding.dart';
 import 'package:kaj_ache/features/home/views/shome_page.dart';
+import 'package:kaj_ache/features/privacy/binding/privacy_binding.dart';
+import 'package:kaj_ache/features/privacy/view/privacy_page.dart';
 import 'package:kaj_ache/features/rewords/bindings/reword_binding.dart';
 import 'package:kaj_ache/features/rewords/views/reword_page.dart';
 import 'package:kaj_ache/features/services/bindings/service_details_binding.dart';
@@ -11,6 +17,8 @@ import 'package:kaj_ache/features/services/views/service_detail_page.dart';
 import 'package:kaj_ache/features/spash/binding/splash_binding.dart';
 import 'package:kaj_ache/features/statistics/binding/statistics_binding.dart';
 import 'package:kaj_ache/features/statistics/view/statistics_page.dart';
+import 'package:kaj_ache/features/terms/binding/terms_binding.dart';
+import 'package:kaj_ache/features/terms/view/terms_page.dart';
 
 import '../../features/auth/bindings/auth_binding.dart';
 import '../../features/auth/views/login_page.dart';
@@ -22,6 +30,8 @@ import '../../features/main/view/main_page.dart';
 import '../../features/menu/views/menu_page.dart';
 import '../../features/orders/bindings/order_binding.dart';
 import '../../features/orders/views/orders_page.dart';
+import '../../features/portfolio/binding/portfolio_binding.dart';
+import '../../features/portfolio/view/portfolio_page.dart';
 import '../../features/profile/bindings/profile_binding.dart';
 import '../../features/profile/views/complete_profile_page.dart';
 import '../../features/profile/views/edit_profile_page.dart';
@@ -119,6 +129,31 @@ class AppPages {
       name: AppRoutes.shomePage,
       page: () =>  SHomePage(),
       binding: SHomeBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.portfolioPage,
+      page: () => const PortfolioPage(),
+      binding: PortfolioBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.termsConditionPage,
+      page: () => const TermsConditionPage(),
+      binding: TermsConditionBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.chatPage,
+      page: () => const ChatPage(),
+      binding: ChatBinding()
+    ),
+    GetPage(
+      name: AppRoutes.privacyPolicyPage,
+      page: () => const PrivacyPolicyPage(),
+      binding: PrivacyPolicyBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.customerSupportPage,
+      page: () => const CustomerSupportPage(),
+      binding: CustomerSupportBinding(),
     ),
   ];
 }

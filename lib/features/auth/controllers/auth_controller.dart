@@ -19,10 +19,10 @@ class AuthController extends GetxController {
   final passwordController = TextEditingController();
   final RxBool obscurePassword = true.obs;
 
-  static const String buyerEmail = 'buyer@kajache.com';
+  static const String buyerEmail = 'buyer@gmail.com';
   static const String buyerPassword = '123456';
 
-  static const String serviceEmail = 'service@kajache.com';
+  static const String serviceEmail = 'service@gmail.com';
   static const String servicePassword = '123456';
 
   @override
