@@ -23,6 +23,8 @@ import 'package:kaj_ache/features/terms/view/terms_page.dart';
 import '../../features/auth/bindings/auth_binding.dart';
 import '../../features/auth/views/login_page.dart';
 import '../../features/auth/views/register_page.dart';
+import '../../features/booking/binding/booking_binding.dart';
+import '../../features/booking/view/booking_page.dart';
 import '../../features/home/bindings/home_binding.dart';
 import '../../features/home/views/home_page.dart';
 import '../../features/main/binding/main_binding.dart';
@@ -64,10 +66,20 @@ class AppPages {
       page: () => RegisterPage(),
       binding: AuthBinding(),
     ),
-    GetPage(name: AppRoutes.forgotPassword, page: () => ForgotPassword(),),
+    GetPage(
+      name: AppRoutes.forgotPassword,
+      page: () => ForgotPassword(),
+    ),
 
-    GetPage(name: AppRoutes.otpPage, page: () => OtpPage(),),
-
+    GetPage(
+      name: AppRoutes.otpPage,
+      page: () => OtpPage(),
+    ),
+    GetPage(
+      name: AppRoutes.bookingPage,
+      page: () => const BookingPage(),
+      binding: BookingBinding(),
+    ),
     GetPage(
       name: AppRoutes.services,
       page: () =>  AllServices(),

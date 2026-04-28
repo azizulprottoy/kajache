@@ -127,6 +127,9 @@ class PopularServicesList extends GetView<HomeController> {
                           variant: ButtonVariant.primary,
                           size: ButtonSize.sm,
                           isFullWidth: true,
+                          onPressed: () {
+                            Get.toNamed(AppRoutes.bookingPage);
+                          },
                         ),
                       ],
                     ),

@@ -29,19 +29,26 @@ class CommonBottomNavBar extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           _NavItem(
-            icon: isServiceProvider
+            selectedIcon: isServiceProvider
                 ? Icons.bar_chart_rounded
                 : Icons.design_services,
+            unselectedIcon: isServiceProvider
+                ? Icons.bar_chart_outlined
+                : Icons.design_services_outlined,
             isSelected: currentIndex == 0,
             onTap: () => onTap(0),
           ),
+
           _NavItem(
-            icon: Icons.home,
+            selectedIcon: Icons.home,
+            unselectedIcon: Icons.home_outlined,
             isSelected: currentIndex == 1,
             onTap: () => onTap(1),
           ),
+
           _NavItem(
-            icon: Icons.person_outline,
+            selectedIcon: Icons.person,
+            unselectedIcon: Icons.person_outline,
             isSelected: currentIndex == 2,
             onTap: () => onTap(2),
           ),
@@ -52,12 +59,14 @@ class CommonBottomNavBar extends StatelessWidget {
 }
 
 class _NavItem extends StatelessWidget {
-  final IconData icon;
+  final IconData selectedIcon;
+  final IconData unselectedIcon;
   final bool isSelected;
   final VoidCallback onTap;
 
   const _NavItem({
-    required this.icon,
+    required this.selectedIcon,
+    required this.unselectedIcon,
     required this.isSelected,
     required this.onTap,
   });
@@ -67,7 +76,7 @@ class _NavItem extends StatelessWidget {
     return IconButton(
       onPressed: onTap,
       icon: Icon(
-        icon,
+        isSelected ? selectedIcon : unselectedIcon,
         size: 30,
         color: isSelected
             ? context.colors.primary

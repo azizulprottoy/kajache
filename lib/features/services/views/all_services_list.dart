@@ -5,6 +5,7 @@ import '../../../app/routes/app_routes.dart';
 import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/common_app_bar.dart';
 import '../../../shared/widgets/custom_button.dart';
+import '../../booking/controller/booking_controller.dart';
 import '../arguments/service_argument.dart';
 import '../controllers/all_services_controller.dart';
 
@@ -133,6 +134,16 @@ class AllServices extends GetView<AllServicesController> {
                             variant: ButtonVariant.primary,
                             size: ButtonSize.sm,
                             isFullWidth: true,
+                            onPressed: () {
+                              Get.toNamed(
+                                AppRoutes.bookingPage,
+                                arguments: BookingArgument(
+                                  title: service.title.tr,
+                                  category: service.category.tr,
+                                  price: service.price,
+                                ),
+                              );
+                            },
                           ),
                         ],
                       ),

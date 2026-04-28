@@ -48,7 +48,7 @@ const Map<String, String> bnBD = {
   // Services
   TKeys.services:          'সেবাসমূহ',
   TKeys.categories:        'ক্যাটাগরি',
-  TKeys.bookNow:           'এখনই বুক করুন',
+  TKeys.bookNow:           'বুক করুন',
   TKeys.serviceDetails:    'সেবার বিবরণ',
   TKeys.selectDate:        'তারিখ নির্বাচন করুন',
   TKeys.selectTime:        'সময় নির্বাচন করুন',

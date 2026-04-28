@@ -24,7 +24,7 @@ class AppRoutes {
   static const customerSupportPage = '/customer-support';
   static const privacyPolicyPage = '/privacy-policy';
   static const termsConditionPage = '/terms-condition';
-
+  static const bookingPage = '/booking-page';
 }
 //   static const onboarding = '/onboarding';
 //   // Main
