@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:kaj_ache/app/routes/app_routes.dart';
 
 class BookingController extends GetxController {
   final formKey = GlobalKey<FormState>();
@@ -102,11 +103,7 @@ class BookingController extends GetxController {
     await Future.delayed(const Duration(milliseconds: 700));
     isLoading.value = false;
 
-    Get.snackbar(
-      'Success',
-      'Booking information submitted',
-      snackPosition: SnackPosition.BOTTOM,
-    );
+    Get.toNamed( AppRoutes.serviceDetails);
   }
 
   void cancel() {
