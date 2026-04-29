@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kaj_ache/app/routes/app_routes.dart';
 
+import '../../services/arguments/service_argument.dart';
+
 class BookingController extends GetxController {
   final formKey = GlobalKey<FormState>();
 
@@ -103,8 +105,9 @@ class BookingController extends GetxController {
     await Future.delayed(const Duration(milliseconds: 700));
     isLoading.value = false;
 
-    Get.toNamed( AppRoutes.serviceDetails);
-  }
+    Get.toNamed( AppRoutes.serviceDetails,  arguments: ServiceArgument(ServiceID: '20',isbooking: true));}
+
+
 
   void cancel() {
     Get.back();

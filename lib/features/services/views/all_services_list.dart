@@ -40,7 +40,7 @@ class AllServices extends GetView<AllServicesController> {
             return GestureDetector(
               onTap: () => Get.toNamed(
                 AppRoutes.serviceDetails,
-                arguments: ServiceArgument(ServiceID: '20'),
+                arguments: ServiceArgument(ServiceID: '20',isbooking: false),
               ),
               child: Container(
                 decoration: BoxDecoration(

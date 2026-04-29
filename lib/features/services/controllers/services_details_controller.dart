@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../home/controllers/home_controller.dart';
+import '../arguments/service_argument.dart';
 
 class ServicesDetailsController extends GetxController {
   RxBool isLoading = false.obs;
@@ -10,9 +11,13 @@ class ServicesDetailsController extends GetxController {
 
   final RxList<ServiceModel> popularServices = <ServiceModel>[].obs;
 
+
   @override
   void onInit() {
     super.onInit();
+
+
+
     AllServices();
   }
 

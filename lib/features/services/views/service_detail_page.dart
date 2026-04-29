@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../app/routes/app_routes.dart';
 import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/common_app_bar.dart';
 import '../../../shared/widgets/custom_button.dart';
+import '../../booking/controller/booking_controller.dart';
+import '../arguments/service_argument.dart';
 import '../controllers/services_details_controller.dart';
 
 class ServiceDetailPage extends GetView<ServicesDetailsController> {
@@ -13,7 +16,8 @@ class ServiceDetailPage extends GetView<ServicesDetailsController> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-
+    final args = Get.arguments as ServiceArgument?;
+    final isBooking = args?.isbooking ?? false;
     return Scaffold(
       backgroundColor: colorScheme.surface,
       appBar: const CommonAppBar(
@@ -25,15 +29,32 @@ class ServiceDetailPage extends GetView<ServicesDetailsController> {
         top: false,
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-          child: CustomButton(
+          child: isBooking
+              ? CustomButton(
             label: 'View Provider Bids',
             variant: ButtonVariant.primary,
             isFullWidth: true,
             onPressed: () => _showBidsBottomSheet(context),
+          )
+              : CustomButton(
+            label: 'Book Now',
+            variant: ButtonVariant.primary,
+            isFullWidth: true,
+            onPressed: () {
+              final service = controller.popularServices.first;
+
+              Get.toNamed(
+                AppRoutes.bookingPage,
+                arguments: BookingArgument(
+                  title: service.title.tr,
+                  category: service.category.tr,
+                  price: service.price,
+                ),
+              );
+            },
           ),
         ),
-      ),
-      body: Obx(() {
+      ),      body: Obx(() {
         if (controller.isLoading.value) {
           return const Center(child: CircularProgressIndicator());
         }
