@@ -1,6 +1,11 @@
 class ServiceArgument {
-  String? ServiceID;
-bool? isbooking;
+  final String ServiceID;
+  final bool isbooking;
+  final bool isProviderBidFlow;
 
-  ServiceArgument({this.ServiceID,this.isbooking});
+  ServiceArgument({
+    required this.ServiceID,
+    this.isbooking = false,
+    this.isProviderBidFlow = false,
+  });
 }

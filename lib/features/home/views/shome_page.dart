@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../app/routes/app_routes.dart';
 import '../../../shared/widgets/common_app_bar.dart';
+import '../../services/arguments/service_argument.dart';
 import '../controllers/shome_controller.dart';
 
 class SHomePage extends GetView<SHomeController> {
@@ -54,7 +56,9 @@ class SHomePage extends GetView<SHomeController> {
                   ],
                 ),
               ),
+
               const SizedBox(height: 20),
+
               Text(
                 'Today Overview',
                 style: theme.textTheme.titleMedium?.copyWith(
@@ -63,6 +67,7 @@ class SHomePage extends GetView<SHomeController> {
                 ),
               ),
               const SizedBox(height: 12),
+
               Row(
                 children: [
                   Expanded(
@@ -83,6 +88,7 @@ class SHomePage extends GetView<SHomeController> {
                 ],
               ),
               const SizedBox(height: 12),
+
               Row(
                 children: [
                   Expanded(
@@ -102,7 +108,36 @@ class SHomePage extends GetView<SHomeController> {
                   ),
                 ],
               ),
+
               const SizedBox(height: 24),
+
+              Text(
+                'Booked Services',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.onSurface,
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              ...controller.bookedServices.map(
+                    (item) => GestureDetector(
+                  onTap: () {
+                    Get.toNamed(
+                      AppRoutes.serviceDetails,
+                      arguments: ServiceArgument(
+                        ServiceID: '20',
+                        isbooking: false,
+                        isProviderBidFlow: true,
+                      ),
+                    );
+                  },
+                  child: _BookedServiceTile(service: item),
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
               Text(
                 'Recent Activities',
                 style: theme.textTheme.titleMedium?.copyWith(
@@ -111,6 +146,7 @@ class SHomePage extends GetView<SHomeController> {
                 ),
               ),
               const SizedBox(height: 12),
+
               ...controller.recentActivities.map(
                     (item) => _ActivityTile(
                   title: item.title,
@@ -168,6 +204,141 @@ class _OverviewCard extends StatelessWidget {
             style: theme.textTheme.bodySmall?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BookedServiceTile extends StatelessWidget {
+  final BookedServiceModel service;
+
+  const _BookedServiceTile({
+    required this.service,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    Color statusColor;
+    switch (service.status.toLowerCase()) {
+      case 'accepted':
+        statusColor = Colors.blue;
+        break;
+      case 'completed':
+        statusColor = Colors.green;
+        break;
+      default:
+        statusColor = Colors.orange;
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: colorScheme.outlineVariant.withOpacity(0.2),
+        ),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 46,
+                height: 46,
+                decoration: BoxDecoration(
+                  color: colorScheme.primary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  Icons.home_repair_service_outlined,
+                  color: colorScheme.primary,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      service.title,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Customer: ${service.customerName}',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Text(
+                service.price,
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.primary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Icon(
+                Icons.calendar_today_outlined,
+                size: 15,
+                color: colorScheme.onSurfaceVariant,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                service.date,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Icon(
+                Icons.access_time_outlined,
+                size: 15,
+                color: colorScheme.onSurfaceVariant,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                service.time,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 5,
+                ),
+                decoration: BoxDecoration(
+                  color: statusColor.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  service.status,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: statusColor,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),

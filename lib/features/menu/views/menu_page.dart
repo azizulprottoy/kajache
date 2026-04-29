@@ -43,6 +43,14 @@ class MenuPage extends StatelessWidget {
                 ),
                 _MenuDivider(),
                 _MenuTile(
+                  icon: Icons.fire_extinguisher_sharp,
+                  title: 'Rewords',
+                  onTap: () {
+                    Get.toNamed(AppRoutes.rewordPage);
+                  },
+                ),
+                _MenuDivider(),
+                _MenuTile(
                   icon: Icons.chat_bubble_outline,
                   title: 'Chat',
                   onTap: () {
