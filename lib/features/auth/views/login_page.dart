@@ -29,7 +29,7 @@ class LoginPage extends GetView<AuthController> {
               const SizedBox(height: 16),
 
               Text(
-                'welcome_back'.tr,
+                TKeys.welcomeBack.tr,
                 style: theme.textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: colorScheme.onSurface,
@@ -37,7 +37,7 @@ class LoginPage extends GetView<AuthController> {
               ),
               const SizedBox(height: 6),
               Text(
-                'login_subtitle'.tr,
+                TKeys.login.tr,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: colorScheme.onSurface.withOpacity(0.6),
                 ),

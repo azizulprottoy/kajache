@@ -254,7 +254,7 @@ class RegisterPage extends GetView<AuthController> {
                       //   if (!controller.formKey.currentState!.validate()) {
                       //     return;
                       //   }
-                      onPressed: () => Get.toNamed(AppRoutes.otpPage, arguments: OtpArgument(isReset: false)),
+                      // onPressed: () => Get.toNamed(AppRoutes.otpPage, arguments: OtpArgument(isReset: false)),
                         // TODO: call your register method
                         // Example:
                         // controller.register(
@@ -264,6 +264,17 @@ class RegisterPage extends GetView<AuthController> {
                         //   password: passwordController.text,
                         // );
                       // },
+                      onPressed: controller.isLoading.value
+                          ? null
+                          : () {
+                        controller.register(
+                          accountType: selectedAccountType.value,
+                          fullName: fullNameController.text,
+                          email: emailController.text,
+                          phone: phoneController.text,
+                          password: passwordController.text,
+                        );
+                      },
                       style: FilledButton.styleFrom(
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),

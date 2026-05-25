@@ -44,7 +44,6 @@ class ApiClient {
   static void resetInstance() => _dio = null;
 }
 
-// ── Auth Interceptor — attaches Bearer token ──────────────────────────────────
 class _AuthInterceptor extends Interceptor {
   @override
   Future<void> onRequest(
