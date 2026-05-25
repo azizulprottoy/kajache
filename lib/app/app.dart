@@ -13,7 +13,6 @@ class KajAcheApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeController  = Get.put(ThemeController(),  permanent: true);
     Get.put(LocaleController(), permanent: true);
 
     return GetMaterialApp(
@@ -32,9 +31,9 @@ class KajAcheApp extends StatelessWidget {
         Locale('bn', 'BD'),
       ],
 
-      theme:        AppThemes.light,
-      darkTheme:    AppThemes.dark,
-      themeMode:    themeController.themeMode,
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.system,
       initialRoute: AppRoutes.splash,
       getPages:     AppPages.pages,
     );

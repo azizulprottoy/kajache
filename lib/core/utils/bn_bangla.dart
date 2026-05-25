@@ -22,7 +22,8 @@ const Map<String, String> bnBD = {
 
   // Auth
   TKeys.welcomeBack:      'স্বাগতম',
-  TKeys.loginSubtitle:    'চালিয়ে যেতে সাইন ইন করুন',
+  TKeys.fullname:    'পুরো নাম',
+
   TKeys.email:            'ইমেইল',
   TKeys.phone:            'ফোন',
   TKeys.password:         'পাসওয়ার্ড',
@@ -37,7 +38,7 @@ const Map<String, String> bnBD = {
   TKeys.inputInvalid:     'সঠিক ইমেইল বা ফোন নম্বর দিন',
   TKeys.passwordRequired: 'পাসওয়ার্ড দেওয়া আবশ্যক',
   TKeys.passwordMin:      'সর্বনিম্ন ৬টি অক্ষর',
-
+  TKeys.resetPassword:       'রিসেট পাসওয়ার্ড',
   // Home
   TKeys.home:              'হোম',
   TKeys.whatService:       'আপনার কী সেবা দরকার?',
@@ -47,7 +48,7 @@ const Map<String, String> bnBD = {
   // Services
   TKeys.services:          'সেবাসমূহ',
   TKeys.categories:        'ক্যাটাগরি',
-  TKeys.bookNow:           'এখনই বুক করুন',
+  TKeys.bookNow:           'বুক করুন',
   TKeys.serviceDetails:    'সেবার বিবরণ',
   TKeys.selectDate:        'তারিখ নির্বাচন করুন',
   TKeys.selectTime:        'সময় নির্বাচন করুন',

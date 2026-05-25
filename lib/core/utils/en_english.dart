@@ -21,7 +21,7 @@ const Map<String, String> enUS = {
 
   // Auth
   TKeys.welcomeBack:      'Welcome back',
-  TKeys.loginSubtitle:    'Sign in to continue',
+  TKeys.fullname:         'Full Name',
   TKeys.email:            'Email',
   TKeys.phone:            'Phone',
   TKeys.password:         'Password',
@@ -36,7 +36,7 @@ const Map<String, String> enUS = {
   TKeys.inputInvalid:     'Enter a valid email or phone number',
   TKeys.passwordRequired: 'Password is required',
   TKeys.passwordMin:      'Minimum 6 characters',
-
+  TKeys.resetPassword:       'Reset Password',
   // Home
   TKeys.home:              'Home',
   TKeys.whatService:       'What service do you need?',

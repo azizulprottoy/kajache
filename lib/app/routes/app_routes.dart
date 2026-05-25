@@ -4,28 +4,36 @@ class AppRoutes {
   // Auth
   static const splash = '/splash';
   static const login = '/login';
-  static const home  = '/home';
+  static const homePage  = '/homePage';
+  static const menuPage  = '/menuPage';
   static const services  = '/services';
-static const main = '/mainpage';
+  static const serviceDetails  = '/serviceDetails';
+  static const main = '/mainpage';
+  static const register = '/register';
+  static const otpPage = '/otpPage';
+  static const forgotPassword = '/forgotPassword';
+   static const myProfile       = '/myProfile';
+   static const editProfile   = '/editProfile';
+   static const completeProfile = '/completeProfile';
+  static const previousOrders = '/previousOrders';
+  static const rewordPage = '/rewordPage';
+  static const statisticsPage = '/statisticsPage';
+  static const shomePage = '/shomePage';
+  static const portfolioPage = '/portfolio';
+  static const chatPage = '/chat';
+  static const customerSupportPage = '/customer-support';
+  static const privacyPolicyPage = '/privacy-policy';
+  static const termsConditionPage = '/terms-condition';
+  static const bookingPage = '/booking-page';
 }
-//   static const register      = '/register';
-//   static const otp           = '/otp';
 //   static const onboarding = '/onboarding';
 //   // Main
 //
-//   // Services
-//   static const categories    = '/categories';
-//   static const serviceList   = '/service-list';
-//   static const serviceDetail = '/service-detail';
-//   static const booking       = '/booking';
-//   static const bookingConfirm = '/booking-confirm';
-//
+
 //   // Orders
 //   static const orders        = '/orders';
 //   static const orderDetail   = '/order-detail';
-//
-//   // Tracking
-//   static const tracking      = '/tracking';
+
 //
 //   // Chat
 //   static const conversations = '/conversations';
@@ -43,7 +51,5 @@ static const main = '/mainpage';
 //   static const notifications = '/notifications';
 //
 //   // Profile
-//   static const profile       = '/profile';
-//   static const editProfile   = '/edit-profile';
-//   static const workerProfile = '/worker-profile';
+
 // }

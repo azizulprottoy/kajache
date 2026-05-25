@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../app/routes/app_routes.dart';
 import '../../../core/controller/local_controller.dart';
 import '../../../shared/widgets/common_app_bar.dart';
-import '../../../shared/widgets/common_nav_bar.dart';
 
 class MenuPage extends StatelessWidget {
   const MenuPage({super.key});
@@ -20,8 +20,6 @@ class MenuPage extends StatelessWidget {
         title: 'Menu',
         showLanguageToggle: true,
       ),
-
-
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(16),
@@ -32,23 +30,61 @@ class MenuPage extends StatelessWidget {
                   icon: Icons.person_outline,
                   title: 'My Profile',
                   onTap: () {
-                    // TODO: navigate to profile page
+                    Get.toNamed(AppRoutes.myProfile);
                   },
                 ),
                 _MenuDivider(),
                 _MenuTile(
-                  icon: Icons.history,
-                  title: 'Previous Orders',
+                  icon: Icons.work_outline,
+                  title: 'Portfolio',
                   onTap: () {
-                    // TODO: navigate to previous orders page
+                    Get.toNamed(AppRoutes.portfolioPage);
                   },
                 ),
                 _MenuDivider(),
                 _MenuTile(
-                  icon: Icons.card_giftcard_outlined,
-                  title: 'Rewards',
+                  icon: Icons.fire_extinguisher_sharp,
+                  title: 'Rewords',
                   onTap: () {
-                    // TODO: navigate to rewards page
+                    Get.toNamed(AppRoutes.rewordPage);
+                  },
+                ),
+                _MenuDivider(),
+                _MenuTile(
+                  icon: Icons.chat_bubble_outline,
+                  title: 'Chat',
+                  onTap: () {
+                    Get.toNamed(AppRoutes.chatPage);
+                  },
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 16),
+
+            _MenuSectionCard(
+              children: [
+                _MenuTile(
+                  icon: Icons.support_agent_outlined,
+                  title: 'Customer Support',
+                  onTap: () {
+                    Get.toNamed(AppRoutes.customerSupportPage);
+                  },
+                ),
+                _MenuDivider(),
+                _MenuTile(
+                  icon: Icons.privacy_tip_outlined,
+                  title: 'Privacy Policy',
+                  onTap: () {
+                    Get.toNamed(AppRoutes.privacyPolicyPage);
+                  },
+                ),
+                _MenuDivider(),
+                _MenuTile(
+                  icon: Icons.description_outlined,
+                  title: 'Terms & Conditions',
+                  onTap: () {
+                    Get.toNamed(AppRoutes.termsConditionPage);
                   },
                 ),
               ],
@@ -87,6 +123,7 @@ class MenuPage extends StatelessWidget {
                 ),
               ],
             ),
+
             const SizedBox(height: 16),
 
             _MenuSectionCard(
@@ -130,11 +167,7 @@ class MenuPage extends StatelessWidget {
             ),
             onPressed: () {
               Get.back();
-
-              // TODO: clear user session / token
-              // TODO: navigate to login page
-              // Example:
-              // Get.offAllNamed(AppRoutes.login);
+              Get.offAllNamed(AppRoutes.login);
             },
             child: const Text('Log Out'),
           ),
@@ -164,9 +197,13 @@ class _MenuSectionCard extends StatelessWidget {
             offset: const Offset(0, 4),
           ),
         ],
-
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outlineVariant.withOpacity(0.08),
+        ),
       ),
-      child: Column(children: children),
+      child: Column(
+        children: children,
+      ),
     );
   }
 }
@@ -277,7 +314,7 @@ class _MenuDivider extends StatelessWidget {
       thickness: 1,
       indent: 16,
       endIndent: 16,
-      color: Theme.of(context).colorScheme.outlineVariant.withOpacity(0.05),
+      color: Theme.of(context).colorScheme.outlineVariant.withOpacity(0.08),
     );
   }
 }

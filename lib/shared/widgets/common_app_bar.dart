@@ -59,7 +59,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
             return Container(
               margin: const EdgeInsets.symmetric(vertical: 10),
               decoration: BoxDecoration(
-                border: Border.all(color: colorScheme.outlineVariant),
+                border: Border.all(color: Colors.grey.shade100),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Row(

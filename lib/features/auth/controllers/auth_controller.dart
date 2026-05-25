@@ -4,14 +4,26 @@ import '../../../app/routes/app_routes.dart';
 import '../../../core/storage/local_storage_service.dart';
 import '../../../core/storage/secure_storage_service.dart';
 
+enum UserType {
+  buyer,
+  serviceProvider,
+}
+
 class AuthController extends GetxController {
   final _secureStorage = Get.find<SecureStorageService>();
-  final _localStorage  = Get.find<LocalStorageService>();
-  RxBool isLoading = false.obs;
-  final formKey          = GlobalKey<FormState>();
-  final inputController  = TextEditingController();
+  final _localStorage = Get.find<LocalStorageService>();
+
+  final RxBool isLoading = false.obs;
+  final formKey = GlobalKey<FormState>();
+  final inputController = TextEditingController();
   final passwordController = TextEditingController();
-  RxBool obscurePassword = true.obs;
+  final RxBool obscurePassword = true.obs;
+
+  static const String buyerEmail = 'buyer@gmail.com';
+  static const String buyerPassword = '123456';
+
+  static const String serviceEmail = 'service@gmail.com';
+  static const String servicePassword = '123456';
 
   @override
   void onClose() {
@@ -20,44 +32,58 @@ class AuthController extends GetxController {
     super.onClose();
   }
 
-  Future<void> checkAuthState() async {
-    await Future.delayed(const Duration(seconds: 2));
-
-    final isFirstTime = !_localStorage.isOnboardingDone;
-    if (isFirstTime) {
-      Get.toNamed(AppRoutes.login);
-      return;
-    }
-
-    final token = await _secureStorage.getToken();
-    if (token != null && token.isNotEmpty) {
-      Get.toNamed(AppRoutes.login);
-    } else {
-      Get.toNamed(AppRoutes.login);
-    }
+  void toggleObscurePassword() {
+    obscurePassword.value = !obscurePassword.value;
   }
-
-  void toggleObscurePassword() => obscurePassword.value = !obscurePassword.value;
 
   Future<void> login() async {
     if (!formKey.currentState!.validate()) return;
+
+    FocusManager.instance.primaryFocus?.unfocus();
     isLoading.value = true;
+
     try {
-      final input    = inputController.text.trim();
+      final input = inputController.text.trim().toLowerCase();
       final password = passwordController.text;
 
-      // TODO: replace with your actual API call
       await Future.delayed(const Duration(seconds: 1));
 
-      await _secureStorage.saveToken('your_token_here');
-      Get.toNamed(AppRoutes.main);
-    } catch (e) {
-      Get.snackbar('error'.tr, e.toString(),
-          snackPosition: SnackPosition.BOTTOM);
-      Get.toNamed(AppRoutes.main);
+      UserType? userType;
 
-    } finally {
+      if (input == buyerEmail && password == buyerPassword) {
+        userType = UserType.buyer;
+      } else if (input == serviceEmail && password == servicePassword) {
+        userType = UserType.serviceProvider;
+      }
+
+      if (userType == null) {
+        isLoading.value = false;
+        Get.snackbar(
+          'Login Failed',
+          'Invalid email or password',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        return;
+      }
+
+      await _secureStorage.saveToken('dummy_token_${userType.name}');
+      _localStorage.write('user_type', userType.name);
+
       isLoading.value = false;
+
+      Get.offAllNamed(
+        AppRoutes.main,
+        arguments: userType,
+      );
+    } catch (e) {
+      if (!isClosed) {
+        isLoading.value = false;
+        Get.snackbar(
+          'error'.tr,
+          e.toString(),
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
     }
   }
 }

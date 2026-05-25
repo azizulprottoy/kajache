@@ -21,7 +21,7 @@ class TKeys {
 
   // ── Auth ────────────────────────────────────────────────────────────────────
   static const welcomeBack      = 'welcome_back';
-  static const loginSubtitle    = 'login_subtitle';
+  static const fullname    = 'fullname';
   static const email            = 'email';
   static const phone            = 'phone';
   static const password         = 'password';
@@ -36,6 +36,7 @@ class TKeys {
   static const inputInvalid     = 'input_invalid';
   static const passwordRequired = 'password_required';
   static const passwordMin      = 'password_min';
+  static const resetPassword    = 'reset_password';
 
   // ── Home ────────────────────────────────────────────────────────────────────
   static const home           = 'home';

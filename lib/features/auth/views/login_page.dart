@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kaj_ache/core/utils/translation_keys.dart';
+import '../arguments/otp_argument.dart';
 import '../controllers/auth_controller.dart';
 import '../../../app/routes/app_routes.dart';
 
@@ -48,7 +49,6 @@ class LoginPage extends GetView<AuthController> {
                 child: Column(
                   children: [
 
-                    // ── Email or phone ───────────────────────────────────
                     TextFormField(
                       controller: controller.inputController,
                       keyboardType: TextInputType.emailAddress,
@@ -74,7 +74,6 @@ class LoginPage extends GetView<AuthController> {
                     ),
                     const SizedBox(height: 16),
 
-                    // ── Password ─────────────────────────────────────────
                     Obx(() => TextFormField(
                       controller: controller.passwordController,
                       obscureText: controller.obscurePassword.value,
@@ -104,21 +103,9 @@ class LoginPage extends GetView<AuthController> {
                 ),
               ),
 
-              // ── Forgot password ──────────────────────────────────────────
-              // Align(
-              //   alignment: Alignment.centerRight,
-              //   child: TextButton(
-              //     onPressed: () => Get.toNamed(AppRoutes.forgotPassword),
-              //     child: Text(
-              //       'forgot_password'.tr,
-              //       style: TextStyle(color: colorScheme.primary),
-              //     ),
-              //   ),
-              // ),
+              const SizedBox(height: 16),
 
-              const SizedBox(height: 8),
 
-              // ── Submit ───────────────────────────────────────────────────
               Obx(() => SizedBox(
                 width: double.infinity,
                 height: 52,
@@ -147,28 +134,49 @@ class LoginPage extends GetView<AuthController> {
                   ),
                 ),
               )),
-
-              const SizedBox(height: 24),
-
-              // ── Sign up ──────────────────────────────────────────────────
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'no_account'.tr,
+                    TKeys.forgotPassword.tr,
                     style: TextStyle(
                         color: colorScheme.onSurface.withOpacity(0.6)),
                   ),
-                  // TextButton(
-                  //   onPressed: () => Get.toNamed(AppRoutes.register),
-                  //   child: Text(
-                  //     'sign_up'.tr,
-                  //     style: TextStyle(
-                  //       color: colorScheme.primary,
-                  //       fontWeight: FontWeight.w600,
-                  //     ),
-                  //   ),
-                  // ),
+
+                  TextButton(
+                    onPressed: () => Get.toNamed(AppRoutes.otpPage,  arguments:  OtpArgument(
+                       isReset:true
+                    )),
+                    child: Text(
+                      TKeys.resetPassword.tr,
+                      style: TextStyle(
+                        color: colorScheme.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    TKeys.noAccount.tr,
+                    style: TextStyle(
+                        color: colorScheme.onSurface.withOpacity(0.6)),
+                  ),
+                  TextButton(
+                    onPressed: () => Get.toNamed(AppRoutes.register),
+                    child: Text(
+                      TKeys.signUp.tr,
+                      style: TextStyle(
+                        color: colorScheme.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 16),
