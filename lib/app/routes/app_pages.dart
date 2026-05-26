@@ -80,16 +80,16 @@ class AppPages {
       page: () => const BookingPage(),
       binding: BookingBinding(),
     ),
-    GetPage(
-      name: AppRoutes.services,
-      page: () =>  AllServices(),
-      binding: ServiceBinding(),
-    ),
-    GetPage(
-      name: AppRoutes.serviceDetails,
-      page: () =>  ServiceDetailPage(),
-      binding: ServiceDetailsBinding(),
-    ),
+    // GetPage(
+    //   name: AppRoutes.services,
+    //   page: () =>  AllServices(),
+    //   binding: ServiceBinding(),
+    // ),
+    // GetPage(
+    //   name: AppRoutes.serviceDetails,
+    //   page: () =>  ServiceDetailPage(),
+    //   binding: ServiceDetailsBinding(),
+    // ),
     GetPage(
       name: AppRoutes.myProfile,
       page: () => const MyProfilePage(),
@@ -116,11 +116,11 @@ class AppPages {
 
     ),
 
-    GetPage(
-      name: AppRoutes.services,
-      page: () =>  AllServices(),
-      binding: ServiceBinding(),
-    ),
+    // GetPage(
+    //   name: AppRoutes.services,
+    //   page: () =>  AllServices(),
+    //   binding: ServiceBinding(),
+    // ),
     GetPage(
       name: AppRoutes.rewordPage,
       page: () =>  RewardsPage(),

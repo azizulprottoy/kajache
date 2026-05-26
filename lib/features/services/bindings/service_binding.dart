@@ -1,9 +1,12 @@
 import 'package:get/get.dart';
-import 'package:kaj_ache/features/services/controllers/all_services_controller.dart';
 
-class ServiceBinding extends Bindings {
+import '../controllers/all_services_controller.dart';
+import '../repository/service_repository.dart';
+
+class AllServicesBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<AllServicesController>(() => AllServicesController(), fenix: true);
+    Get.lazyPut<AllServicesRepository>(() => AllServicesRepository());
+    Get.lazyPut<AllServicesController>(() => AllServicesController());
   }
 }

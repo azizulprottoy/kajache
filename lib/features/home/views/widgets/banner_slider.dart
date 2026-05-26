@@ -1,37 +1,68 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../controllers/home_controller.dart';
+import '../../models/banner_response_model.dart';
 
-class BannerSlider extends GetView<HomeController> {
-  const BannerSlider({super.key});
+class BannerSlider extends StatelessWidget {
+  final List<AppBannerModel> banners;
+  final int currentIndex;
+  final PageController pageController;
+  final ValueChanged<int> onPageChanged;
+
+  const BannerSlider({
+    super.key,
+    required this.banners,
+    required this.currentIndex,
+    required this.pageController,
+    required this.onPageChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+
+    if (banners.isEmpty) {
+      return Container(
+        height: 180,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: colorScheme.surfaceContainerLow,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          'No banners available',
+          style: TextStyle(color: colorScheme.onSurfaceVariant),
+        ),
+      );
+    }
 
     return Column(
       children: [
         SizedBox(
           height: 180,
           child: PageView.builder(
-            controller: controller.bannerPageController,
-            itemCount: controller.banners.length,
-            onPageChanged: controller.onBannerPageChanged,
+            controller: pageController,
+            itemCount: banners.length,
+            onPageChanged: onPageChanged,
             itemBuilder: (context, index) {
-              final banner = controller.banners[index];
+              final banner = banners[index];
+
               return Container(
                 margin: const EdgeInsets.symmetric(horizontal: 4),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(16),
-                  gradient: LinearGradient(
-                    colors: [
-                      colorScheme.primary,
-                      colorScheme.primary.withOpacity(0.7),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+                  color: colorScheme.primary,
+                  image: banner.imageUrl.isNotEmpty
+                      ? DecorationImage(
+                    image: NetworkImage(banner.imageUrl),
+                    fit: BoxFit.cover,
+                    colorFilter: ColorFilter.mode(
+                      Colors.black.withOpacity(0.35),
+                      BlendMode.darken,
+                    ),
+                  )
+                      : null,
                 ),
                 padding: const EdgeInsets.all(20),
                 child: Column(
@@ -39,19 +70,11 @@ class BannerSlider extends GetView<HomeController> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      banner.title.tr,
+                      banner.title,
                       style: TextStyle(
                         color: colorScheme.onPrimary,
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      banner.subtitle.tr,
-                      style: TextStyle(
-                        color: colorScheme.onPrimary.withOpacity(0.85),
-                        fontSize: 13,
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -61,12 +84,17 @@ class BannerSlider extends GetView<HomeController> {
                         backgroundColor: colorScheme.onPrimary,
                         foregroundColor: colorScheme.primary,
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 8),
+                          horizontal: 20,
+                          vertical: 8,
+                        ),
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                       ),
-                      child: Text('book_now'.tr,
-                          style: const TextStyle(fontWeight: FontWeight.w600)),
+                      child: Text(
+                        'book_now'.tr,
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
                     ),
                   ],
                 ),
@@ -76,24 +104,25 @@ class BannerSlider extends GetView<HomeController> {
         ),
 
         const SizedBox(height: 10),
-        Obx(() => Row(
+
+        Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: List.generate(
-            controller.banners.length,
+            banners.length,
                 (index) => AnimatedContainer(
               duration: const Duration(milliseconds: 250),
               margin: const EdgeInsets.symmetric(horizontal: 3),
-              width: controller.currentBannerIndex.value == index ? 20 : 6,
+              width: currentIndex == index ? 20 : 6,
               height: 6,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(4),
-                color: controller.currentBannerIndex.value == index
+                color: currentIndex == index
                     ? colorScheme.primary
                     : colorScheme.primary.withOpacity(0.3),
               ),
             ),
           ),
-        )),
+        ),
       ],
     );
   }

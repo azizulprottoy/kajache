@@ -22,7 +22,7 @@ class MainPage extends GetView<MainController> {
         MenuPage(),
       ]
           : const [
-        AllServices(),
+         AllServices(),
         HomePage(),
         MenuPage(),
       ];

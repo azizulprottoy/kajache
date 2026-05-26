@@ -1,82 +1,41 @@
-import 'dart:async';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../home/controllers/home_controller.dart';
+import '../../home/models/services_response_model.dart';
+import '../repository/service_repository.dart';
 
 class AllServicesController extends GetxController {
-  RxBool isLoading = false.obs;
-  final RxInt currentIndex = 0.obs;
+  final AllServicesRepository _repository = Get.find<AllServicesRepository>();
 
-  final RxList<ServiceModel> popularServices = <ServiceModel>[].obs;
+  final RxBool isLoading = false.obs;
+  final RxList<ServiceModel> allServices = <ServiceModel>[].obs;
 
   @override
   void onInit() {
     super.onInit();
-    AllServices();
+    fetchAllServices();
   }
 
-  Future<void> AllServices() async {
+  Future<void> fetchAllServices() {
     isLoading.value = true;
-    try {
-      await Future.delayed(const Duration(seconds: 1));
-      popularServices.assignAll([
-        ServiceModel(
-          id: '1',
-          title: 'pipe_leak_fix',
-          category: 'plumbing',
-          rating: 4.8,
-          reviews: 120,
-          price: 500,
-          imageUrl: '',
-        ),
-        ServiceModel(
-          id: '2',
-          title: 'full_bathroom_clean',
-          category: 'bathroom_cleaning',
-          rating: 4.6,
-          reviews: 98,
-          price: 800,
-          imageUrl: '',
-        ),
-        ServiceModel(
-          id: '3',
-          title: 'stove_burner_repair',
-          category: 'stove_fixing',
-          rating: 4.7,
-          reviews: 75,
-          price: 400,
-          imageUrl: '',
-        ),
-        ServiceModel(
-          id: '4',
-          title: 'room_painting',
-          category: 'painting',
-          rating: 4.9,
-          reviews: 210,
-          price: 3000,
-          imageUrl: '',
-        ),
-      ]);
-    } catch (e) {
+
+    return _repository
+        .getAllServices()
+        .then((services) {
+      allServices.assignAll(services);
+    })
+        .catchError((error) {
       Get.snackbar(
         'error'.tr,
-        e.toString(),
+        error.toString().replaceFirst('Exception: ', ''),
         snackPosition: SnackPosition.BOTTOM,
       );
-    } finally {
+    })
+        .whenComplete(() {
       isLoading.value = false;
-    }
+    });
   }
 
   void onServiceTap(ServiceModel service) {
-    // TODO: navigate to service detail page
-  }
-
-  @override
-  void onClose() {
-    super.onClose();
+    // You can handle navigation from UI or here.
   }
 }
-
-
