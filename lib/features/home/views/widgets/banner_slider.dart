@@ -69,33 +69,8 @@ class BannerSlider extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      banner.title,
-                      style: TextStyle(
-                        color: colorScheme.onPrimary,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    FilledButton(
-                      onPressed: () {},
-                      style: FilledButton.styleFrom(
-                        backgroundColor: colorScheme.onPrimary,
-                        foregroundColor: colorScheme.primary,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 8,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      child: Text(
-                        'book_now'.tr,
-                        style: const TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                    ),
+
+
                   ],
                 ),
               );
