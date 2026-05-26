@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:kaj_ache/features/service_details/arguments/service_details_arguments.dart';
 
 import '../../../app/routes/app_routes.dart';
 import '../../../core/utils/translation_keys.dart';
@@ -51,9 +52,8 @@ class PopularServicesList extends StatelessWidget {
         return GestureDetector(
           onTap: () => Get.toNamed(
             AppRoutes.serviceDetails,
-            arguments: ServiceArgument(
-              ServiceID: service.id,
-              isbooking: false,
+            arguments: ServiceDetailsArgument(serviceSlug: service.slug
+
             ),
           ),
           child: Container(

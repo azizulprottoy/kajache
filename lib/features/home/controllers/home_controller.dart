@@ -3,6 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../app/routes/app_routes.dart';
+import '../../category_details/arguments/category_details_arguments.dart';
+import '../../service_details/arguments/service_details_arguments.dart';
 import '../models/banner_response_model.dart';
 import '../models/category_response_model.dart';
 import '../models/services_response_model.dart';
@@ -105,11 +108,16 @@ class HomeController extends GetxController {
     super.onClose();
   }
 
-  void onCategoryTap(CategoryModel category) {
-    // TODO: navigate to category services page
+  onCategoryTap(CategoryModel category) {
+    Get.toNamed(
+      AppRoutes.categoryDetails,
+      arguments: CategoryDetailsArgument(categoryId: category.id),
+    );
   }
 
   void onServiceTap(ServiceModel service) {
-    // TODO: navigate to service details page
-  }
+    Get.toNamed(
+      AppRoutes.serviceDetails,
+      arguments: ServiceDetailsArgument(serviceSlug: service.slug),
+    );  }
 }

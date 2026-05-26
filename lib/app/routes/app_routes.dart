@@ -4,27 +4,28 @@ class AppRoutes {
   // Auth
   static const splash = '/splash';
   static const login = '/login';
-  static const homePage  = '/homePage';
-  static const menuPage  = '/menuPage';
-  static const services  = '/services';
-  static const serviceDetails  = '/serviceDetails';
+  static const homePage = '/homePage';
+  static const menuPage = '/menuPage';
+  static const services = '/services';
+  static const serviceDetails = '/serviceDetails';
   static const main = '/mainpage';
   static const register = '/register';
   static const otpPage = '/otpPage';
   static const forgotPassword = '/forgotPassword';
-   static const myProfile       = '/myProfile';
-   static const editProfile   = '/editProfile';
-   static const completeProfile = '/completeProfile';
+  static const myProfile = '/myProfile';
+  static const editProfile = '/editProfile';
+  static const completeProfile = '/completeProfile';
   static const previousOrders = '/previousOrders';
   static const rewordPage = '/rewordPage';
   static const statisticsPage = '/statisticsPage';
   static const shomePage = '/shomePage';
   static const portfolioPage = '/portfolio';
   static const chatPage = '/chat';
-  static const customerSupportPage = '/customer-support';
-  static const privacyPolicyPage = '/privacy-policy';
-  static const termsConditionPage = '/terms-condition';
-  static const bookingPage = '/booking-page';
+  static const customerSupportPage = '/customerSupport';
+  static const privacyPolicyPage = '/privacyPolicy';
+  static const termsConditionPage = '/termsCondition';
+  static const bookingPage = '/bookingPage';
+  static const categoryDetails = '/categoryDetails';
 }
 //   static const onboarding = '/onboarding';
 //   // Main

@@ -26,7 +26,7 @@ class ApiEndpoints {
   // Service
   static const String services = '/service';
   static const String service = '/service';
-  static String serviceById(String id) => '/service/$id';
+  static String serviceByslug(String slug) => '/service/$slug';
 
   // Booking
   static const String bookings = '/booking';

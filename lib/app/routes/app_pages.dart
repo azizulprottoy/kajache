@@ -1,6 +1,8 @@
 import 'package:get/get.dart';
 import 'package:kaj_ache/features/auth/views/forgot_password.dart';
 import 'package:kaj_ache/features/auth/views/otp_page.dart';
+import 'package:kaj_ache/features/category_details/binding/category_details_binding.dart';
+import 'package:kaj_ache/features/category_details/view/category_details_page.dart';
 import 'package:kaj_ache/features/chat/binding/chat_binding.dart';
 import 'package:kaj_ache/features/chat/view/chat_page.dart';
 import 'package:kaj_ache/features/csupport/binding/csupport_binding.dart';
@@ -38,6 +40,8 @@ import '../../features/profile/bindings/profile_binding.dart';
 import '../../features/profile/views/complete_profile_page.dart';
 import '../../features/profile/views/edit_profile_page.dart';
 import '../../features/profile/views/profile_page.dart';
+import '../../features/service_details/binding/service_details_binding.dart';
+import '../../features/service_details/view/service_details_page.dart';
 import '../../features/services/bindings/service_binding.dart';
 import '../../features/spash/view/splash_page.dart';
 import 'app_routes.dart';
@@ -85,11 +89,16 @@ class AppPages {
     //   page: () =>  AllServices(),
     //   binding: ServiceBinding(),
     // ),
-    // GetPage(
-    //   name: AppRoutes.serviceDetails,
-    //   page: () =>  ServiceDetailPage(),
-    //   binding: ServiceDetailsBinding(),
-    // ),
+    GetPage(
+      name: AppRoutes.categoryDetails,
+      page: () =>  CategoryDetailsPage(),
+      binding: CategoryDetailsBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.serviceDetails,
+      page: () =>  ServiceDetailsPage(),
+      binding: ServiceDetailsBinding(),
+    ),
     GetPage(
       name: AppRoutes.myProfile,
       page: () => const MyProfilePage(),

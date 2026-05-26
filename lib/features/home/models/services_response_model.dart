@@ -1,3 +1,5 @@
+import '../../../core/utils/media_url_helper.dart';
+
 class ServiceResponseModel {
   final bool success;
   final int count;
@@ -35,6 +37,8 @@ class ServiceModel {
   final CreatedByModel? createdBy;
   final String createdAt;
   final String updatedAt;
+  final String imageLink;
+
 
   ServiceModel({
     required this.id,
@@ -47,6 +51,8 @@ class ServiceModel {
     this.createdBy,
     required this.createdAt,
     required this.updatedAt,
+    required this.imageLink,
+
   });
 
   factory ServiceModel.fromJson(Map<String, dynamic> json) {
@@ -67,6 +73,8 @@ class ServiceModel {
           : null,
       createdAt: json['createdAt']?.toString() ?? '',
       updatedAt: json['updatedAt']?.toString() ?? '',
+      imageLink: MediaUrlHelper.resolve(json['imageLink']?.toString()),
+
     );
   }
 }

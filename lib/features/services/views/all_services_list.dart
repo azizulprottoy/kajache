@@ -5,6 +5,7 @@ import '../../../app/routes/app_routes.dart';
 import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/common_app_bar.dart';
 import '../../../shared/widgets/custom_button.dart';
+import '../../service_details/arguments/service_details_arguments.dart';
 import '../arguments/service_argument.dart';
 import '../controllers/all_services_controller.dart';
 
@@ -65,9 +66,8 @@ class AllServices extends GetView<AllServicesController> {
               return GestureDetector(
                 onTap: () => Get.toNamed(
                   AppRoutes.serviceDetails,
-                  arguments: ServiceArgument(
-                    ServiceID: service.id,
-                    isbooking: false,
+                  arguments: ServiceDetailsArgument(serviceSlug: service.slug
+
                   ),
                 ),
                 child: Container(
