@@ -46,7 +46,7 @@ class ApiEndpoints {
   static String sendBidMessage(String bidId) => '/booking/bid/$bidId/message';
 
   // Payment
-  static const String payment = '/payment';
+  static  String payment(String bookingId) => '/booking/$bookingId/confirm-payment';
 
   // Coupon
   static const String coupons = '/coupon';

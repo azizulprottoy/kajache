@@ -1,144 +1,203 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:kaj_ache/app/routes/app_routes.dart';
 
-import '../../services/arguments/service_argument.dart';
+import '../arguments/service_booking_arguments.dart';
+import '../model/booking_request_model.dart';
+import '../repository/booking_repository.dart';
 
 class BookingController extends GetxController {
   final formKey = GlobalKey<FormState>();
+  final BookingRepository _repository = Get.find<BookingRepository>();
+  // Service info
+  final serviceTitle = ''.obs;
+  final servicePrice = 0.0.obs;
+  final serviceId = ''.obs;
 
-  late TextEditingController dateController;
-  late TextEditingController timeController;
+  // Step
+  final currentStep = 1.obs;
+  final isLoading = false.obs;
 
-  final RxBool isLoading = false.obs;
-  final RxInt selectedAddressIndex = 0.obs;
+  // Step 1
+  final selectedSubServices = <String>[].obs;
+  final problemDetailsController = TextEditingController();
 
-  final RxString serviceTitle = ''.obs;
-  final RxString serviceCategory = ''.obs;
-  final RxDouble servicePrice = 0.0.obs;
+  // Step 2
+  final dateController = TextEditingController();
+  RxnString selectedTime = RxnString();
+  final addressController = TextEditingController();
 
-  final RxList<AddressModel> addresses = <AddressModel>[
-    AddressModel(
-      title: 'Home',
-      address: 'House 12, Road 5, Dhanmondi, Dhaka',
-    ),
-    AddressModel(
-      title: 'Office',
-      address: 'Level 7, Banani, Dhaka',
-    ),
-    AddressModel(
-      title: 'Other',
-      address: 'Mirpur DOHS, Dhaka',
-    ),
-  ].obs;
+  final budgetController = TextEditingController();
+  final selectedCity = 'Dhaka'.obs;
+  // Step 3
+  final selectedPaymentMethod = 'bkash'.obs;
+
+  final cities = [
+    'Dhaka',
+    'Chittagong',
+    'Sylhet',
+    'Rajshahi',
+    'Khulna',
+    'Barisal',
+  ];
+  final timeSlots = [
+    '09:00 AM',
+    '11:00 AM',
+    '01:00 PM',
+    '03:00 PM',
+    '05:00 PM',
+    '07:00 PM',
+  ];
+  final paymentMethods = ['bkash', 'nagad', 'card'];
+
+  late final List<String> subServiceOptions;
+
+  static const _subServices = {
+    'AC Repair': [
+      'Gas Charge',
+      'Deep Cleaning',
+      'Compressor Repair',
+      'Installation',
+    ],
+    'Plumbing': ['Pipe Repair', 'Faucet Fix', 'Drain Cleaning', 'Installation'],
+    'Electrical': [
+      'Wiring',
+      'Socket Repair',
+      'Short Circuit Fix',
+      'Panel Work',
+    ],
+    'Cleaning': [
+      'Full House',
+      'Kitchen Only',
+      'Bathroom Scrub',
+      'Carpet Clean',
+    ],
+    'Painting': ['Interior', 'Exterior', 'Single Room', 'Full House'],
+    'Moving': ['Packing', 'Loading', 'Transport', 'Unpacking'],
+  };
+  static const _defaultSubs = [
+    'Standard Service',
+    'Premium Service',
+    'Inspection',
+    'Repair',
+  ];
 
   @override
   void onInit() {
     super.onInit();
-    dateController = TextEditingController();
-    timeController = TextEditingController();
-
-    final args = Get.arguments;
-    if (args is BookingArgument) {
-      serviceTitle.value = args.title;
-      serviceCategory.value = args.category;
-      servicePrice.value = args.price;
+    final args = Get.arguments as ServiceBookingArgument?;
+    final service = args?.serviceDetails;
+    if (service != null) {
+      serviceId.value = service.id;
+      serviceTitle.value = service.title;
+      servicePrice.value = service.basePrice.toDouble() ?? 0.0;
+      subServiceOptions = _defaultSubs;
+    } else {
+      subServiceOptions = _defaultSubs;
     }
-  }
-
-  Future<void> pickDate(BuildContext context) async {
-    final now = DateTime.now();
-
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: now,
-      firstDate: now,
-      lastDate: DateTime(now.year + 2),
-    );
-
-    if (picked != null) {
-      dateController.text =
-      '${picked.day.toString().padLeft(2, '0')}-'
-          '${picked.month.toString().padLeft(2, '0')}-'
-          '${picked.year}';
-      update();
-    }
-  }
-
-  Future<void> pickTime(BuildContext context) async {
-    final picked = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.now(),
-    );
-
-    if (picked != null) {
-      timeController.text = picked.format(context);
-      update();
-    }
-  }
-
-  void selectAddress(int index) {
-    selectedAddressIndex.value = index;
-  }
-
-  void addNewAddress() {
-    Get.snackbar(
-      'Add Address',
-      'Add new address action tapped',
-      snackPosition: SnackPosition.BOTTOM,
-    );
-  }
-
-  Future<void> proceed() async {
-    if (!formKey.currentState!.validate()) return;
-
-    if (addresses.isEmpty) {
-      Get.snackbar(
-        'Error',
-        'Please select an address',
-        snackPosition: SnackPosition.BOTTOM,
-      );
-      return;
-    }
-
-    isLoading.value = true;
-    await Future.delayed(const Duration(milliseconds: 700));
-    isLoading.value = false;
-
-    Get.toNamed( AppRoutes.serviceDetails,  arguments: ServiceArgument(ServiceID: '20',isbooking: true));}
-
-
-
-  void cancel() {
-    Get.back();
   }
 
   @override
   void onClose() {
+    problemDetailsController.dispose();
     dateController.dispose();
-    timeController.dispose();
+    addressController.dispose();
+    budgetController.dispose();
     super.onClose();
   }
-}
 
-class AddressModel {
-  final String title;
-  final String address;
+  void toggleSubService(String sub) {
+    if (selectedSubServices.contains(sub)) {
+      selectedSubServices.remove(sub);
+    } else {
+      selectedSubServices.add(sub);
+    }
+  }
 
-  AddressModel({
-    required this.title,
-    required this.address,
-  });
-}
+  Future<void> pickDate(BuildContext context) async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+    );
+    if (picked != null) {
+      dateController.text =
+          '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
+      update();
+    }
+  }
 
-class BookingArgument {
-  final String title;
-  final String category;
-  final double price;
+  String? validateStep() {
+    if (currentStep.value == 1) {
+      if (problemDetailsController.text.trim().isEmpty) {
+        return 'Please describe your problem.';
+      }
+    }
+    if (currentStep.value == 2) {
+      if (addressController.text.trim().isEmpty) return 'Address is required.';
+      if (dateController.text.trim().isEmpty) return 'Please pick a date.';
+      final budget = int.tryParse(budgetController.text.trim()) ?? 0;
+      if (budget < 100) return 'Set a budget of at least 100 BDT.';
+    }
+    return null;
+  }
 
-  BookingArgument({
-    required this.title,
-    required this.category,
-    required this.price,
-  });
+  void nextStep(BuildContext context) {
+    final error = validateStep();
+    if (error != null) {
+      Get.snackbar(
+        'Validation',
+        error,
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red.shade50,
+        colorText: Colors.red.shade700,
+        margin: const EdgeInsets.all(16),
+        borderRadius: 14,
+      );
+      return;
+    }
+    if (currentStep.value < 3) currentStep.value++;
+  }
+
+  void prevStep() {
+    if (currentStep.value > 1) currentStep.value--;
+  }
+
+
+  Future<void> submitBooking(String serviceId) async {
+    try {
+      isLoading.value = true;
+
+      final request = BookingRequestModel(
+        service: serviceId,
+        details: problemDetailsController.text.trim(),
+        subServices: selectedSubServices.toList(),
+        location: LocationModel(
+          address: addressController.text.trim(),
+          city: selectedCity.value,
+        ),
+        schedule: ScheduleModel(
+          date: dateController.text.trim(),
+          time: selectedTime.value ?? '',
+        ),
+        maxLimit: int.tryParse(budgetController.text.trim()) ?? 0,
+      );
+
+      final res = await _repository.createBooking(request);
+
+      Get.snackbar(
+        "Success",
+        "Booking created successfully",
+        snackPosition: SnackPosition.BOTTOM,
+      );
+
+      return;
+    } catch (e) {
+      Get.snackbar("Error", e.toString(), snackPosition: SnackPosition.BOTTOM);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  void cancel() => Get.back();
 }

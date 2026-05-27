@@ -10,11 +10,9 @@ class ServiceDetailsRepository {
   final Dio _dio;
   final NetworkInfo _networkInfo;
 
-  ServiceDetailsRepository({
-    Dio? dio,
-    NetworkInfo? networkInfo,
-  })  : _dio = dio ?? ApiClient.instance,
-        _networkInfo = networkInfo ?? NetworkInfo();
+  ServiceDetailsRepository({Dio? dio, NetworkInfo? networkInfo})
+    : _dio = dio ?? ApiClient.instance,
+      _networkInfo = networkInfo ?? NetworkInfo();
 
   Future<ServiceModel?> getServiceBySlug(String slug) async {
     final isConnected = await _networkInfo.isConnected;
@@ -23,9 +21,7 @@ class ServiceDetailsRepository {
       throw Exception('No internet connection.');
     }
 
-    final response = await _dio.get(
-      ApiEndpoints.serviceByslug(slug),
-    );
+    final response = await _dio.get(ApiEndpoints.serviceByslug(slug));
 
     final result = ServiceDetailsResponseModel.fromJson(
       Map<String, dynamic>.from(response.data),

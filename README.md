@@ -1,12 +1,3 @@
-1. Commplete profile page 
-2. success page 
-3. place order page
-4. add address page
-5. emergency service page 
-
-
-service app 
-1. home page 
-2. bid page 
-3. request withdrawal page
-4. statistics page 
+1. bids and book on service details page , 
+2. my profile page 
+3. 
