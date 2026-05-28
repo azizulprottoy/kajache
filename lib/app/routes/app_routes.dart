@@ -26,6 +26,8 @@ class AppRoutes {
   static const termsConditionPage = '/termsCondition';
   static const bookingPage = '/bookingPage';
   static const categoryDetails = '/categoryDetails';
+   static const myBookings       = '/myBookings';
+
 }
 //   static const onboarding = '/onboarding';
 //   // Main

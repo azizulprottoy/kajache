@@ -36,6 +36,13 @@ class MenuPage extends StatelessWidget {
                 _MenuDivider(),
                 _MenuTile(
                   icon: Icons.work_outline,
+                  title: 'My Bookings',
+                  onTap: () {
+                    Get.toNamed(AppRoutes.myBookings);
+                  },
+                ),
+                _MenuTile(
+                  icon: Icons.work_outline,
                   title: 'Portfolio',
                   onTap: () {
                     Get.toNamed(AppRoutes.portfolioPage);

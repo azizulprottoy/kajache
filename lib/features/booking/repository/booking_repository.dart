@@ -41,7 +41,7 @@ class BookingRepository {
       throw Exception('No internet connection');
     }
 
-    final response = await _dio.patch(ApiEndpoints.payment(bookingId));
+    final response = await _dio.post(ApiEndpoints.payment(bookingId));
 
     return Map<String, dynamic>.from(response.data);
   }

@@ -32,7 +32,7 @@ class ServiceDetailsPage extends GetView<ServiceDetailsController> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final args = Get.arguments as ServiceDetailsArgument?;
+    final args = Get.arguments as ServiceDetailsArgument;
     final isBooking = args?.isbooking ?? false;
     final isProviderBidFlow = args?.isProviderBidFlow ?? false;
 

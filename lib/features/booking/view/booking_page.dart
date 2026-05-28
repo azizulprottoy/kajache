@@ -66,8 +66,7 @@ class BookingPage extends GetView<BookingController> {
             onBack: controller.prevStep,
             onNext: () => controller.nextStep(context),
             onConfirm: () => controller.submitBooking(
-              controller.serviceId.value,
-            ),          )),
+              ),          )),
         ],
       ),
     );

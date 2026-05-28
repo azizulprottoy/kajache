@@ -7,28 +7,32 @@ import '../repository/booking_repository.dart';
 
 class BookingController extends GetxController {
   final formKey = GlobalKey<FormState>();
-  final BookingRepository _repository = Get.find<BookingRepository>();
-  // Service info
+
+  final BookingRepository bookingRepository = BookingRepository();
+
+  /// Service
   final serviceTitle = ''.obs;
   final servicePrice = 0.0.obs;
-  final serviceId = ''.obs;
 
-  // Step
+  late final String serviceId;
+
+  /// Step
   final currentStep = 1.obs;
   final isLoading = false.obs;
 
-  // Step 1
+  /// Step 1
   final selectedSubServices = <String>[].obs;
   final problemDetailsController = TextEditingController();
 
-  // Step 2
+  /// Step 2
   final dateController = TextEditingController();
-  RxnString selectedTime = RxnString();
   final addressController = TextEditingController();
-
   final budgetController = TextEditingController();
-  final selectedCity = 'Dhaka'.obs;
-  // Step 3
+
+  RxnString selectedCity = RxnString();
+  RxnString selectedTime = RxnString();
+
+  /// Step 3
   final selectedPaymentMethod = 'bkash'.obs;
 
   final cities = [
@@ -39,6 +43,7 @@ class BookingController extends GetxController {
     'Khulna',
     'Barisal',
   ];
+
   final timeSlots = [
     '09:00 AM',
     '11:00 AM',
@@ -47,33 +52,15 @@ class BookingController extends GetxController {
     '05:00 PM',
     '07:00 PM',
   ];
-  final paymentMethods = ['bkash', 'nagad', 'card'];
+
+  final paymentMethods = [
+    'bkash',
+    'nagad',
+    'card',
+  ];
 
   late final List<String> subServiceOptions;
 
-  static const _subServices = {
-    'AC Repair': [
-      'Gas Charge',
-      'Deep Cleaning',
-      'Compressor Repair',
-      'Installation',
-    ],
-    'Plumbing': ['Pipe Repair', 'Faucet Fix', 'Drain Cleaning', 'Installation'],
-    'Electrical': [
-      'Wiring',
-      'Socket Repair',
-      'Short Circuit Fix',
-      'Panel Work',
-    ],
-    'Cleaning': [
-      'Full House',
-      'Kitchen Only',
-      'Bathroom Scrub',
-      'Carpet Clean',
-    ],
-    'Painting': ['Interior', 'Exterior', 'Single Room', 'Full House'],
-    'Moving': ['Packing', 'Loading', 'Transport', 'Unpacking'],
-  };
   static const _defaultSubs = [
     'Standard Service',
     'Premium Service',
@@ -84,16 +71,20 @@ class BookingController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+
     final args = Get.arguments as ServiceBookingArgument?;
+
     final service = args?.serviceDetails;
+
     if (service != null) {
-      serviceId.value = service.id;
+      serviceId = service.id;
       serviceTitle.value = service.title;
-      servicePrice.value = service.basePrice.toDouble() ?? 0.0;
-      subServiceOptions = _defaultSubs;
-    } else {
-      subServiceOptions = _defaultSubs;
+      servicePrice.value = (service.basePrice ?? 0).toDouble();
     }
+
+    selectedCity.value = 'Dhaka';
+
+    subServiceOptions = _defaultSubs;
   }
 
   @override
@@ -118,11 +109,15 @@ class BookingController extends GetxController {
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 365)),
+      lastDate: DateTime.now().add(
+        const Duration(days: 365),
+      ),
     );
+
     if (picked != null) {
       dateController.text =
-          '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
+      '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
+
       update();
     }
   }
@@ -133,17 +128,35 @@ class BookingController extends GetxController {
         return 'Please describe your problem.';
       }
     }
+
     if (currentStep.value == 2) {
-      if (addressController.text.trim().isEmpty) return 'Address is required.';
-      if (dateController.text.trim().isEmpty) return 'Please pick a date.';
-      final budget = int.tryParse(budgetController.text.trim()) ?? 0;
-      if (budget < 100) return 'Set a budget of at least 100 BDT.';
+      if (addressController.text.trim().isEmpty) {
+        return 'Address is required.';
+      }
+
+      if (dateController.text.trim().isEmpty) {
+        return 'Please pick a date.';
+      }
+
+      if (selectedTime.value == null ||
+          selectedTime.value!.isEmpty) {
+        return 'Please select a time slot.';
+      }
+
+      final budget =
+          int.tryParse(budgetController.text.trim()) ?? 0;
+
+      if (budget < 100) {
+        return 'Set a budget of at least 100 BDT.';
+      }
     }
+
     return null;
   }
 
   void nextStep(BuildContext context) {
     final error = validateStep();
+
     if (error != null) {
       Get.snackbar(
         'Validation',
@@ -154,46 +167,81 @@ class BookingController extends GetxController {
         margin: const EdgeInsets.all(16),
         borderRadius: 14,
       );
+
       return;
     }
-    if (currentStep.value < 3) currentStep.value++;
+
+    if (currentStep.value < 3) {
+      currentStep.value++;
+    }
   }
 
   void prevStep() {
-    if (currentStep.value > 1) currentStep.value--;
+    if (currentStep.value > 1) {
+      currentStep.value--;
+    }
   }
 
+  /// ==========================================
+  /// CREATE BOOKING -> CONFIRM PAYMENT
+  /// ==========================================
 
-  Future<void> submitBooking(String serviceId) async {
+  Future<void> submitBooking() async {
     try {
       isLoading.value = true;
 
+      /// 1. CREATE BOOKING
       final request = BookingRequestModel(
         service: serviceId,
         details: problemDetailsController.text.trim(),
         subServices: selectedSubServices.toList(),
         location: LocationModel(
           address: addressController.text.trim(),
-          city: selectedCity.value,
+          city: selectedCity.value ?? 'Dhaka',
         ),
         schedule: ScheduleModel(
           date: dateController.text.trim(),
           time: selectedTime.value ?? '',
         ),
-        maxLimit: int.tryParse(budgetController.text.trim()) ?? 0,
+        maxLimit:
+        int.tryParse(budgetController.text.trim()) ?? 0,
       );
 
-      final res = await _repository.createBooking(request);
+      final createRes =
+      await bookingRepository.createBooking(request);
 
+      final success = createRes['success'] == true;
+
+      if (!success) {
+        throw Exception('Failed to create booking');
+      }
+
+      /// 2. GET BOOKING ID
+      final bookingId =
+      createRes['data']['_id'].toString();
+
+      /// 3. CONFIRM PAYMENT
+      await bookingRepository.confirmPayment(
+        bookingId,
+      );
+
+      /// 4. SUCCESS
       Get.snackbar(
-        "Success",
-        "Booking created successfully",
+        'Success',
+        'Booking created successfully',
         snackPosition: SnackPosition.BOTTOM,
       );
 
-      return;
+      /// 5. NAVIGATE
+      Get.toNamed(
+        '/booking/status/$bookingId',
+      );
     } catch (e) {
-      Get.snackbar("Error", e.toString(), snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(
+        'Error',
+        e.toString(),
+        snackPosition: SnackPosition.BOTTOM,
+      );
     } finally {
       isLoading.value = false;
     }

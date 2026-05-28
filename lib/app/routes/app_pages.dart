@@ -32,6 +32,8 @@ import '../../features/home/views/home_page.dart';
 import '../../features/main/binding/main_binding.dart';
 import '../../features/main/view/main_page.dart';
 import '../../features/menu/views/menu_page.dart';
+import '../../features/my_bookings/bindings/my_booking_binding.dart';
+import '../../features/my_bookings/view/my_bookings_page.dart';
 import '../../features/orders/bindings/order_binding.dart';
 import '../../features/orders/views/orders_page.dart';
 import '../../features/portfolio/binding/portfolio_binding.dart';
@@ -96,7 +98,7 @@ class AppPages {
     ),
     GetPage(
       name: AppRoutes.serviceDetails,
-      page: () =>  ServiceDetailsPage(),
+      page: () =>  const ServiceDetailsPage(),
       binding: ServiceDetailsBinding(),
     ),
     GetPage(
@@ -124,12 +126,13 @@ class AppPages {
       page: () =>  MenuPage(),
 
     ),
+    GetPage(
+      name: AppRoutes.myBookings,
+      page: () =>  MyBookingPage(),
+      binding: MyBookingBinding(),
 
-    // GetPage(
-    //   name: AppRoutes.services,
-    //   page: () =>  AllServices(),
-    //   binding: ServiceBinding(),
-    // ),
+    ),
+
     GetPage(
       name: AppRoutes.rewordPage,
       page: () =>  RewardsPage(),
