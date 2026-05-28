@@ -3,9 +3,10 @@ import 'package:get/get.dart';
 import 'package:kaj_ache/core/utils/translation_keys.dart';
 import 'package:kaj_ache/features/auth/arguments/otp_argument.dart';
 import '../../../app/routes/app_routes.dart';
-import '../controllers/auth_controller.dart';
+import '../controllers/login_controller.dart';
+import '../controllers/register_controller.dart';
 
-class RegisterPage extends GetView<AuthController> {
+class RegisterPage extends GetView<RegisterController> {
   const RegisterPage({super.key});
 
   @override

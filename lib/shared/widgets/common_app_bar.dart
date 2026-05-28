@@ -39,20 +39,16 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
           ? Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title!.tr,
-            style: theme.textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: colorScheme.primary,
-            ),
-          ),
-
+          Image.asset(
+            'assets/images/logo.png',
+            height: 45,
+            fit: BoxFit.contain,
+          )
         ],
       )
           : null,
 
       actions: [
-        // ── Language toggle ──────────────────────────────────────────────
         if (showLanguageToggle)
           Obx(() {
             final isBengali = localeController.isBengali;

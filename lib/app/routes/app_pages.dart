@@ -22,7 +22,8 @@ import 'package:kaj_ache/features/statistics/view/statistics_page.dart';
 import 'package:kaj_ache/features/terms/binding/terms_binding.dart';
 import 'package:kaj_ache/features/terms/view/terms_page.dart';
 
-import '../../features/auth/bindings/auth_binding.dart';
+import '../../features/auth/bindings/login_binding.dart';
+import '../../features/auth/bindings/register_binding.dart';
 import '../../features/auth/views/login_page.dart';
 import '../../features/auth/views/register_page.dart';
 import '../../features/booking/binding/booking_binding.dart';
@@ -65,12 +66,12 @@ class AppPages {
     GetPage(
       name: AppRoutes.login,
       page: () => LoginPage(),
-      binding: AuthBinding(),
+      binding: LoginBinding(),
     ),
     GetPage(
       name: AppRoutes.register,
       page: () => RegisterPage(),
-      binding: AuthBinding(),
+      binding: RegisterBinding(),
     ),
     GetPage(
       name: AppRoutes.forgotPassword,

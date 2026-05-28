@@ -12,83 +12,23 @@ enum UserType {
   serviceProvider,
 }
 
-class AuthController extends GetxController {
-  final _secureStorage = Get.find<SecureStorageService>();
-  final _localStorage = Get.find<LocalStorageService>();
+class RegisterController extends GetxController {
   final _authRepository = Get.find<AuthRepository>();
+
   final RxBool isLoading = false.obs;
+
   final formKey = GlobalKey<FormState>();
+
   final inputController = TextEditingController();
   final passwordController = TextEditingController();
+
   final RxBool obscurePassword = true.obs;
-
-
-  @override
-  void onClose() {
-    inputController.dispose();
-    passwordController.dispose();
-    super.onClose();
-  }
 
   void toggleObscurePassword() {
     obscurePassword.value = !obscurePassword.value;
   }
 
-  Future<void> login() {
-    if (!formKey.currentState!.validate()) {
-      return Future.value();
-    }
 
-    FocusManager.instance.primaryFocus?.unfocus();
-    isLoading.value = true;
-
-    final request = LoginRequestModel(
-      email: inputController.text.trim().toLowerCase(),
-      password: passwordController.text,
-    );
-
-    return _authRepository
-        .login(request)
-        .then((response) async {
-      if (!response.success) {
-        Get.snackbar(
-          'Login Failed',
-          response.message,
-          snackPosition: SnackPosition.BOTTOM,
-        );
-        return;
-      }
-
-      await _secureStorage.saveToken(response.token);
-
-      final roleTitle = response.user.role?.title.isNotEmpty == true
-          ? response.user.role!.title
-          : response.user.roleModelName;
-
-      final userType = _mapRoleToUserType(roleTitle);
-
-      _localStorage.write('user_id', response.user.id);
-      _localStorage.write('user_email', response.user.email);
-      _localStorage.write('username', response.user.username);
-      _localStorage.write('role_title', roleTitle);
-      _localStorage.write('user_type', userType.name);
-
-      Get.offAllNamed(
-        AppRoutes.main,
-        arguments: userType,
-      );
-    })
-        .catchError((error) {
-      Get.snackbar(
-        'Error',
-        error.toString().replaceFirst('Exception: ', ''),
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    })
-        .whenComplete(() {
-      isLoading.value = false;
-    });
-  }
   Future<void> register({
     required String accountType,
     required String fullName,

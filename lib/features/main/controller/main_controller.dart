@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import '../../../core/storage/local_storage_service.dart';
-import '../../auth/controllers/auth_controller.dart';
+import '../../auth/controllers/login_controller.dart';
+import '../../auth/controllers/register_controller.dart';
 
 class MainController extends GetxController {
   final _localStorage = Get.find<LocalStorageService>();

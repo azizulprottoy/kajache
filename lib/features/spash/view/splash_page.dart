@@ -82,7 +82,7 @@ class _SplashPageState extends State<SplashPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.primary,
+      backgroundColor: AppColors.white,
       body: SafeArea(
         child: Center(
           child: AnimatedBuilder(
@@ -120,7 +120,7 @@ class _SplashPageState extends State<SplashPage>
             'v1.0.0',
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: Colors.white54,
+              color: Colors.black,
               fontSize: 12,
               fontFamily: AppTextStyles.fontFamily,
             ),
@@ -136,27 +136,13 @@ class _LogoIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 110,
-      height: 110,
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(28),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.15),
-            blurRadius: 24,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: const Center(
-        child: Icon(
-          Icons.handyman_rounded,
-          size: 56,
-          color: AppColors.primary,
-        ),
-      ),
+    return  Center(
+        child: Image.asset(
+          'assets/images/logo.png',
+          height: 100,
+          fit: BoxFit.contain,
+        )
+
     );
   }
 }
@@ -169,13 +155,13 @@ class _AppName extends StatelessWidget {
     return Column(
       children: const [
         Text(
-          'কাজ আছে',
+          'www.kajache.com',
           textAlign: TextAlign.center,
           style: TextStyle(
             fontFamily: AppTextStyles.fontFamily,
-            fontSize: 36,
+            fontSize: 12,
             fontWeight: FontWeight.bold,
-            color: AppColors.white,
+            color: AppColors.primary,
             letterSpacing: 1.2,
           ),
         ),
