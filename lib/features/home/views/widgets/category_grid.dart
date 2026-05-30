@@ -41,9 +41,9 @@ class CategoryGrid extends StatelessWidget {
       itemCount: categories.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 4,
-        mainAxisSpacing: 12,
-        crossAxisSpacing: 12,
-        childAspectRatio: 0.78,
+        mainAxisSpacing: 6,
+        crossAxisSpacing: 10,
+        childAspectRatio: 0.85,
       ),
       itemBuilder: (context, index) {
         final category = categories[index];
@@ -52,24 +52,18 @@ class CategoryGrid extends StatelessWidget {
           borderRadius: BorderRadius.circular(14),
           onTap: () => onCategoryTap(category),
           child: Container(
-            decoration: BoxDecoration(
-              color: colorScheme.surfaceContainerLowest,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: colorScheme.outlineVariant.withOpacity(0.2),
-              ),
-            ),
+
             padding: const EdgeInsets.all(8),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 if (category.imageLink.isNotEmpty)
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(6),
                     child: Image.network(
                       category.imageLink,
-                      width: 42,
-                      height: 42,
+                      width: 60,
+                      height: 60,
                       fit: BoxFit.cover,
                       errorBuilder: (_, __, ___) => Icon(
                         Icons.category_outlined,
@@ -84,7 +78,7 @@ class CategoryGrid extends StatelessWidget {
                     color: colorScheme.primary,
                     size: 34,
                   ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 4),
                 Text(
                   category.name,
                   maxLines: 2,

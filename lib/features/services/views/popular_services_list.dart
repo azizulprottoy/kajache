@@ -75,11 +75,8 @@ class PopularServicesList extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   alignment: Alignment.center,
-                  child: Icon(
-                    Icons.home_repair_service_outlined,
-                    color: colorScheme.primary,
-                    size: 32,
-                  ),
+                  child: Image.network(service.imageLink
+                 ,fit:BoxFit.cover, ),
                 ),
                 const SizedBox(width: 12),
 

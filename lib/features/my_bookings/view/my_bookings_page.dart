@@ -65,7 +65,7 @@ class MyBookingPage extends GetView<MyBookingController> {
                               vertical: 6,
                             ),
                             decoration: BoxDecoration(
-                              color: colorScheme.primaryContainer,
+                              color: Colors.green.shade50,
                               borderRadius: BorderRadius.circular(30),
                             ),
                             child: Text(booking.status),
@@ -106,7 +106,7 @@ class MyBookingPage extends GetView<MyBookingController> {
                       const SizedBox(height: 12),
 
                       Text(
-                        'Budget: ৳${booking.maxLimit}',
+                        ' ৳${booking.minLimit}',
                         style: theme.textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),

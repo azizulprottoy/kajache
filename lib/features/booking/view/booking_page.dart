@@ -20,24 +20,23 @@ class BookingPage extends GetView<BookingController> {
       ),
       body: Column(
         children: [
-          // ── Stepper header ──────────────────────────────────────
+
+
+          Obx(() => _ServiceContextBar(
+            title: controller.serviceTitle.value,
+            price: controller.servicePrice.value,
+            SImage: controller.serviceImage.value,
+            colorScheme: colorScheme,
+            theme: theme,
+          )),
+
           Obx(() => _StepperHeader(
             currentStep: controller.currentStep.value,
             colorScheme: colorScheme,
             theme: theme,
           )),
-
-          // ── Service context bar ─────────────────────────────────
-          Obx(() => _ServiceContextBar(
-            title: controller.serviceTitle.value,
-            price: controller.servicePrice.value,
-            colorScheme: colorScheme,
-            theme: theme,
-          )),
-
-          // ── Step body ───────────────────────────────────────────
-          Expanded(
-            child: Obx(() => AnimatedSwitcher(
+          SizedBox(height: 20,),
+          Obx(() => AnimatedSwitcher(
               duration: const Duration(milliseconds: 300),
               transitionBuilder: (child, animation) => SlideTransition(
                 position: Tween<Offset>(
@@ -56,9 +55,10 @@ class BookingPage extends GetView<BookingController> {
                   ),
                 ),
               ),
-            )),
-          ),
+            )
+            ),
 
+SizedBox(height: 100,),
           Obx(() => _BottomNavBar(
             currentStep: controller.currentStep.value,
             isLoading: controller.isLoading.value,
@@ -86,7 +86,7 @@ class BookingPage extends GetView<BookingController> {
   }
 }
 
-// ── Stepper header ─────────────────────────────────────────────────────────
+
 class _StepperHeader extends StatelessWidget {
   final int currentStep;
   final ColorScheme colorScheme;
@@ -134,8 +134,8 @@ class _StepperHeader extends StatelessWidget {
             children: [
               AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
-                width: 36,
-                height: 36,
+                width: 26,
+                height: 26,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: isCompleted || isCurrent
@@ -188,15 +188,16 @@ class _StepperHeader extends StatelessWidget {
   }
 }
 
-// ── Service context bar ────────────────────────────────────────────────────
 class _ServiceContextBar extends StatelessWidget {
   final String title;
+  final String SImage;
   final double price;
   final ColorScheme colorScheme;
   final ThemeData theme;
 
   const _ServiceContextBar({
     required this.title,
+    required this.SImage,
     required this.price,
     required this.colorScheme,
     required this.theme,
@@ -223,13 +224,12 @@ class _ServiceContextBar extends StatelessWidget {
               color: colorScheme.primary.withOpacity(0.10),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(
-              Icons.home_repair_service_outlined,
-              color: colorScheme.primary,
-              size: 24,
-            ),
+            child: Image.network(
+            SImage,
+            fit: BoxFit.cover,
           ),
-          const SizedBox(width: 12),
+          ),
+          SizedBox(width: 10,),
           Expanded(
             child: Text(
               title,
@@ -240,7 +240,7 @@ class _ServiceContextBar extends StatelessWidget {
             ),
           ),
           Text(
-            'Base: ৳${price.toInt()}',
+            'Minimum Price: ৳${price.toInt()}',
             style: theme.textTheme.bodySmall?.copyWith(
               fontWeight: FontWeight.bold,
               color: colorScheme.primary,
@@ -252,7 +252,7 @@ class _ServiceContextBar extends StatelessWidget {
   }
 }
 
-// ── Step 1: Service Scope ──────────────────────────────────────────────────
+
 class _Step1Body extends GetView<BookingController> {
   final ThemeData theme;
   final ColorScheme colorScheme;
@@ -265,6 +265,7 @@ class _Step1Body extends GetView<BookingController> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 20),
+
         Text('Define the Scope',
             style: theme.textTheme.headlineSmall
                 ?.copyWith(fontWeight: FontWeight.bold)),
@@ -273,10 +274,8 @@ class _Step1Body extends GetView<BookingController> {
             style: theme.textTheme.bodySmall
                 ?.copyWith(color: colorScheme.onSurfaceVariant)),
 
-        const SizedBox(height: 20),
-
-        // Sub-services chips
-        Text('Sub-services (optional)',
+        SizedBox(height: 20,),
+        Text('Select Subservices (optional)',
             style: theme.textTheme.labelLarge
                 ?.copyWith(fontWeight: FontWeight.bold)),
         const SizedBox(height: 10),
@@ -336,12 +335,12 @@ class _Step1Body extends GetView<BookingController> {
             alignLabelWithHint: true,
           ),
         ),
+
       ],
     );
   }
 }
 
-// ── Step 2: Logistics & Budget ─────────────────────────────────────────────
 class _Step2Body extends GetView<BookingController> {
   final BuildContext context;
   final ThemeData theme;
@@ -519,7 +518,6 @@ class _Step2Body extends GetView<BookingController> {
     );
   }
 }
-// ── Step 3: Review & Pay ───────────────────────────────────────────────────
 class _Step3Body extends GetView<BookingController> {
   final ThemeData theme;
   final ColorScheme colorScheme;
@@ -752,7 +750,6 @@ class _Step3Body extends GetView<BookingController> {
   }
 }
 
-// ── Summary chip ───────────────────────────────────────────────────────────
 class _SummaryChip extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -783,7 +780,6 @@ class _SummaryChip extends StatelessWidget {
   }
 }
 
-// ── Bottom nav bar ─────────────────────────────────────────────────────────
 class _BottomNavBar extends StatelessWidget {
   final int currentStep;
   final bool isLoading;

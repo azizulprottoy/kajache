@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../app/routes/app_routes.dart';
+import '../../../shared/widgets/success_model.dart';
 import '../arguments/service_booking_arguments.dart';
 import '../model/booking_request_model.dart';
 import '../repository/booking_repository.dart';
@@ -13,6 +15,7 @@ class BookingController extends GetxController {
   /// Service
   final serviceTitle = ''.obs;
   final servicePrice = 0.0.obs;
+  final serviceImage = ''.obs;
 
   late final String serviceId;
 
@@ -79,6 +82,7 @@ class BookingController extends GetxController {
     if (service != null) {
       serviceId = service.id;
       serviceTitle.value = service.title;
+      serviceImage.value = service.imageLink;
       servicePrice.value = (service.basePrice ?? 0).toDouble();
     }
 
@@ -182,10 +186,6 @@ class BookingController extends GetxController {
     }
   }
 
-  /// ==========================================
-  /// CREATE BOOKING -> CONFIRM PAYMENT
-  /// ==========================================
-
   Future<void> submitBooking() async {
     try {
       isLoading.value = true;
@@ -225,21 +225,40 @@ class BookingController extends GetxController {
         bookingId,
       );
 
-      /// 4. SUCCESS
-      Get.snackbar(
-        'Success',
-        'Booking created successfully',
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      /// 4. SHOW SUCCESS MODAL
+      await Get.dialog(
+        SuccessModal(
+          title: 'Booking Successful',
+          message:
+          'Your booking has been submitted successfully. Providers can now place bids on your request.',
 
-      /// 5. NAVIGATE
-      Get.toNamed(
-        '/booking/status/$bookingId',
+          yesText: 'View My Bookings',
+
+          onYes: () {
+            Get.back();
+
+            /// REDIRECT TO BOOKING LIST
+            Get.offAllNamed(
+              AppRoutes.myBookings,
+            );
+          },
+
+          onClose: () {
+            Get.back();
+
+            /// REDIRECT TO BOOKING LIST
+            Get.offAllNamed(
+              AppRoutes.myBookings,
+            );
+          },
+        ),
+
+        barrierDismissible: false,
       );
     } catch (e) {
       Get.snackbar(
         'Error',
-        e.toString(),
+        e.toString().replaceFirst('Exception: ', ''),
         snackPosition: SnackPosition.BOTTOM,
       );
     } finally {
