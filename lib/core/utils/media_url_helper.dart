@@ -13,6 +13,7 @@ class MediaUrlHelper {
       '',
     );
 
+
     if (rawUrl.startsWith('http://localhost:3000')) {
       return rawUrl.replaceFirst('http://localhost:3000', mediaBaseUrl);
     }

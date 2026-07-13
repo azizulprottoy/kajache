@@ -2,18 +2,24 @@ import 'package:get/get.dart';
 
 import '../../home/models/category_response_model.dart';
 import '../arguments/category_details_arguments.dart';
+import '../model/category_services_response_model.dart';
 import '../repository/category_details_repository.dart';
 
-
-
 class CategoryDetailsController extends GetxController {
-  final CategoryDetailsRepository _repository =
-  Get.find<CategoryDetailsRepository>();
+  final CategoryDetailsRepository _repository;
 
-  final RxBool isLoading = false.obs;
+  CategoryDetailsController({CategoryDetailsRepository? repository})
+      : _repository = repository ?? CategoryDetailsRepository();
+
+  // State
   final Rxn<CategoryModel> category = Rxn<CategoryModel>();
+  final RxList<Datum> services = <Datum>[].obs;
 
+  final RxBool isLoading = false.obs;          // category details
+  final RxBool isServicesLoading = false.obs;  // services list
+  final RxString errorMessage = ''.obs;
   late final String categoryId;
+  late final String categorySlug;
 
   @override
   void onInit() {
@@ -23,7 +29,10 @@ class CategoryDetailsController extends GetxController {
 
     if (args is CategoryDetailsArgument) {
       categoryId = args.categoryId;
+      categorySlug = args.categorySlug;
       fetchCategoryDetails();
+      fetchServices(categorySlug);
+
     } else {
       Get.back();
       Get.snackbar(
@@ -52,5 +61,18 @@ class CategoryDetailsController extends GetxController {
         .whenComplete(() {
       isLoading.value = false;
     });
+  }
+
+  Future<void> fetchServices(String categorySlug) async {
+    try {
+      isServicesLoading.value = true;
+      final result = await _repository.getServicesbyCategory(categorySlug);
+      services.assignAll(result ?? <Datum>[]);
+    } catch (_) {
+
+      services.clear();
+    } finally {
+      isServicesLoading.value = false;
+    }
   }
 }

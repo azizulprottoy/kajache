@@ -57,10 +57,10 @@ class BannerSlider extends StatelessWidget {
                       ? DecorationImage(
                     image: NetworkImage(banner.imageUrl),
                     fit: BoxFit.cover,
-                    colorFilter: ColorFilter.mode(
-                      Colors.black.withOpacity(0.35),
-                      BlendMode.darken,
-                    ),
+                    // colorFilter: ColorFilter.mode(
+                    //   Colors.black.withOpacity(0.35),
+                    //   BlendMode.darken,
+                    // ),
                   )
                       : null,
                 ),

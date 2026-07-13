@@ -111,7 +111,7 @@ class HomeController extends GetxController {
   onCategoryTap(CategoryModel category) {
     Get.toNamed(
       AppRoutes.categoryDetails,
-      arguments: CategoryDetailsArgument(categoryId: category.id),
+      arguments: CategoryDetailsArgument(categoryId: category.id,categorySlug: category.slug),
     );
   }
 
