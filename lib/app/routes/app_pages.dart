@@ -15,7 +15,6 @@ import 'package:kaj_ache/features/rewords/bindings/reword_binding.dart';
 import 'package:kaj_ache/features/rewords/views/reword_page.dart';
 import 'package:kaj_ache/features/services/bindings/service_details_binding.dart';
 import 'package:kaj_ache/features/services/views/all_services_list.dart';
-import 'package:kaj_ache/features/services/views/service_detail_page.dart';
 import 'package:kaj_ache/features/spash/binding/splash_binding.dart';
 import 'package:kaj_ache/features/statistics/binding/statistics_binding.dart';
 import 'package:kaj_ache/features/statistics/view/statistics_page.dart';

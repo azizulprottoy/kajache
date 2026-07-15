@@ -8,21 +8,23 @@ import '../repository/service_details_repository.dart';
 class ServiceDetailsController extends GetxController {
   final ServiceDetailsRepository _repository =
   Get.find<ServiceDetailsRepository>();
-
+  late final String serviceSlug;
+  bool isBooking = false;
+  bool isProviderBidFlow = false;
+  bool _hasInvalidArgument = false;
   final RxBool isLoading = false.obs;
   final Rxn<ServiceModel> service = Rxn<ServiceModel>();
 
-  String? serviceSlug;
-  bool _hasInvalidArgument = false;
+
 
   @override
   void onInit() {
     super.onInit();
-
     final args = Get.arguments;
-
     if (args is ServiceDetailsArgument && args.serviceSlug.isNotEmpty) {
       serviceSlug = args.serviceSlug;
+      isBooking = args.isbooking ?? false;
+      isProviderBidFlow = args.isProviderBidFlow ?? false;
     } else {
       _hasInvalidArgument = true;
     }

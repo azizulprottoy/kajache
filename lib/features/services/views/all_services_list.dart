@@ -163,23 +163,23 @@ class AllServices extends GetView<AllServicesController> {
                               ),
                             ),
 
-                            const SizedBox(height: 8),
-
-                            CustomButton(
-                              label: TKeys.bookNow.tr,
-                              variant: ButtonVariant.primary,
-                              size: ButtonSize.sm,
-                              isFullWidth: true,
-                              onPressed: () {
-                                Get.toNamed(
-                                  AppRoutes.bookingPage,
-                                  arguments: ServiceArgument(
-                                    ServiceID: service.id,
-                                    isbooking: true,
-                                  ),
-                                );
-                              },
-                            ),
+                            // const SizedBox(height: 8),
+                            //
+                            // CustomButton(
+                            //   label: TKeys.bookNow.tr,
+                            //   variant: ButtonVariant.primary,
+                            //   size: ButtonSize.sm,
+                            //   isFullWidth: true,
+                            //   onPressed: () {
+                            //     Get.toNamed(
+                            //       AppRoutes.bookingPage,
+                            //       arguments: ServiceArgument(
+                            //         ServiceID: service.id,
+                            //         isbooking: true,
+                            //       ),
+                            //     );
+                            //   },
+                            // ),
                           ],
                         ),
                       ),

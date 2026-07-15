@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../shared/widgets/booking_status_helper.dart';
 import '../../../shared/widgets/common_app_bar.dart';
 import '../controller/my_booking_controller.dart';
 
@@ -16,7 +17,7 @@ class MyBookingPage extends GetView<MyBookingController> {
 
       appBar: const CommonAppBar(
         title: 'My Bookings',
-        showBack: true,
+        showBack: false,
         showLanguageToggle: true,
       ),
 
@@ -59,16 +60,24 @@ class MyBookingPage extends GetView<MyBookingController> {
                             ),
                           ),
 
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.green.shade50,
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                            child: Text(booking.status),
+                          Builder(
+                            builder: (_) {
+                              final statusInfo = BookingStatusHelper.of(booking.status);
+                              return Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: statusInfo.color.withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                                child: Text(
+                                  statusInfo.label,
+                                  style: theme.textTheme.labelSmall?.copyWith(
+                                    color: statusInfo.color,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              );
+                            },
                           ),
                         ],
                       ),
@@ -81,7 +90,7 @@ class MyBookingPage extends GetView<MyBookingController> {
 
                       Row(
                         children: [
-                          const Icon(Icons.location_on, size: 18),
+                          Icon(Icons.location_on, size: 18,color: colorScheme.primary,),
 
                           const SizedBox(width: 6),
 
@@ -95,7 +104,7 @@ class MyBookingPage extends GetView<MyBookingController> {
 
                       Row(
                         children: [
-                          const Icon(Icons.calendar_today, size: 18),
+                          Icon(Icons.calendar_today, size: 18,color: colorScheme.primary,),
 
                           const SizedBox(width: 6),
 

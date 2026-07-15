@@ -11,7 +11,7 @@ class ApiEndpoints {
 
   // Profile
   static const String profileMe = '/profile/me';
-
+  static const String profileUpdate = '/profile/update';
   // Upload
   static const String upload = '/upload';
 

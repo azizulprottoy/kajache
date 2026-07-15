@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../app/routes/app_routes.dart';
+import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/common_app_bar.dart';
+import '../../../shared/widgets/custom_button.dart'; // CustomButton, ButtonVariant, ButtonSize
+import '../../service_details/arguments/service_details_arguments.dart';
 import '../controller/category_details_controller.dart';
 import '../model/category_services_response_model.dart';
 
@@ -21,9 +25,7 @@ class CategoryDetailsPage extends GetView<CategoryDetailsController> {
       ),
       body: Obx(() {
         if (controller.isLoading.value && controller.category.value == null) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
+          return const Center(child: CircularProgressIndicator());
         }
 
         final category = controller.category.value;
@@ -50,13 +52,10 @@ class CategoryDetailsPage extends GetView<CategoryDetailsController> {
                   height: 190,
                   width: double.infinity,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => _ImageFallback(
-                    colorScheme: colorScheme,
-                  ),
+                  errorBuilder: (_, __, ___) =>
+                      _ImageFallback(colorScheme: colorScheme),
                 )
-                    : _ImageFallback(
-                  colorScheme: colorScheme,
-                ),
+                    : _ImageFallback(colorScheme: colorScheme),
               ),
 
               const SizedBox(height: 20),
@@ -164,80 +163,114 @@ class _ServiceCard extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    final features = service.features ?? const [];
+    // final imageUrl = service.imageLink ?? '';
 
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: colorScheme.outlineVariant),
+    return GestureDetector(
+      onTap: () => Get.toNamed(
+        AppRoutes.serviceDetails,
+        arguments: ServiceDetailsArgument(serviceSlug: service.slug ?? ''),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Text(
-                  service.title ?? 'Untitled service',
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: colorScheme.onSurface,
-                  ),
-                ),
-              ),
-              if (service.basePrice != null) ...[
-                const SizedBox(width: 8),
-                Text(
-                  '৳${service.basePrice}',
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: colorScheme.primary,
-                  ),
-                ),
-              ],
-            ],
+      child: Container(
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: colorScheme.outlineVariant.withValues(alpha: 0.1),
           ),
-          if ((service.description ?? '').isNotEmpty) ...[
-            const SizedBox(height: 6),
-            Text(
-              service.description!,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-                height: 1.4,
+        ),
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Thumbnail
+            Container(
+              width: 72,
+              height: 72,
+              clipBehavior: Clip.antiAlias,
+              decoration: BoxDecoration(
+                color: colorScheme.surfaceContainerLowest,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              alignment: Alignment.center,
+              child:
+              // imageUrl.isNotEmpty
+              //     ? Image.network(
+              //   imageUrl,
+              //   width: 72,
+              //   height: 72,
+              //   fit: BoxFit.cover,
+              //   errorBuilder: (_, __, ___) => Icon(
+              //     Icons.home_repair_service_outlined,
+              //     color: colorScheme.primary,
+              //     size: 28,
+              //   ),
+              // )
+              //     :
+              Icon(
+                Icons.home_repair_service_outlined,
+                color: colorScheme.primary,
+                size: 28,
               ),
             ),
-          ],
-          if (features.isNotEmpty) ...[
-            const SizedBox(height: 10),
-            Wrap(
-              spacing: 6,
-              runSpacing: 6,
-              children: features
-                  .map(
-                    (f) => Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: colorScheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    f.toString(),
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: colorScheme.onPrimaryContainer,
+
+            const SizedBox(width: 12),
+
+            // Title + description
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    service.title ?? 'Untitled service',
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: colorScheme.onSurface,
                     ),
                   ),
-                ),
-              )
-                  .toList(),
+                  const SizedBox(height: 4),
+                  Text(
+                    service.description ?? '',
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(width: 8),
+
+            // Price + Book Now
+            SizedBox(
+              width: 90,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    '৳${service.basePrice ?? 0}',
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.primary,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  CustomButton(
+                    label: TKeys.bookNow.tr,
+                    variant: ButtonVariant.primary,
+                    size: ButtonSize.sm,
+                    isFullWidth: true,
+                    onPressed: () => Get.toNamed(
+                      AppRoutes.bookingPage,
+                      arguments: service,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
-        ],
+        ),
       ),
     );
   }
@@ -246,9 +279,7 @@ class _ServiceCard extends StatelessWidget {
 class _ImageFallback extends StatelessWidget {
   final ColorScheme colorScheme;
 
-  const _ImageFallback({
-    required this.colorScheme,
-  });
+  const _ImageFallback({required this.colorScheme});
 
   @override
   Widget build(BuildContext context) {

@@ -308,6 +308,8 @@ class _SwitchMenuTile extends StatelessWidget {
       trailing: Switch(
         value: value,
         onChanged: onChanged,
+        inactiveThumbColor: colorScheme.primary,
+        activeThumbColor: colorScheme.secondary,
       ),
     );
   }

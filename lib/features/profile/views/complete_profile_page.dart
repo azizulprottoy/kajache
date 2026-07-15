@@ -16,7 +16,7 @@ class CompleteProfilePage extends GetView<ProfileController> {
       backgroundColor: colorScheme.surface,
       appBar: const CommonAppBar(
         title: 'Complete Profile',
-        showBack: true,
+        showBack: false,
         showLanguageToggle: true,
       ),
       body: Obx(
@@ -82,7 +82,7 @@ class CompleteProfilePage extends GetView<ProfileController> {
                   width: double.infinity,
                   height: 52,
                   child: FilledButton(
-                    onPressed: controller.saveProfile,
+                    onPressed: controller.updateProfile,
                     child: const Text('Save Profile'),
                   ),
                 ),

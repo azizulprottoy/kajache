@@ -9,22 +9,6 @@ import '../../booking/controller/booking_controller.dart';
 import '../arguments/service_details_arguments.dart';
 import '../controller/service_details_controller.dart';
 
-// class _BidModel {
-//   final String name;
-//   final double rating;
-//   final int jobsDone;
-//   final int price;
-//   final String eta;
-//
-//   const _BidModel({
-//     required this.name,
-//     required this.rating,
-//     required this.jobsDone,
-//     required this.price,
-//     required this.eta,
-//   });
-// }
-
 class ServiceDetailsPage extends GetView<ServiceDetailsController> {
   const ServiceDetailsPage({super.key});
 
@@ -32,9 +16,8 @@ class ServiceDetailsPage extends GetView<ServiceDetailsController> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final args = Get.arguments as ServiceDetailsArgument;
-    final isBooking = args?.isbooking ?? false;
-    final isProviderBidFlow = args?.isProviderBidFlow ?? false;
+    final isBooking = controller.isBooking;
+    final isProviderBidFlow = controller.isProviderBidFlow;
 
     return Scaffold(
       backgroundColor: colorScheme.surface,

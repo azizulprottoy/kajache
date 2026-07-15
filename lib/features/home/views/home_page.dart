@@ -33,23 +33,23 @@ class HomePage extends GetView<HomeController> {
                 children: [
                   const SizedBox(height: 12),
 
-                  TextField(
-                    readOnly: true,
-                    onTap: () {},
-                    decoration: InputDecoration(
-                      hintText: 'search_hint'.tr,
-                      prefixIcon: const Icon(Icons.search),
-                      filled: true,
-                      fillColor: colorScheme.surfaceContainerLow,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(vertical: 0),
-                    ),
-                  ),
-
-                  const SizedBox(height: 20),
+                  // TextField(
+                  //   readOnly: true,
+                  //   onTap: () {},
+                  //   decoration: InputDecoration(
+                  //     hintText: 'search_hint'.tr,
+                  //     prefixIcon: const Icon(Icons.search),
+                  //     filled: true,
+                  //     fillColor: colorScheme.surfaceContainerLow,
+                  //     border: OutlineInputBorder(
+                  //       borderRadius: BorderRadius.circular(12),
+                  //       borderSide: BorderSide.none,
+                  //     ),
+                  //     contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                  //   ),
+                  // ),
+                  //
+                  // const SizedBox(height: 20),
 
                   BannerSlider(
                     banners: controller.banners,
@@ -107,9 +107,7 @@ class HomePage extends GetView<HomeController> {
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 8),
-
                   PopularServicesList(
                     services: controller.popularServices,
                     isLoading: controller.isLoading.value,

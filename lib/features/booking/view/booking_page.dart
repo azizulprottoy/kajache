@@ -15,7 +15,6 @@ class BookingPage extends GetView<BookingController> {
       backgroundColor: colorScheme.surface,
       appBar: const CommonAppBar(
         title: 'Book Service',
-        showBack: true,
         showLanguageToggle: true,
       ),
       body: Column(

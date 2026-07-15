@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 
 import '../../../shared/widgets/common_app_bar.dart';
 import '../../../shared/widgets/custom_text_field.dart';
+import '../../../shared/widgets/serachable_dropdown_field.dart';
 import '../controllers/profile_controller.dart';
 
 class EditProfilePage extends GetView<ProfileController> {
@@ -16,7 +17,7 @@ class EditProfilePage extends GetView<ProfileController> {
       backgroundColor: colorScheme.surface,
       appBar: const CommonAppBar(
         title: 'edit_profile',
-        showBack: true,
+        showBack: false,
         showLanguageToggle: true,
       ),
       body: Obx(
@@ -27,31 +28,42 @@ class EditProfilePage extends GetView<ProfileController> {
             child: Column(
               children: [
                 Center(
-                  child: Stack(
-                    children: [
-                      CircleAvatar(
-                        radius: 46,
-                        backgroundColor: colorScheme.primary.withOpacity(0.12),
-                        child: Icon(
-                          Icons.person,
-                          size: 46,
-                          color: colorScheme.primary,
-                        ),
-                      ),
-                      Positioned(
-                        right: 0,
-                        bottom: 0,
-                        child: CircleAvatar(
-                          radius: 16,
-                          backgroundColor: colorScheme.primary,
-                          child: const Icon(
-                            Icons.edit,
-                            size: 16,
-                            color: Colors.white,
+                  child: GestureDetector(
+                    onTap: controller.pickAvatar,
+                    child: Stack(
+                      children: [
+                        Builder(builder: (_) {
+                          final file = controller.avatarFile.value;
+                          final url = controller.profile.value?.avatar ?? '';
+                          ImageProvider? img;
+                          if (file != null) {
+                            img = FileImage(file);
+                          } else if (url.isNotEmpty) {
+                            img = NetworkImage(url);
+                          }
+                          return CircleAvatar(
+                            radius: 46,
+                            backgroundColor:
+                            colorScheme.primary.withOpacity(0.12),
+                            backgroundImage: img,
+                            child: img == null
+                                ? Icon(Icons.person,
+                                size: 46, color: colorScheme.primary)
+                                : null,
+                          );
+                        }),
+                        Positioned(
+                          right: 0,
+                          bottom: 0,
+                          child: CircleAvatar(
+                            radius: 16,
+                            backgroundColor: colorScheme.primary,
+                            child: const Icon(Icons.edit,
+                                size: 16, color: Colors.white),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -75,9 +87,31 @@ class EditProfilePage extends GetView<ProfileController> {
                   keyboardType: TextInputType.phone,
                 ),
                 const SizedBox(height: 14),
+                // ── District & Area ──
+                SearchableDropdownField(
+                  label: 'District',
+                  icon: Icons.map_outlined,
+                  value: controller.selectedDistrict.value,
+                  items: controller.districts,
+                  hint: 'Select district',
+                  onSelected: controller.onDistrictSelected,
+                ),
+                const SizedBox(height: 14),
+                SearchableDropdownField(
+                  label: 'Area',
+                  icon: Icons.location_city_outlined,
+                  value: controller.selectedArea.value,
+                  items: controller.currentAreas,
+                  enabled: controller.selectedDistrict.value != null,
+                  hint: controller.selectedDistrict.value == null
+                      ? 'Select district first'
+                      : 'Select area',
+                  onSelected: controller.onAreaSelected,
+                ),
+                const SizedBox(height: 14),
                 ProfileField(
                   controller: controller.addressController,
-                  label: 'Address',
+                  label: Tkeys.a,
                   icon: Icons.location_on_outlined,
                 ),
                 if (controller.isServiceProvider) ...[
@@ -111,8 +145,19 @@ class EditProfilePage extends GetView<ProfileController> {
                   width: double.infinity,
                   height: 52,
                   child: FilledButton(
-                    onPressed: controller.updateProfile,
-                    child: const Text('Save Changes'),
+                    onPressed: controller.isLoading.value
+                        ? null
+                        : controller.updateProfile,
+                    child: controller.isLoading.value
+                        ? const SizedBox(
+                      height: 22,
+                      width: 22,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                        : const Text('Save Changes'),
                   ),
                 ),
               ],

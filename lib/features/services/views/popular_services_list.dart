@@ -103,7 +103,6 @@ class PopularServicesList extends StatelessWidget {
                     ],
                   ),
                 ),
-
                 SizedBox(
                   width: 90,
                   child: Column(
@@ -116,19 +115,19 @@ class PopularServicesList extends StatelessWidget {
                           color: colorScheme.primary,
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      CustomButton(
-                        label: TKeys.bookNow.tr,
-                        variant: ButtonVariant.primary,
-                        size: ButtonSize.sm,
-                        isFullWidth: true,
-                        onPressed: () {
-                          Get.toNamed(
-                            AppRoutes.bookingPage,
-                            arguments: service,
-                          );
-                        },
-                      ),
+                      // const SizedBox(height: 8),
+                      // CustomButton(
+                      //   label: TKeys.bookNow.tr,
+                      //   variant: ButtonVariant.primary,
+                      //   size: ButtonSize.sm,
+                      //   isFullWidth: true,
+                      //   onPressed: () {
+                      //     Get.toNamed(
+                      //       AppRoutes.bookingPage,
+                      //       arguments: service,
+                      //     );
+                      //   },
+                      // ),
                     ],
                   ),
                 ),

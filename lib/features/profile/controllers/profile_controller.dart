@@ -1,13 +1,23 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 
+import '../models/profile_model.dart';
 import '../models/worker_profile_model.dart';
-
+import '../repository/profile_repository.dart';
 
 class ProfileController extends GetxController {
+  final ProfileRepository _repository = ProfileRepository();
+  final ImagePicker _picker = ImagePicker();
+
   final Rx<ProfileType> profileType = ProfileType.buyer.obs;
+  final Rxn<ProfileModel> profile = Rxn<ProfileModel>();
+  final Rxn<File> avatarFile = Rxn<File>();
 
   final formKey = GlobalKey<FormState>();
+  final RxBool isLoading = false.obs;
 
   late TextEditingController fullNameController;
   late TextEditingController emailController;
@@ -20,50 +30,147 @@ class ProfileController extends GetxController {
   late TextEditingController experienceController;
   late TextEditingController serviceAreaController;
 
-  final RxBool isLoading = false.obs;
-
   bool get isBuyer => profileType.value == ProfileType.buyer;
-  bool get isServiceProvider => profileType.value == ProfileType.serviceProvider;
+  bool get isServiceProvider =>
+      profileType.value == ProfileType.serviceProvider;
+
+  final selectedDistrict = RxnString();
+  final selectedArea = RxnString();
+
+  final districts = <String>[
+    'Bagerhat', 'Bandarban', 'Barguna', 'Barishal', 'Bhola', 'Bogura',
+    'Brahmanbaria', 'Chandpur', 'Chattogram', 'Chuadanga', "Cox's Bazar",
+    'Cumilla', 'Dhaka', 'Dinajpur', 'Faridpur', 'Feni', 'Gaibandha',
+    'Gazipur', 'Gopalganj', 'Habiganj', 'Jamalpur', 'Jashore', 'Jhalokati',
+    'Jhenaidah', 'Joypurhat', 'Khagrachhari', 'Khulna', 'Kishoreganj',
+    'Kurigram', 'Kushtia', 'Lakshmipur', 'Lalmonirhat', 'Madaripur', 'Magura',
+    'Manikganj', 'Meherpur', 'Moulvibazar', 'Munshiganj', 'Mymensingh',
+    'Naogaon', 'Narail', 'Narayanganj', 'Narsingdi', 'Natore',
+    'Chapainawabganj', 'Netrokona', 'Nilphamari', 'Noakhali', 'Pabna',
+    'Panchagarh', 'Patuakhali', 'Pirojpur', 'Rajbari', 'Rajshahi',
+    'Rangamati', 'Rangpur', 'Satkhira', 'Shariatpur', 'Sherpur', 'Sirajganj',
+    'Sunamganj', 'Sylhet', 'Tangail', 'Thakurgaon',
+  ].obs;
+
+  final Map<String, List<String>> areasByDistrict = {
+    'Dhaka': ['Dhanmondi', 'Gulshan', 'Mirpur', 'Uttara', 'Mohammadpur', 'Banani', 'Motijheel'],
+    'Chattogram': ['Agrabad', 'Pahartali', 'Halishahar', 'Nasirabad', 'Khulshi'],
+    'Sylhet': ['Zindabazar', 'Ambarkhana', 'Subid Bazar', 'Tilagor'],
+    // ...populate the rest, or fetch from backend
+  };
+
+  List<String> get currentAreas => selectedDistrict.value == null
+      ? <String>[]
+      : (areasByDistrict[selectedDistrict.value] ?? <String>[]);
+
+  void onDistrictSelected(String district) {
+    selectedDistrict.value = district;
+    selectedArea.value = null;
+  }
+
+  void onAreaSelected(String area) => selectedArea.value = area;
 
   @override
   void onInit() {
     super.onInit();
 
+    fullNameController = TextEditingController();
+    emailController = TextEditingController();
+    phoneController = TextEditingController();
+    addressController = TextEditingController();
+    businessNameController = TextEditingController();
+    categoryController = TextEditingController();
+    experienceController = TextEditingController();
+    serviceAreaController = TextEditingController();
+
     final args = Get.arguments;
-    if (args is ProfileType) {
-      profileType.value = args;
+    if (args is ProfileType) profileType.value = args;
+
+    fetchMyProfile();
+  }
+
+  Future<void> fetchMyProfile() async {
+    try {
+      isLoading.value = true;
+
+      final p = await _repository.getMyProfile();
+      profile.value = p;
+
+      // Account type comes from the server (roleModelName)
+      profileType.value = p.isServiceProvider
+          ? ProfileType.serviceProvider
+          : ProfileType.buyer;
+
+      fullNameController.text = p.fullName;
+      emailController.text = p.email;
+      phoneController.text = p.phone;
+      addressController.text = p.address;
+      businessNameController.text = p.businessName;
+      categoryController.text = p.category;
+      experienceController.text = p.experience;
+      serviceAreaController.text = p.serviceArea;
+
+      if (p.district.isNotEmpty) selectedDistrict.value = p.district;
+      if (p.area.isNotEmpty) selectedArea.value = p.area;
+    } catch (e) {
+      Get.snackbar('Error', e.toString(),
+          snackPosition: SnackPosition.BOTTOM);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> pickAvatar() async {
+    final picked = await _picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 80,
+    );
+    if (picked != null) {
+      avatarFile.value = File(picked.path);
+    }
+  }
+
+  Future<void> updateProfile() async {
+    if (!formKey.currentState!.validate()) return;
+
+    if (selectedDistrict.value == null) {
+      Get.snackbar('Missing', 'Please select a district',
+          snackPosition: SnackPosition.BOTTOM);
+      return;
     }
 
-    fullNameController = TextEditingController(text: 'Prottoy Alam');
-    emailController = TextEditingController(text: 'prottoy@example.com');
-    phoneController = TextEditingController(text: '+8801XXXXXXXXX');
-    addressController = TextEditingController(text: 'Dhaka, Bangladesh');
+    try {
+      isLoading.value = true;
 
-    businessNameController =
-        TextEditingController(text: 'Rahim Electric Service');
-    categoryController = TextEditingController(text: 'Electrician');
-    experienceController = TextEditingController(text: '5 Years');
-    serviceAreaController = TextEditingController(text: 'Dhaka City');
-  }
+      final fields = <String, dynamic>{
+        'fullName': fullNameController.text.trim(),
+        'phone': phoneController.text.trim(),
+        'address': addressController.text.trim(),
+        'district': selectedDistrict.value,
+        'area': selectedArea.value,
+        if (isServiceProvider) ...{
+          'businessName': businessNameController.text.trim(),
+          'category': categoryController.text.trim(),
+          'experience': experienceController.text.trim(),
+          'serviceArea': serviceAreaController.text.trim(),
+        },
+      };
 
-  void saveProfile() {
-    if (!formKey.currentState!.validate()) return;
+      await _repository.updateProfile(
+        fields: fields,
+        avatar: avatarFile.value,
+      );
 
-    Get.snackbar(
-      'Success',
-      'Profile saved successfully',
-      snackPosition: SnackPosition.BOTTOM,
-    );
-  }
+      Get.snackbar('Success', 'Profile updated successfully',
+          snackPosition: SnackPosition.BOTTOM);
 
-  void updateProfile() {
-    if (!formKey.currentState!.validate()) return;
-
-    Get.snackbar(
-      'Success',
-      'Profile updated successfully',
-      snackPosition: SnackPosition.BOTTOM,
-    );
+      await fetchMyProfile(); // refresh with saved values
+    } catch (e) {
+      Get.snackbar('Error', e.toString(),
+          snackPosition: SnackPosition.BOTTOM);
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   @override
