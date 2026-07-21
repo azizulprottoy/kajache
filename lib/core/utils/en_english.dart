@@ -18,6 +18,16 @@ const Map<String, String> enUS = {
   TKeys.submit:            'Submit',
   TKeys.search:            'Search',
   TKeys.seeAll:            'See All',
+  TKeys.district:            'District',
+  TKeys.area:                'Area',
+  TKeys.selectDistrict:      'Select district',
+  TKeys.selectDistrictFirst: 'Select district first',
+  TKeys.selectArea:          'Select area',
+  TKeys.businessName:        'Business Name',
+  TKeys.serviceCategory:     'Service Category',
+  TKeys.experience:          'Experience',
+  TKeys.serviceArea:         'Service Area',
+  TKeys.saveChanges:         'Save Changes',
 
   // Auth
   TKeys.welcomeBack:      'Welcome back',

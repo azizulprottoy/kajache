@@ -19,6 +19,16 @@ const Map<String, String> bnBD = {
   TKeys.submit:            'জমা দিন',
   TKeys.search:            'খুঁজুন',
   TKeys.seeAll:            'সব দেখুন',
+  TKeys.district:            'জেলা',
+  TKeys.area:                'এলাকা',
+  TKeys.selectDistrict:      'জেলা নির্বাচন করুন',
+  TKeys.selectDistrictFirst: 'প্রথমে জেলা নির্বাচন করুন',
+  TKeys.selectArea:          'এলাকা নির্বাচন করুন',
+  TKeys.businessName:        'ব্যবসার নাম',
+  TKeys.serviceCategory:     'সেবার ধরন',
+  TKeys.experience:          'অভিজ্ঞতা',
+  TKeys.serviceArea:         'সেবার এলাকা',
+  TKeys.saveChanges:         'পরিবর্তন সংরক্ষণ করুন',
 
   // Auth
   TKeys.welcomeBack:      'স্বাগতম',

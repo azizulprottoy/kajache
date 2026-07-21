@@ -18,7 +18,16 @@ class TKeys {
   static const submit         = 'submit';
   static const search         = 'search';
   static const seeAll         = 'see_all';
-
+  static const district            = 'district';
+  static const area                = 'area';
+  static const selectDistrict      = 'select_district';
+  static const selectDistrictFirst = 'select_district_first';
+  static const selectArea          = 'select_area';
+  static const businessName        = 'business_name';
+  static const serviceCategory     = 'service_category';
+  static const experience          = 'experience';
+  static const serviceArea         = 'service_area';
+  static const saveChanges         = 'save_changes';
   // ── Auth ────────────────────────────────────────────────────────────────────
   static const welcomeBack      = 'welcome_back';
   static const fullname    = 'fullname';
