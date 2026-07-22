@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import '../../../core/utils/translation_keys.dart';
 
 class PortfolioController extends GetxController {
   final RxList<PortfolioItem> portfolioItems = <PortfolioItem>[].obs;
@@ -12,16 +13,16 @@ class PortfolioController extends GetxController {
   void loadPortfolio() {
     portfolioItems.assignAll([
       PortfolioItem(
-        title: 'Bathroom Deep Cleaning',
-        subtitle: 'Completed for a residential apartment',
+        title: TKeys.pfBathroomCleaning.tr,
+        subtitle: TKeys.pfBathroomCleaningDesc.tr,
       ),
       PortfolioItem(
-        title: 'Kitchen Plumbing Repair',
-        subtitle: 'Pipe leakage fixed successfully',
+        title: TKeys.pfKitchenPlumbing.tr,
+        subtitle: TKeys.pfKitchenPlumbingDesc.tr,
       ),
       PortfolioItem(
-        title: 'Wall Painting Service',
-        subtitle: 'Full room repaint completed',
+        title: TKeys.pfWallPainting.tr,
+        subtitle: TKeys.pfWallPaintingDesc.tr,
       ),
     ]);
   }

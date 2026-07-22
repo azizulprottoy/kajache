@@ -159,7 +159,7 @@ class EditProfilePage extends GetView<ProfileController> {
                         color: Colors.white,
                       ),
                     )
-                        : const Text('Save Changes'),
+                        : Text(TKeys.saveChanges.tr),
                   ),
                 ),
               ],

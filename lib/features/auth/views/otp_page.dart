@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import '../../../app/routes/app_routes.dart';
+import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/success_model.dart';
 
 class OtpArgument {
@@ -61,8 +62,8 @@ class _OtpPageState extends State<OtpPage> {
   void _verifyOtp() {
     if (otp.length != 6) {
       Get.snackbar(
-        'Error',
-        'Please enter the 6-digit OTP',
+        TKeys.error.tr,
+        TKeys.enterOtp.tr,
         snackPosition: SnackPosition.BOTTOM,
       );
       return;
@@ -79,9 +80,9 @@ class _OtpPageState extends State<OtpPage> {
       context: context,
       barrierDismissible: false,
       builder: (_) => SuccessModal(
-        title: 'Success',
-        message: 'Your account has been verified successfully.',
-        yesText: 'OK',
+        title: TKeys.success.tr,
+        message: TKeys.accountVerified.tr,
+        yesText: TKeys.ok.tr,
         onYes: () {
           Navigator.of(context).pop();
           Get.offAllNamed(AppRoutes.login);
@@ -114,7 +115,7 @@ class _OtpPageState extends State<OtpPage> {
             children: [
               const SizedBox(height: 20),
               Text(
-                'Verify OTP',
+                TKeys.verifyOtp.tr,
                 style: theme.textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: colorScheme.onSurface,
@@ -122,7 +123,7 @@ class _OtpPageState extends State<OtpPage> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Enter the 6-digit code sent to your phone or email.',
+                TKeys.otpSentInfo.tr,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: colorScheme.onSurface.withOpacity(0.6),
                 ),
@@ -194,8 +195,8 @@ class _OtpPageState extends State<OtpPage> {
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  child: const Text(
-                    'Verify',
+                  child: Text(
+                    TKeys.verify.tr,
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
                     ),
@@ -207,7 +208,7 @@ class _OtpPageState extends State<OtpPage> {
                 child: TextButton(
                   onPressed: () {},
                   child: Text(
-                    'Resend OTP',
+                    TKeys.resendOtp.tr,
                     style: TextStyle(
                       color: colorScheme.primary,
                       fontWeight: FontWeight.w600,

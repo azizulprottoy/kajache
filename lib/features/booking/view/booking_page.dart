@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../shared/widgets/common_app_bar.dart';
 import '../controller/booking_controller.dart';
+import '../../../core/utils/translation_keys.dart';
 
 class BookingPage extends GetView<BookingController> {
   const BookingPage({super.key});
@@ -13,8 +14,8 @@ class BookingPage extends GetView<BookingController> {
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
-      appBar: const CommonAppBar(
-        title: 'Book Service',
+      appBar: CommonAppBar(
+        title: TKeys.bookService.tr,
         showLanguageToggle: true,
       ),
       body: Column(
@@ -97,7 +98,7 @@ class _StepperHeader extends StatelessWidget {
     required this.theme,
   });
 
-  static const _steps = ['Service Scope', 'Logistics', 'Pay & Confirm'];
+  static final _steps = [TKeys.serviceScope.tr, TKeys.logistics.tr, TKeys.payConfirm.tr];
 
   @override
   Widget build(BuildContext context) {
@@ -239,7 +240,7 @@ class _ServiceContextBar extends StatelessWidget {
             ),
           ),
           Text(
-            'Minimum Price: ৳${price.toInt()}',
+            '${TKeys.minimumPrice.tr}: ৳${price.toInt()}',
             style: theme.textTheme.bodySmall?.copyWith(
               fontWeight: FontWeight.bold,
               color: colorScheme.primary,
@@ -265,16 +266,16 @@ class _Step1Body extends GetView<BookingController> {
       children: [
         const SizedBox(height: 20),
 
-        Text('Define the Scope',
+        Text(TKeys.defineScope.tr,
             style: theme.textTheme.headlineSmall
                 ?.copyWith(fontWeight: FontWeight.bold)),
         const SizedBox(height: 4),
-        Text('Tell us exactly what you need done.',
+        Text(TKeys.defineScopeSubtitle.tr,
             style: theme.textTheme.bodySmall
                 ?.copyWith(color: colorScheme.onSurfaceVariant)),
 
         SizedBox(height: 20,),
-        Text('Select Subservices (optional)',
+        Text(TKeys.selectSubservices.tr,
             style: theme.textTheme.labelLarge
                 ?.copyWith(fontWeight: FontWeight.bold)),
         const SizedBox(height: 10),
@@ -318,7 +319,7 @@ class _Step1Body extends GetView<BookingController> {
         const SizedBox(height: 20),
 
         // Problem details
-        Text('Problem Details *',
+        Text(TKeys.problemDetails.tr,
             style: theme.textTheme.labelLarge
                 ?.copyWith(fontWeight: FontWeight.bold)),
         const SizedBox(height: 8),
@@ -326,10 +327,10 @@ class _Step1Body extends GetView<BookingController> {
           controller: controller.problemDetailsController,
           maxLines: 5,
           validator: (v) =>
-          v == null || v.trim().isEmpty ? 'Please describe your problem' : null,
+          v == null || v.trim().isEmpty ? TKeys.describeProblemError.tr : null,
           decoration: InputDecoration(
             hintText:
-            'Describe the problem in detail. The more you share, the better bids you\'ll receive...',
+            TKeys.problemDetailsHint.tr,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
             alignLabelWithHint: true,
           ),
@@ -359,7 +360,7 @@ class _Step2Body extends GetView<BookingController> {
         const SizedBox(height: 20),
 
         Text(
-          'Logistics & Budget',
+          TKeys.logisticsBudget.tr,
           style: theme.textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.bold,
           ),
@@ -368,7 +369,7 @@ class _Step2Body extends GetView<BookingController> {
         const SizedBox(height: 4),
 
         Text(
-          'Where, when, and how much?',
+          TKeys.logisticsSubtitle.tr,
           style: theme.textTheme.bodySmall?.copyWith(
             color: colorScheme.onSurfaceVariant,
           ),
@@ -380,8 +381,8 @@ class _Step2Body extends GetView<BookingController> {
         TextFormField(
           controller: controller.addressController,
           decoration: InputDecoration(
-            labelText: 'Service Address *',
-            hintText: 'House #, Road, Area...',
+            labelText: TKeys.serviceAddress.tr,
+            hintText: TKeys.addressHint.tr,
             prefixIcon: const Icon(Icons.location_on_outlined),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
@@ -396,7 +397,7 @@ class _Step2Body extends GetView<BookingController> {
               () => DropdownButtonFormField<String>(
             value: controller.selectedCity.value,
             decoration: InputDecoration(
-              labelText: 'City',
+              labelText: TKeys.city.tr,
               prefixIcon: const Icon(Icons.location_city_outlined),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
@@ -430,13 +431,13 @@ class _Step2Body extends GetView<BookingController> {
                   onTap: () => controller.pickDate(context),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'Select a date';
+                      return TKeys.selectDate.tr;
                     }
                     return null;
                   },
                   decoration: InputDecoration(
-                    labelText: 'Date *',
-                    hintText: 'Pick date',
+                    labelText: TKeys.dateLabel.tr,
+                    hintText: TKeys.pickDate.tr,
                     prefixIcon:
                     const Icon(Icons.calendar_today_outlined),
                     border: OutlineInputBorder(
@@ -454,9 +455,9 @@ class _Step2Body extends GetView<BookingController> {
               child: Obx(
                     () => DropdownButtonFormField<String>(
                   value: controller.selectedTime.value,
-                  hint: const Text('Pick time'),
+                  hint: Text(TKeys.pickTime.tr),
                   decoration: InputDecoration(
-                    labelText: 'Time Slot *',
+                    labelText: TKeys.timeSlot.tr,
                     prefixIcon:
                     const Icon(Icons.access_time_outlined),
                     border: OutlineInputBorder(
@@ -473,7 +474,7 @@ class _Step2Body extends GetView<BookingController> {
                       .toList(),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Select a time';
+                      return TKeys.selectTime.tr;
                     }
                     return null;
                   },
@@ -496,18 +497,18 @@ class _Step2Body extends GetView<BookingController> {
             final amount = int.tryParse(value ?? '') ?? 0;
 
             if (amount < 100) {
-              return 'Minimum budget is 100 BDT';
+              return TKeys.minBudgetError.tr;
             }
 
             return null;
           },
           decoration: InputDecoration(
-            labelText: 'Maximum Budget (BDT) *',
-            hintText: 'e.g. 2000',
+            labelText: TKeys.maxBudgetLabel.tr,
+            hintText: TKeys.budgetHint.tr,
             prefixIcon:
             const Icon(Icons.account_balance_wallet_outlined),
             helperText:
-            'Providers won\'t bid above this amount.',
+            TKeys.maxBudgetInfo.tr,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
             ),

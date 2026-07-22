@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../shared/widgets/common_app_bar.dart';
+import '../../../core/utils/translation_keys.dart';
 import '../controllers/reword_controller.dart';
 
 class RewardsPage extends GetView<RewardsController> {
@@ -14,8 +15,8 @@ class RewardsPage extends GetView<RewardsController> {
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
-      appBar: const CommonAppBar(
-        title: 'Rewards',
+      appBar: CommonAppBar(
+        title: TKeys.rewards.tr,
         showBack: true,
         showLanguageToggle: true,
       ),
@@ -42,7 +43,7 @@ class RewardsPage extends GetView<RewardsController> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Total Reward Points',
+                      TKeys.totalRewardPoints.tr,
                       style: theme.textTheme.titleMedium?.copyWith(
                         color: colorScheme.onPrimary.withOpacity(0.9),
                       ),
@@ -66,7 +67,7 @@ class RewardsPage extends GetView<RewardsController> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
-                        'Use your points for discounts and special offers',
+                        TKeys.rewardPointsSubtitle.tr,
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: colorScheme.onPrimary,
                         ),
@@ -79,7 +80,7 @@ class RewardsPage extends GetView<RewardsController> {
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  'Reward History',
+                  TKeys.rewardHistory.tr,
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: colorScheme.onSurface,

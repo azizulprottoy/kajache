@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/common_app_bar.dart';
 import '../controllers/order_controller.dart';
 
@@ -14,8 +15,8 @@ class PreviousOrdersPage extends GetView<PreviousOrdersController> {
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
-      appBar: const CommonAppBar(
-        title: 'Previous Orders',
+      appBar: CommonAppBar(
+        title: TKeys.previousOrders.tr,
         showBack: true,
         showLanguageToggle: true,
       ),
@@ -27,7 +28,7 @@ class PreviousOrdersPage extends GetView<PreviousOrdersController> {
         if (controller.previousOrders.isEmpty) {
           return Center(
             child: Text(
-              'No previous orders found',
+              TKeys.noPreviousOrders.tr,
               style: theme.textTheme.bodyLarge,
             ),
           );
@@ -154,7 +155,7 @@ class PreviousOrdersPage extends GetView<PreviousOrdersController> {
                         onPressed: () {
                           // TODO: reorder or view details
                         },
-                        child: const Text('View Details'),
+                        child: Text(TKeys.viewDetails.tr),
                       ),
                     ],
                   ),

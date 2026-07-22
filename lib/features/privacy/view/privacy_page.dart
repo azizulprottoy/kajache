@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../shared/widgets/common_app_bar.dart';
+import '../../../core/utils/translation_keys.dart';
 import '../controller/privacy_controller.dart';
 
 class PrivacyPolicyPage extends GetView<PrivacyPolicyController> {
@@ -13,8 +14,8 @@ class PrivacyPolicyPage extends GetView<PrivacyPolicyController> {
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
-      appBar: const CommonAppBar(
-        title: 'Privacy Policy',
+      appBar: CommonAppBar(
+        title: TKeys.privacyPolicy.tr,
         showBack: true,
         showLanguageToggle: true,
       ),

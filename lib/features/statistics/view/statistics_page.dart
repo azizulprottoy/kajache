@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/common_app_bar.dart';
 import '../controller/statistics_controller.dart';
 
@@ -13,8 +14,8 @@ class StatisticsPage extends GetView<StatisticsController> {
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
-      appBar: const CommonAppBar(
-        title: 'Statistics',
+      appBar: CommonAppBar(
+        title: TKeys.statistics.tr,
         showLanguageToggle: true,
       ),
       body: Obx(
@@ -26,7 +27,7 @@ class StatisticsPage extends GetView<StatisticsController> {
                 children: [
                   Expanded(
                     child: _StatCard(
-                      title: 'Total Jobs',
+                      title: TKeys.totalJobs.tr,
                       value: '${controller.totalJobs.value}',
                       icon: Icons.work_outline,
                     ),
@@ -34,7 +35,7 @@ class StatisticsPage extends GetView<StatisticsController> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: _StatCard(
-                      title: 'Completed',
+                      title: TKeys.completed.tr,
                       value: '${controller.completedJobs.value}',
                       icon: Icons.check_circle_outline,
                     ),
@@ -46,7 +47,7 @@ class StatisticsPage extends GetView<StatisticsController> {
                 children: [
                   Expanded(
                     child: _StatCard(
-                      title: 'Cancelled',
+                      title: TKeys.cancelled.tr,
                       value: '${controller.cancelledJobs.value}',
                       icon: Icons.cancel_outlined,
                     ),
@@ -54,7 +55,7 @@ class StatisticsPage extends GetView<StatisticsController> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: _StatCard(
-                      title: 'Rating',
+                      title: TKeys.rating.tr,
                       value: '${controller.rating.value}',
                       icon: Icons.star_outline,
                     ),
@@ -62,14 +63,14 @@ class StatisticsPage extends GetView<StatisticsController> {
                 ],
               ),
               const SizedBox(height: 20),
-              const _ChartPlaceholder(
-                title: 'Weekly Earnings',
-                subtitle: 'This week earnings overview',
+              _ChartPlaceholder(
+                title: TKeys.weeklyEarnings.tr,
+                subtitle: TKeys.weeklyEarningsSubtitle.tr,
               ),
               const SizedBox(height: 16),
-              const _ChartPlaceholder(
-                title: 'Monthly Performance',
-                subtitle: 'Jobs completed by month',
+              _ChartPlaceholder(
+                title: TKeys.monthlyPerformance.tr,
+                subtitle: TKeys.monthlyPerformanceSubtitle.tr,
               ),
             ],
           ),

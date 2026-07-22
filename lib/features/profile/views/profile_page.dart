@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/common_app_bar.dart';
 import '../controllers/profile_controller.dart';
 import 'edit_profile_page.dart';
@@ -74,8 +75,8 @@ class MyProfilePage extends GetView<ProfileController> {
                       const SizedBox(height: 4),
                       Text(
                         controller.isBuyer
-                            ? 'Buyer Account'
-                            : 'Service Provider',
+                            ? TKeys.buyerAccount.tr
+                            : TKeys.serviceProvider.tr,
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: colorScheme.onSurface.withOpacity(0.6),
                         ),
@@ -91,7 +92,7 @@ class MyProfilePage extends GetView<ProfileController> {
                             );
                           },
                           icon: const Icon(Icons.edit_outlined),
-                          label: const Text('Edit Profile'),
+                          label: Text(TKeys.editProfile.tr),
                         ),
                       ),
                     ],
@@ -99,63 +100,63 @@ class MyProfilePage extends GetView<ProfileController> {
                 ),
                 const SizedBox(height: 16),
                 _ProfileSection(
-                  title: 'Basic Information',
+                  title: TKeys.basicInformation.tr,
                   children: [
                     _InfoRow(
-                        label: 'Full Name',
+                        label: TKeys.fullname.tr,
                         value: controller.fullNameController.text),
                     _InfoRow(
-                        label: 'Email',
+                        label: TKeys.email.tr,
                         value: controller.emailController.text),
                     _InfoRow(
-                        label: 'Phone',
+                        label: TKeys.phone.tr,
                         value: controller.phoneController.text),
                     _InfoRow(
-                        label: 'Address',
+                        label: TKeys.address.tr,
                         value: controller.addressController.text),
                   ],
                 ),
                 const SizedBox(height: 16),
                 if (controller.isBuyer)
                   _ProfileSection(
-                    title: 'Buyer Details',
+                    title: TKeys.buyerDetails.tr,
                     children: [
                       _InfoRow(
-                        label: 'Jobs Posted',
+                        label: TKeys.jobsPosted.tr,
                         value: '${controller.profile.value?.jobPostCount ?? 0}',
                       ),
                       _InfoRow(
-                        label: 'Total Spent',
+                        label: TKeys.totalSpent.tr,
                         value: '৳${controller.profile.value?.totalSpent ?? 0}',
                       ),
                       _InfoRow(
-                        label: 'Trust Score',
+                        label: TKeys.trustScore.tr,
                         value: '${controller.profile.value?.trustScore ?? 0}',
                       ),
                     ],
                   ),
                 if (controller.isServiceProvider)
                   _ProfileSection(
-                    title: 'Service Provider Details',
+                    title: TKeys.serviceProviderDetails.tr,
                     children: [
                       _InfoRow(
-                          label: 'Business Name',
+                          label: TKeys.businessName.tr,
                           value: controller.businessNameController.text),
                       _InfoRow(
-                          label: 'Category',
+                          label: TKeys.category.tr,
                           value: controller.categoryController.text),
                       _InfoRow(
-                          label: 'Experience',
+                          label: TKeys.experience.tr,
                           value: controller.experienceController.text),
                       _InfoRow(
-                          label: 'Service Area',
+                          label: TKeys.serviceArea.tr,
                           value: controller.serviceAreaController.text),
                       _InfoRow(
-                        label: 'Rating',
+                        label: TKeys.rating.tr,
                         value: '${controller.profile.value?.rating ?? 0}',
                       ),
                       _InfoRow(
-                        label: 'Completed Jobs',
+                        label: TKeys.completedJobs.tr,
                         value:
                         '${controller.profile.value?.totalJobsCompleted ?? 0}',
                       ),

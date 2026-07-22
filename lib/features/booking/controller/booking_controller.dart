@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../app/routes/app_routes.dart';
+import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/success_model.dart';
 import '../arguments/service_booking_arguments.dart';
 import '../model/booking_request_model.dart';
@@ -129,29 +130,29 @@ class BookingController extends GetxController {
   String? validateStep() {
     if (currentStep.value == 1) {
       if (problemDetailsController.text.trim().isEmpty) {
-        return 'Please describe your problem.';
+        return TKeys.describeProblemError.tr;
       }
     }
 
     if (currentStep.value == 2) {
       if (addressController.text.trim().isEmpty) {
-        return 'Address is required.';
+        return TKeys.addressRequired.tr;
       }
 
       if (dateController.text.trim().isEmpty) {
-        return 'Please pick a date.';
+        return TKeys.pickDateError.tr;
       }
 
       if (selectedTime.value == null ||
           selectedTime.value!.isEmpty) {
-        return 'Please select a time slot.';
+        return TKeys.selectTimeSlotError.tr;
       }
 
       final budget =
           int.tryParse(budgetController.text.trim()) ?? 0;
 
       if (budget < 100) {
-        return 'Set a budget of at least 100 BDT.';
+        return TKeys.budgetMinError.tr;
       }
     }
 
@@ -163,7 +164,7 @@ class BookingController extends GetxController {
 
     if (error != null) {
       Get.snackbar(
-        'Validation',
+        TKeys.validation.tr,
         error,
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red.shade50,
@@ -228,11 +229,11 @@ class BookingController extends GetxController {
       /// 4. SHOW SUCCESS MODAL
       await Get.dialog(
         SuccessModal(
-          title: 'Booking Successful',
+          title: TKeys.bookingSuccessful.tr,
           message:
-          'Your booking has been submitted successfully. Providers can now place bids on your request.',
+          TKeys.bookingSubmittedMsg.tr,
 
-          yesText: 'View My Bookings',
+          yesText: TKeys.viewMyBookings.tr,
 
           onYes: () {
             Get.back();
@@ -257,7 +258,7 @@ class BookingController extends GetxController {
       );
     } catch (e) {
       Get.snackbar(
-        'Error',
+        TKeys.error.tr,
         e.toString().replaceFirst('Exception: ', ''),
         snackPosition: SnackPosition.BOTTOM,
       );

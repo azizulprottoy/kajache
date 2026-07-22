@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/booking_status_helper.dart';
 import '../../../shared/widgets/common_app_bar.dart';
 import '../controller/my_booking_controller.dart';
@@ -15,8 +16,8 @@ class MyBookingPage extends GetView<MyBookingController> {
     return Scaffold(
       backgroundColor: colorScheme.surface,
 
-      appBar: const CommonAppBar(
-        title: 'My Bookings',
+      appBar: CommonAppBar(
+        title: TKeys.myBookings.tr,
         showBack: false,
         showLanguageToggle: true,
       ),
@@ -27,7 +28,7 @@ class MyBookingPage extends GetView<MyBookingController> {
         }
 
         if (controller.bookings.isEmpty) {
-          return const Center(child: Text('No bookings found'));
+          return Center(child: Text(TKeys.noBookingsFound.tr));
         }
 
         return RefreshIndicator(

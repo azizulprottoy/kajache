@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../shared/widgets/common_app_bar.dart';
+import '../../../core/utils/translation_keys.dart';
 import '../controller/portfolio_controller.dart';
 
 class PortfolioPage extends GetView<PortfolioController> {
@@ -13,15 +14,15 @@ class PortfolioPage extends GetView<PortfolioController> {
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
-      appBar: const CommonAppBar(
-        title: 'Portfolio',
+      appBar: CommonAppBar(
+        title: TKeys.portfolio.tr,
         showBack: true,
         showLanguageToggle: true,
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {},
         icon: const Icon(Icons.add),
-        label: const Text('Add Work'),
+        label: Text(TKeys.addWork.tr),
       ),
       body: Obx(
             () => ListView.builder(

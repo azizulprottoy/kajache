@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../shared/widgets/common_app_bar.dart';
+import '../../../core/utils/translation_keys.dart';
 import '../controller/terms_controller.dart';
 
 class TermsConditionPage extends GetView<TermsConditionController> {
@@ -13,8 +14,8 @@ class TermsConditionPage extends GetView<TermsConditionController> {
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
-      appBar: const CommonAppBar(
-        title: 'Terms & Conditions',
+      appBar: CommonAppBar(
+        title: TKeys.termsConditions.tr,
         showBack: true,
         showLanguageToggle: true,
       ),

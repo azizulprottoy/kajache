@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../app/routes/app_routes.dart';
+import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/common_app_bar.dart';
 import '../../../shared/widgets/custom_button.dart';
 import '../../../shared/widgets/success_model.dart';
@@ -21,8 +22,8 @@ class ServiceDetailsPage extends GetView<ServiceDetailsController> {
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
-      appBar: const CommonAppBar(
-        title: 'Service Details',
+      appBar: CommonAppBar(
+        title: TKeys.serviceDetails.tr,
         showLanguageToggle: true,
       ),
       bottomNavigationBar: SafeArea(
@@ -31,20 +32,20 @@ class ServiceDetailsPage extends GetView<ServiceDetailsController> {
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
           child: isProviderBidFlow
               ? CustomButton(
-            label: 'Bid Now',
+            label: TKeys.bidNow.tr,
             variant: ButtonVariant.primary,
             isFullWidth: true,
             onPressed: () => _showBidingBottomSheet(context),
           )
               : isBooking
               ? CustomButton(
-            label: 'View Provider Bids',
+            label: TKeys.viewProviderBids.tr,
             variant: ButtonVariant.primary,
             isFullWidth: true,
             onPressed: () => _showBidsBottomSheet(context),
           )
               : CustomButton(
-            label: 'Book Now',
+            label: TKeys.bookNow.tr,
             variant: ButtonVariant.primary,
             isFullWidth: true,
             onPressed: () {
@@ -69,7 +70,7 @@ class ServiceDetailsPage extends GetView<ServiceDetailsController> {
         if (service == null) {
           return Center(
             child: Text(
-              'Service not found',
+              TKeys.serviceNotFound.tr,
               style: theme.textTheme.titleMedium,
             ),
           );
@@ -119,7 +120,7 @@ class ServiceDetailsPage extends GetView<ServiceDetailsController> {
               Text(
                 service.description.isNotEmpty
                     ? service.description
-                    : 'No description available',
+                    : TKeys.noDescription.tr,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                   height: 1.5,
@@ -137,7 +138,7 @@ class ServiceDetailsPage extends GetView<ServiceDetailsController> {
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    'Tap the button below to get started',
+                    TKeys.tapToStart.tr,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: colorScheme.onSurfaceVariant,
                     ),
@@ -216,7 +217,7 @@ class ServiceDetailsPage extends GetView<ServiceDetailsController> {
                 const SizedBox(height: 16),
 
                 Text(
-                  'Service Provider Bids',
+                  TKeys.serviceProviderBids.tr,
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: colorScheme.onSurface,
@@ -224,7 +225,7 @@ class ServiceDetailsPage extends GetView<ServiceDetailsController> {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'Compare offers and choose the best provider for your request.',
+                  TKeys.compareOffers.tr,
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
@@ -455,9 +456,9 @@ class _BiddingBottomSheetState extends State<BiddingBottomSheet> {
         showDialog(
           context: Get.context!,
           builder: (_) => SuccessModal(
-            title: 'Bid Submitted',
-            message: 'Your bid has been submitted successfully.',
-            yesText: 'OK',
+            title: TKeys.bidSubmitted.tr,
+            message: TKeys.bidSubmittedMsg.tr,
+            yesText: TKeys.ok.tr,
             onYes: () => Get.back(),
             onClose: () => Get.back(),
           ),
@@ -510,7 +511,7 @@ class _BiddingBottomSheetState extends State<BiddingBottomSheet> {
                     const SizedBox(height: 16),
 
                     Text(
-                      'Place Your Bid',
+                      TKeys.placeYourBid.tr,
                       style: theme.textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: colorScheme.onSurface,
@@ -518,7 +519,7 @@ class _BiddingBottomSheetState extends State<BiddingBottomSheet> {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      'Submit your price and estimated arrival time for this service request.',
+                      TKeys.placeBidSubtitle.tr,
                       textAlign: TextAlign.center,
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: colorScheme.onSurfaceVariant,
@@ -532,13 +533,13 @@ class _BiddingBottomSheetState extends State<BiddingBottomSheet> {
                       keyboardType: TextInputType.number,
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
-                          return 'Please enter your bid price';
+                          return TKeys.enterBidPriceError.tr;
                         }
                         return null;
                       },
                       decoration: InputDecoration(
-                        labelText: 'Bid Price',
-                        hintText: 'Enter your price',
+                        labelText: TKeys.bidPrice.tr,
+                        hintText: TKeys.enterPrice.tr,
                         prefixIcon: const Icon(Icons.currency_exchange),
                         prefixText: '৳ ',
                         border: OutlineInputBorder(
@@ -555,13 +556,13 @@ class _BiddingBottomSheetState extends State<BiddingBottomSheet> {
                       onTap: _pickTime,
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
-                          return 'Please select estimated time';
+                          return TKeys.selectEstimatedTimeError.tr;
                         }
                         return null;
                       },
                       decoration: InputDecoration(
-                        labelText: 'Estimated Arrival Time',
-                        hintText: 'Select time',
+                        labelText: TKeys.estimatedArrival.tr,
+                        hintText: TKeys.selectTime.tr,
                         prefixIcon: const Icon(Icons.access_time_outlined),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
@@ -575,8 +576,8 @@ class _BiddingBottomSheetState extends State<BiddingBottomSheet> {
                       controller: _noteController,
                       maxLines: 4,
                       decoration: InputDecoration(
-                        labelText: 'Note',
-                        hintText: 'Add a short message for the customer',
+                        labelText: TKeys.note.tr,
+                        hintText: TKeys.noteHint.tr,
                         alignLabelWithHint: true,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
@@ -597,7 +598,7 @@ class _BiddingBottomSheetState extends State<BiddingBottomSheet> {
                                 borderRadius: BorderRadius.circular(14),
                               ),
                             ),
-                            child: const Text('Cancel'),
+                            child: Text(TKeys.cancel.tr),
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -610,7 +611,7 @@ class _BiddingBottomSheetState extends State<BiddingBottomSheet> {
                                 borderRadius: BorderRadius.circular(14),
                               ),
                             ),
-                            child: const Text('Submit Bid'),
+                            child: Text(TKeys.submitBid.tr),
                           ),
                         ),
                       ],

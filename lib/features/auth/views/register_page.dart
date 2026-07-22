@@ -42,7 +42,7 @@ class RegisterPage extends GetView<RegisterController> {
                 const SizedBox(height: 100),
 
                 Text(
-                  'Create Account',
+                  TKeys.createAccount.tr,
                   style: theme.textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: colorScheme.onSurface,
@@ -50,7 +50,7 @@ class RegisterPage extends GetView<RegisterController> {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'Register to continue using Kaj Ache',
+                  TKeys.registerSubtitle.tr,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: colorScheme.onSurface.withOpacity(0.6),
                   ),
@@ -59,7 +59,7 @@ class RegisterPage extends GetView<RegisterController> {
                 const SizedBox(height: 28),
 
                 Text(
-                  'Account Type',
+                  TKeys.accountType.tr,
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: colorScheme.onSurface,
@@ -81,14 +81,14 @@ class RegisterPage extends GetView<RegisterController> {
                       children: [
                         Expanded(
                           child: _AccountTypeButton(
-                            title: 'Buyer',
+                            title: TKeys.buyer.tr,
                             isSelected: selectedAccountType.value == 'buyer',
                             onTap: () => selectedAccountType.value = 'buyer',
                           ),
                         ),
                         Expanded(
                           child: _AccountTypeButton(
-                            title: 'Service',
+                            title: TKeys.service.tr,
                             isSelected: selectedAccountType.value == 'service',
                             onTap: () => selectedAccountType.value = 'service',
                           ),
@@ -105,7 +105,7 @@ class RegisterPage extends GetView<RegisterController> {
                   textInputAction: TextInputAction.next,
                   decoration: InputDecoration(
                     labelText: TKeys.fullname.tr,
-                    hintText: 'Enter your full name',
+                    hintText: TKeys.enterFullName.tr,
                     prefixIcon: const Icon(Icons.person),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -113,7 +113,7 @@ class RegisterPage extends GetView<RegisterController> {
                   ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'Name is Required';
+                      return TKeys.nameRequired.tr;
                     }
 
                     return null;
@@ -127,7 +127,7 @@ class RegisterPage extends GetView<RegisterController> {
                   textInputAction: TextInputAction.next,
                   decoration: InputDecoration(
                     labelText: TKeys.email.tr,
-                    hintText: 'Enter your email',
+                    hintText: TKeys.enterEmail.tr,
                     prefixIcon: const Icon(Icons.email_outlined),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -135,10 +135,10 @@ class RegisterPage extends GetView<RegisterController> {
                   ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'Email is required';
+                      return TKeys.emailRequired.tr;
                     }
                     if (!GetUtils.isEmail(value.trim())) {
-                      return 'Enter a valid email';
+                      return TKeys.enterValidEmail.tr;
                     }
                     return null;
                   },
@@ -152,7 +152,7 @@ class RegisterPage extends GetView<RegisterController> {
                   textInputAction: TextInputAction.next,
                   decoration: InputDecoration(
                     labelText: TKeys.phone.tr,
-                    hintText: 'Enter your phone number',
+                    hintText: TKeys.enterPhone.tr,
                     prefixIcon: const Icon(Icons.phone_outlined),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -160,10 +160,10 @@ class RegisterPage extends GetView<RegisterController> {
                   ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'Phone number is required';
+                      return TKeys.phoneRequired.tr;
                     }
                     if (!GetUtils.isPhoneNumber(value.trim())) {
-                      return 'Enter a valid phone number';
+                      return TKeys.enterValidPhone.tr;
                     }
                     return null;
                   },
@@ -195,10 +195,10 @@ class RegisterPage extends GetView<RegisterController> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Password is required';
+                        return TKeys.passwordRequired.tr;
                       }
                       if (value.length < 6) {
-                        return 'Password must be at least 6 characters';
+                        return TKeys.passwordMin.tr;
                       }
                       return null;
                     },
@@ -213,7 +213,7 @@ class RegisterPage extends GetView<RegisterController> {
                     obscureText: obscureConfirmPassword.value,
                     textInputAction: TextInputAction.done,
                     decoration: InputDecoration(
-                      labelText: 'Confirm Password',
+                      labelText: TKeys.confirmPassword.tr,
                       prefixIcon: const Icon(Icons.lock_outline),
                       suffixIcon: IconButton(
                         icon: Icon(
@@ -232,10 +232,10 @@ class RegisterPage extends GetView<RegisterController> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Confirm password is required';
+                        return TKeys.confirmPasswordRequired.tr;
                       }
                       if (value != passwordController.text) {
-                        return 'Passwords do not match';
+                        return TKeys.passwordsDoNotMatch.tr;
                       }
                       return null;
                     },
@@ -307,7 +307,7 @@ class RegisterPage extends GetView<RegisterController> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Already have an account?',
+                      TKeys.haveAccount.tr,
                       style: TextStyle(
                         color: colorScheme.onSurface.withOpacity(0.6),
                       ),

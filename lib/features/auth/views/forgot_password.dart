@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../app/routes/app_routes.dart';
+import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/success_model.dart';
 
 class ForgotPassword extends StatefulWidget {
@@ -45,9 +46,9 @@ class _ForgotPasswordState extends State<ForgotPassword> {
     showDialog(
       context: context,
       builder: (_) => SuccessModal(
-        title: 'Success',
-        message: 'Your Password has been reset successfully .',
-        yesText: 'OK',
+        title: TKeys.success.tr,
+        message: TKeys.passwordResetSuccess.tr,
+        yesText: TKeys.ok.tr,
 
         onYes: () {
            Get.offAllNamed(AppRoutes.login);      },
@@ -83,7 +84,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
               children: [
                 const SizedBox(height: 20),
                 Text(
-                  'Reset Password',
+                  TKeys.resetPassword.tr,
                   style: theme.textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: colorScheme.onSurface,
@@ -91,7 +92,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Create a new password for your account.',
+                  TKeys.createNewPassword.tr,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: colorScheme.onSurface.withOpacity(0.6),
                   ),
@@ -103,7 +104,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                   obscureText: obscureNewPassword,
                   textInputAction: TextInputAction.next,
                   decoration: InputDecoration(
-                    labelText: 'New Password',
+                    labelText: TKeys.newPassword.tr,
                     prefixIcon: const Icon(Icons.lock_outline),
                     suffixIcon: IconButton(
                       icon: Icon(
@@ -123,10 +124,10 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'New password is required';
+                      return TKeys.newPasswordRequired.tr;
                     }
                     if (value.length < 6) {
-                      return 'Password must be at least 6 characters';
+                      return TKeys.passwordMin.tr;
                     }
                     return null;
                   },
@@ -139,7 +140,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                   obscureText: obscureConfirmPassword,
                   textInputAction: TextInputAction.done,
                   decoration: InputDecoration(
-                    labelText: 'Confirm Password',
+                    labelText: TKeys.confirmPassword.tr,
                     prefixIcon: const Icon(Icons.lock_outline),
                     suffixIcon: IconButton(
                       icon: Icon(
@@ -159,10 +160,10 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Confirm password is required';
+                      return TKeys.confirmPasswordRequired.tr;
                     }
                     if (value != newPasswordController.text) {
-                      return 'Passwords do not match';
+                      return TKeys.passwordsDoNotMatch.tr;
                     }
                     return null;
                   },
@@ -190,7 +191,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                       ),
                     )
                         : Text(
-                      'Reset Password',
+                      TKeys.resetPassword.tr,
                       style: theme.textTheme.labelLarge?.copyWith(
                         color: colorScheme.onPrimary,
                         fontWeight: FontWeight.w600,

@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 
 import '../../../app/routes/app_routes.dart';
 import '../../../core/controller/local_controller.dart';
+import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/common_app_bar.dart';
 
 class MenuPage extends StatelessWidget {
@@ -28,7 +29,7 @@ class MenuPage extends StatelessWidget {
               children: [
                 _MenuTile(
                   icon: Icons.person_outline,
-                  title: 'My Profile',
+                  title: TKeys.myProfile.tr,
                   onTap: () {
                     Get.toNamed(AppRoutes.myProfile);
                   },
@@ -36,14 +37,14 @@ class MenuPage extends StatelessWidget {
                 _MenuDivider(),
                 _MenuTile(
                   icon: Icons.work_outline,
-                  title: 'My Bookings',
+                  title: TKeys.myBookings.tr,
                   onTap: () {
                     Get.toNamed(AppRoutes.myBookings);
                   },
                 ),
                 _MenuTile(
                   icon: Icons.work_outline,
-                  title: 'Portfolio',
+                  title: TKeys.portfolio.tr,
                   onTap: () {
                     Get.toNamed(AppRoutes.portfolioPage);
                   },
@@ -51,7 +52,7 @@ class MenuPage extends StatelessWidget {
                 _MenuDivider(),
                 _MenuTile(
                   icon: Icons.fire_extinguisher_sharp,
-                  title: 'Rewords',
+                  title: TKeys.rewards.tr,
                   onTap: () {
                     Get.toNamed(AppRoutes.rewordPage);
                   },
@@ -59,7 +60,7 @@ class MenuPage extends StatelessWidget {
                 _MenuDivider(),
                 _MenuTile(
                   icon: Icons.chat_bubble_outline,
-                  title: 'Chat',
+                  title: TKeys.chat.tr,
                   onTap: () {
                     Get.toNamed(AppRoutes.chatPage);
                   },
@@ -73,7 +74,7 @@ class MenuPage extends StatelessWidget {
               children: [
                 _MenuTile(
                   icon: Icons.support_agent_outlined,
-                  title: 'Customer Support',
+                  title: TKeys.customerSupport.tr,
                   onTap: () {
                     Get.toNamed(AppRoutes.customerSupportPage);
                   },
@@ -81,7 +82,7 @@ class MenuPage extends StatelessWidget {
                 _MenuDivider(),
                 _MenuTile(
                   icon: Icons.privacy_tip_outlined,
-                  title: 'Privacy Policy',
+                  title: TKeys.privacyPolicy.tr,
                   onTap: () {
                     Get.toNamed(AppRoutes.privacyPolicyPage);
                   },
@@ -89,7 +90,7 @@ class MenuPage extends StatelessWidget {
                 _MenuDivider(),
                 _MenuTile(
                   icon: Icons.description_outlined,
-                  title: 'Terms & Conditions',
+                  title: TKeys.termsConditions.tr,
                   onTap: () {
                     Get.toNamed(AppRoutes.termsConditionPage);
                   },
@@ -105,7 +106,7 @@ class MenuPage extends StatelessWidget {
                   icon: Get.isDarkMode
                       ? Icons.dark_mode_outlined
                       : Icons.light_mode_outlined,
-                  title: 'Dark Mode',
+                  title: TKeys.darkMode.tr,
                   value: Get.isDarkMode,
                   onChanged: (value) {
                     Get.changeThemeMode(
@@ -137,7 +138,7 @@ class MenuPage extends StatelessWidget {
               children: [
                 _MenuTile(
                   icon: Icons.logout_rounded,
-                  title: 'Log Out',
+                  title: TKeys.logout.tr,
                   textColor: colorScheme.error,
                   iconColor: colorScheme.error,
                   onTap: () {
@@ -160,12 +161,12 @@ class MenuPage extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
-        title: const Text('Log Out'),
-        content: const Text('Are you sure you want to log out?'),
+        title: Text(TKeys.logout.tr),
+        content: Text(TKeys.logoutConfirm.tr),
         actions: [
           TextButton(
             onPressed: Get.back,
-            child: const Text('Cancel'),
+            child: Text(TKeys.cancel.tr),
           ),
           FilledButton(
             style: FilledButton.styleFrom(
@@ -176,7 +177,7 @@ class MenuPage extends StatelessWidget {
               Get.back();
               Get.offAllNamed(AppRoutes.login);
             },
-            child: const Text('Log Out'),
+            child: Text(TKeys.logout.tr),
           ),
         ],
       ),

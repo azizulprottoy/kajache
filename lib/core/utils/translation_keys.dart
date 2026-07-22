@@ -53,6 +53,19 @@ class TKeys {
   static const popularServices = 'popular_services';
   static const allCategories  = 'all_categories';
 
+  // ── Technician Dashboard ──────────────────────────────────────────────────────
+  static const dashboardSubtitle = 'dashboard_subtitle';
+  static const todayOverview     = 'today_overview';
+  static const availableJobs     = 'available_jobs';
+  static const ongoing           = 'ongoing';
+  static const earnings          = 'earnings';
+  static const noAvailableJobs   = 'no_available_jobs';
+  static const recentActivities  = 'recent_activities';
+  static const customer          = 'customer';
+  static const request           = 'request';
+  static const bids              = 'bids';
+  static const noBidsYet         = 'no_bids_yet';
+
   // ── Services ────────────────────────────────────────────────────────────────
   static const services       = 'services';
   static const categories     = 'categories';
@@ -118,4 +131,168 @@ class TKeys {
   static const darkMode       = 'dark_mode';
   static const lightMode      = 'light_mode';
   static const settings       = 'settings';
+
+  // ── Auth (extended) ───────────────────────────────────────────────────────────
+  static const passwordResetSuccess    = 'password_reset_success';
+  static const createNewPassword        = 'create_new_password';
+  static const newPassword              = 'new_password';
+  static const newPasswordRequired      = 'new_password_required';
+  static const confirmPassword          = 'confirm_password';
+  static const confirmPasswordRequired  = 'confirm_password_required';
+  static const passwordsDoNotMatch      = 'passwords_do_not_match';
+  static const enterOtp                 = 'enter_otp';
+  static const accountVerified          = 'account_verified';
+  static const verifyOtp                = 'verify_otp';
+  static const otpSentInfo              = 'otp_sent_info';
+  static const verify                   = 'verify';
+  static const resendOtp                = 'resend_otp';
+  static const createAccount            = 'create_account';
+  static const registerSubtitle         = 'register_subtitle';
+  static const accountType              = 'account_type';
+  static const buyer                    = 'buyer';
+  static const service                  = 'service';
+  static const enterFullName            = 'enter_full_name';
+  static const nameRequired             = 'name_required';
+  static const enterEmail               = 'enter_email';
+  static const emailRequired            = 'email_required';
+  static const enterValidEmail          = 'enter_valid_email';
+  static const enterPhone               = 'enter_phone';
+  static const phoneRequired            = 'phone_required';
+  static const enterValidPhone          = 'enter_valid_phone';
+  static const haveAccount              = 'have_account';
+
+  // ── Profile (extended) ─────────────────────────────────────────────────────────
+  static const completeProfile          = 'complete_profile';
+  static const saveProfile              = 'save_profile';
+  static const buyerAccount             = 'buyer_account';
+  static const serviceProvider          = 'service_provider';
+  static const basicInformation         = 'basic_information';
+  static const buyerDetails             = 'buyer_details';
+  static const jobsPosted               = 'jobs_posted';
+  static const totalSpent               = 'total_spent';
+  static const trustScore               = 'trust_score';
+  static const serviceProviderDetails   = 'service_provider_details';
+  static const category                 = 'category';
+  static const completedJobs            = 'completed_jobs';
+
+  // ── Booking ─────────────────────────────────────────────────────────────────────
+  static const describeProblemError     = 'describe_problem_error';
+  static const addressRequired          = 'address_required';
+  static const pickDateError            = 'pick_date_error';
+  static const selectTimeSlotError      = 'select_time_slot_error';
+  static const budgetMinError           = 'budget_min_error';
+  static const validation               = 'validation';
+  static const bookingSuccessful        = 'booking_successful';
+  static const bookingSubmittedMsg      = 'booking_submitted_msg';
+  static const viewMyBookings           = 'view_my_bookings';
+  static const bookService              = 'book_service';
+  static const serviceScope             = 'service_scope';
+  static const logistics                = 'logistics';
+  static const payConfirm               = 'pay_confirm';
+  static const minimumPrice             = 'minimum_price';
+  static const defineScope              = 'define_scope';
+  static const defineScopeSubtitle      = 'define_scope_subtitle';
+  static const selectSubservices        = 'select_subservices';
+  static const problemDetails           = 'problem_details';
+  static const problemDetailsHint       = 'problem_details_hint';
+  static const logisticsBudget          = 'logistics_budget';
+  static const logisticsSubtitle        = 'logistics_subtitle';
+  static const serviceAddress           = 'service_address';
+  static const addressHint              = 'address_hint';
+  static const city                     = 'city';
+  static const dateLabel                = 'date_label';
+  static const pickDate                 = 'pick_date';
+  static const pickTime                 = 'pick_time';
+  static const timeSlot                 = 'time_slot';
+  static const minBudgetError           = 'min_budget_error';
+  static const maxBudgetLabel           = 'max_budget_label';
+  static const budgetHint               = 'budget_hint';
+  static const maxBudgetInfo            = 'max_budget_info';
+  static const reviewPay                = 'review_pay';
+  static const bookingFeeInfo           = 'booking_fee_info';
+  static const maxBudgetShort           = 'max_budget_short';
+  static const bookingFee               = 'booking_fee';
+  static const refundableInfo           = 'refundable_info';
+  static const processing               = 'processing';
+  static const confirmPay500            = 'confirm_pay_500';
+  static const next                     = 'next';
+  static const bdt                      = 'bdt';
+
+  // ── My Bookings / Orders / Services ──────────────────────────────────────────────
+  static const myBookings               = 'my_bookings';
+  static const noBookingsFound          = 'no_bookings_found';
+  static const previousOrders           = 'previous_orders';
+  static const noPreviousOrders         = 'no_previous_orders';
+  static const viewDetails              = 'view_details';
+  static const noServicesAvailable      = 'no_services_available';
+
+  // ── Service Details / Bidding ─────────────────────────────────────────────────────
+  static const bidNow                   = 'bid_now';
+  static const viewProviderBids         = 'view_provider_bids';
+  static const serviceNotFound          = 'service_not_found';
+  static const noDescription            = 'no_description';
+  static const tapToStart               = 'tap_to_start';
+  static const serviceProviderBids      = 'service_provider_bids';
+  static const compareOffers            = 'compare_offers';
+  static const bidSubmitted             = 'bid_submitted';
+  static const bidSubmittedMsg          = 'bid_submitted_msg';
+  static const placeYourBid             = 'place_your_bid';
+  static const placeBidSubtitle         = 'place_bid_subtitle';
+  static const enterBidPriceError       = 'enter_bid_price_error';
+  static const bidPrice                 = 'bid_price';
+  static const enterPrice               = 'enter_price';
+  static const selectEstimatedTimeError = 'select_estimated_time_error';
+  static const estimatedArrival         = 'estimated_arrival';
+  static const note                     = 'note';
+  static const noteHint                 = 'note_hint';
+  static const submitBid                = 'submit_bid';
+
+  // ── Category Details ──────────────────────────────────────────────────────────────
+  static const categoryDetails          = 'category_details';
+  static const categoryNotFound         = 'category_not_found';
+  static const clicks                   = 'clicks';
+  static const noServicesInCategory     = 'no_services_in_category';
+  static const untitledService          = 'untitled_service';
+
+  // ── Menu ──────────────────────────────────────────────────────────────────────────
+  static const menuTitle                = 'menu_title';
+  static const portfolio                = 'portfolio';
+  static const rewards                  = 'rewards';
+  static const customerSupport          = 'customer_support';
+  static const privacyPolicy            = 'privacy_policy';
+  static const termsConditions          = 'terms_conditions';
+  static const logout                   = 'logout';
+  static const logoutConfirm            = 'logout_confirm';
+
+  // ── Customer Support ────────────────────────────────────────────────────────────────
+  static const subject                  = 'subject';
+  static const subjectRequired          = 'subject_required';
+  static const messageLabel             = 'message_label';
+  static const messageRequired          = 'message_required';
+
+  // ── Statistics ──────────────────────────────────────────────────────────────────────
+  static const statistics               = 'statistics';
+  static const totalJobs                = 'total_jobs';
+  static const weeklyEarnings           = 'weekly_earnings';
+  static const weeklyEarningsSubtitle   = 'weekly_earnings_subtitle';
+  static const monthlyPerformance       = 'monthly_performance';
+  static const monthlyPerformanceSubtitle = 'monthly_performance_subtitle';
+
+  // ── Portfolio ─────────────────────────────────────────────────────────────────────────
+  static const addWork                  = 'add_work';
+  static const pfBathroomCleaning       = 'pf_bathroom_cleaning';
+  static const pfBathroomCleaningDesc   = 'pf_bathroom_cleaning_desc';
+  static const pfKitchenPlumbing        = 'pf_kitchen_plumbing';
+  static const pfKitchenPlumbingDesc    = 'pf_kitchen_plumbing_desc';
+  static const pfWallPainting           = 'pf_wall_painting';
+  static const pfWallPaintingDesc       = 'pf_wall_painting_desc';
+
+  // ── Rewards ─────────────────────────────────────────────────────────────────────────────
+  static const totalRewardPoints        = 'total_reward_points';
+  static const rewardPointsSubtitle     = 'reward_points_subtitle';
+  static const rewardHistory            = 'reward_history';
+  static const rwOrderBonus             = 'rw_order_bonus';
+  static const rwReferral               = 'rw_referral';
+  static const rwFirstBooking           = 'rw_first_booking';
+  static const rwCampaign               = 'rw_campaign';
 }

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../app/routes/app_routes.dart';
+import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/common_app_bar.dart';
 import '../../services/arguments/service_argument.dart';
 import '../controllers/shome_controller.dart';
+import '../models/available_booking_response_model.dart';
 
 class SHomePage extends GetView<SHomeController> {
   const SHomePage({super.key});
@@ -19,12 +21,19 @@ class SHomePage extends GetView<SHomeController> {
         title: 'app_name',
         showLanguageToggle: true,
       ),
-      body: Obx(
-            () => SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+      body: Obx(() {
+        if (controller.isLoading.value && controller.availableBookings.isEmpty) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        return RefreshIndicator(
+          onRefresh: controller.fetchDashboardData,
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(18),
@@ -41,14 +50,14 @@ class SHomePage extends GetView<SHomeController> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Welcome back!',
+                      '${TKeys.welcomeBack.tr}!',
                       style: theme.textTheme.titleMedium?.copyWith(
                         color: colorScheme.onPrimary.withOpacity(0.9),
                       ),
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Manage your services and track your performance.',
+                      TKeys.dashboardSubtitle.tr,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: colorScheme.onPrimary,
                       ),
@@ -60,7 +69,7 @@ class SHomePage extends GetView<SHomeController> {
               const SizedBox(height: 20),
 
               Text(
-                'Today Overview',
+                TKeys.todayOverview.tr,
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: colorScheme.onSurface,
@@ -72,7 +81,7 @@ class SHomePage extends GetView<SHomeController> {
                 children: [
                   Expanded(
                     child: _OverviewCard(
-                      title: 'New Orders',
+                      title: TKeys.availableJobs.tr,
                       value: '${controller.newOrders.value}',
                       icon: Icons.receipt_long_outlined,
                     ),
@@ -80,9 +89,9 @@ class SHomePage extends GetView<SHomeController> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: _OverviewCard(
-                      title: 'Completed',
-                      value: '${controller.completedOrders.value}',
-                      icon: Icons.check_circle_outline,
+                      title: TKeys.ongoing.tr,
+                      value: '${controller.ongoing.value}',
+                      icon: Icons.pending_actions_outlined,
                     ),
                   ),
                 ],
@@ -93,15 +102,15 @@ class SHomePage extends GetView<SHomeController> {
                 children: [
                   Expanded(
                     child: _OverviewCard(
-                      title: 'Pending',
-                      value: '${controller.pendingOrders.value}',
-                      icon: Icons.pending_actions_outlined,
+                      title: TKeys.completed.tr,
+                      value: '${controller.completed.value}',
+                      icon: Icons.check_circle_outline,
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: _OverviewCard(
-                      title: 'Earnings',
+                      title: TKeys.earnings.tr,
                       value: controller.earnings.value,
                       icon: Icons.account_balance_wallet_outlined,
                     ),
@@ -112,7 +121,7 @@ class SHomePage extends GetView<SHomeController> {
               const SizedBox(height: 24),
 
               Text(
-                'Booked Services',
+                TKeys.availableJobs.tr,
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: colorScheme.onSurface,
@@ -120,26 +129,31 @@ class SHomePage extends GetView<SHomeController> {
               ),
               const SizedBox(height: 12),
 
-              ...controller.bookedServices.map(
-                    (item) => GestureDetector(
-                  onTap: () {
-                    Get.toNamed(
-                      AppRoutes.serviceDetails,
-                      arguments: ServiceArgument(
-                        ServiceID: '20',
-                        isbooking: false,
-                        isProviderBidFlow: true,
-                      ),
-                    );
-                  },
-                  child: _BookedServiceTile(service: item),
+              if (controller.availableBookings.isEmpty)
+                _EmptyState(
+                  message: TKeys.noAvailableJobs.tr,
+                )
+              else
+                ...controller.availableBookings.map(
+                  (item) => GestureDetector(
+                    onTap: () {
+                      Get.toNamed(
+                        AppRoutes.serviceDetails,
+                        arguments: ServiceArgument(
+                          ServiceID: item.serviceId,
+                          isbooking: false,
+                          isProviderBidFlow: true,
+                        ),
+                      );
+                    },
+                    child: _BookedServiceTile(booking: item),
+                  ),
                 ),
-              ),
 
               const SizedBox(height: 24),
 
               Text(
-                'Recent Activities',
+                TKeys.recentActivities.tr,
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: colorScheme.onSurface,
@@ -148,15 +162,16 @@ class SHomePage extends GetView<SHomeController> {
               const SizedBox(height: 12),
 
               ...controller.recentActivities.map(
-                    (item) => _ActivityTile(
+                (item) => _ActivityTile(
                   title: item.title,
                   subtitle: item.subtitle,
                 ),
               ),
-            ],
+              ],
+            ),
           ),
-        ),
-      ),
+        );
+      }),
     );
   }
 }
@@ -212,10 +227,10 @@ class _OverviewCard extends StatelessWidget {
 }
 
 class _BookedServiceTile extends StatelessWidget {
-  final BookedServiceModel service;
+  final AvailableBookingModel booking;
 
   const _BookedServiceTile({
-    required this.service,
+    required this.booking,
   });
 
   @override
@@ -223,17 +238,10 @@ class _BookedServiceTile extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    Color statusColor;
-    switch (service.status.toLowerCase()) {
-      case 'accepted':
-        statusColor = Colors.blue;
-        break;
-      case 'completed':
-        statusColor = Colors.green;
-        break;
-      default:
-        statusColor = Colors.orange;
-    }
+    final statusColor = booking.hasBids ? Colors.blue : Colors.orange;
+    final statusLabel = booking.hasBids
+        ? '${booking.bidsCount} ${TKeys.bids.tr}'
+        : TKeys.noBidsYet.tr;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -267,7 +275,7 @@ class _BookedServiceTile extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      service.title,
+                      booking.serviceTitle,
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w600,
                         color: colorScheme.onSurface,
@@ -275,7 +283,7 @@ class _BookedServiceTile extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Customer: ${service.customerName}',
+                      '${TKeys.customer.tr}: ${booking.clientName}',
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                       ),
@@ -284,7 +292,7 @@ class _BookedServiceTile extends StatelessWidget {
                 ),
               ),
               Text(
-                service.price,
+                booking.budgetLabel,
                 style: theme.textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: colorScheme.primary,
@@ -302,7 +310,7 @@ class _BookedServiceTile extends StatelessWidget {
               ),
               const SizedBox(width: 6),
               Text(
-                service.date,
+                booking.scheduleDate,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),
@@ -315,7 +323,7 @@ class _BookedServiceTile extends StatelessWidget {
               ),
               const SizedBox(width: 6),
               Text(
-                service.time,
+                booking.scheduleTime,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),
@@ -331,7 +339,7 @@ class _BookedServiceTile extends StatelessWidget {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  service.status,
+                  statusLabel,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: statusColor,
                     fontWeight: FontWeight.w600,
@@ -404,6 +412,47 @@ class _ActivityTile extends StatelessWidget {
                   ),
                 ),
               ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _EmptyState extends StatelessWidget {
+  final String message;
+
+  const _EmptyState({required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 16),
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: colorScheme.outlineVariant.withOpacity(0.2),
+        ),
+      ),
+      child: Column(
+        children: [
+          Icon(
+            Icons.inbox_outlined,
+            size: 40,
+            color: colorScheme.onSurfaceVariant,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            message,
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
             ),
           ),
         ],

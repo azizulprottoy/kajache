@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/common_app_bar.dart';
 import '../controller/chat_controller.dart';
 
@@ -12,8 +13,8 @@ class ChatPage extends GetView<ChatController> {
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
-      appBar: const CommonAppBar(
-        title: 'Chat',
+      appBar: CommonAppBar(
+        title: TKeys.chat.tr,
         showBack: true,
         showLanguageToggle: true,
       ),
@@ -66,7 +67,7 @@ class ChatPage extends GetView<ChatController> {
                     child: TextField(
                       controller: controller.messageController,
                       decoration: InputDecoration(
-                        hintText: 'Type a message',
+                        hintText: TKeys.typeMessage.tr,
                         filled: true,
                         fillColor: colorScheme.surfaceContainerLowest,
                         border: OutlineInputBorder(

@@ -19,8 +19,8 @@ class CategoryDetailsPage extends GetView<CategoryDetailsController> {
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
-      appBar: const CommonAppBar(
-        title: 'Category Details',
+      appBar: CommonAppBar(
+        title: TKeys.categoryDetails.tr,
         showLanguageToggle: true,
       ),
       body: Obx(() {
@@ -33,7 +33,7 @@ class CategoryDetailsPage extends GetView<CategoryDetailsController> {
         if (category == null) {
           return Center(
             child: Text(
-              'Category not found',
+              TKeys.categoryNotFound.tr,
               style: theme.textTheme.titleMedium,
             ),
           );
@@ -83,7 +83,7 @@ class CategoryDetailsPage extends GetView<CategoryDetailsController> {
               Text(
                 category.description.isNotEmpty
                     ? category.description
-                    : 'No description available',
+                    : TKeys.noDescription.tr,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                   height: 1.5,
@@ -101,7 +101,7 @@ class CategoryDetailsPage extends GetView<CategoryDetailsController> {
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    '${category.clicks} clicks',
+                    '${category.clicks} ${TKeys.clicks.tr}',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: colorScheme.onSurfaceVariant,
                     ),
@@ -114,7 +114,7 @@ class CategoryDetailsPage extends GetView<CategoryDetailsController> {
               const SizedBox(height: 12),
 
               Text(
-                'Services',
+                TKeys.services.tr,
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: colorScheme.onSurface,
@@ -132,7 +132,7 @@ class CategoryDetailsPage extends GetView<CategoryDetailsController> {
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   child: Text(
-                    'No services available for this category',
+                    TKeys.noServicesInCategory.tr,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: colorScheme.onSurfaceVariant,
                     ),
@@ -221,7 +221,7 @@ class _ServiceCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    service.title ?? 'Untitled service',
+                    service.title ?? TKeys.untitledService.tr,
                     style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.w600,
                       color: colorScheme.onSurface,
