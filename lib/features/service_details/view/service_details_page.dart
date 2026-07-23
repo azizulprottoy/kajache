@@ -5,9 +5,8 @@ import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/common_app_bar.dart';
 import '../../../shared/widgets/custom_button.dart';
 import '../../../shared/widgets/success_model.dart';
+import 'package:flutter_html/flutter_html.dart';
 import '../../booking/arguments/service_booking_arguments.dart';
-import '../../booking/controller/booking_controller.dart';
-import '../arguments/service_details_arguments.dart';
 import '../controller/service_details_controller.dart';
 
 class ServiceDetailsPage extends GetView<ServiceDetailsController> {
@@ -32,7 +31,9 @@ class ServiceDetailsPage extends GetView<ServiceDetailsController> {
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
           child: isProviderBidFlow
               ? CustomButton(
-            label: TKeys.bidNow.tr,
+            label: controller.hasBid
+                ? TKeys.editBid.tr
+                : TKeys.bidNow.tr,
             variant: ButtonVariant.primary,
             isFullWidth: true,
             onPressed: () => _showBidingBottomSheet(context),
@@ -115,17 +116,105 @@ class ServiceDetailsPage extends GetView<ServiceDetailsController> {
                 ),
               ),
 
+              if (isProviderBidFlow && controller.minLimit > 0) ...[
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.account_balance_wallet_outlined,
+                          color: colorScheme.onPrimaryContainer),
+                      const SizedBox(width: 10),
+                      Text(
+                        TKeys.customerBudget.tr,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onPrimaryContainer,
+                        ),
+                      ),
+                      const Spacer(),
+                      Text(
+                        '৳${controller.minLimit}',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: colorScheme.onPrimaryContainer,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+
+              if (isProviderBidFlow && controller.hasBid &&
+                  controller.myBidPrice != null) ...[
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: Colors.green.shade50,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: Colors.green.shade300),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: Colors.green.withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(Icons.how_to_reg_outlined,
+                            color: Colors.green.shade700),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          TKeys.myCurrentBid.tr,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: Colors.green.shade800,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        '৳${controller.myBidPrice}',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green.shade700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+
               const SizedBox(height: 16),
 
-              Text(
-                service.description.isNotEmpty
-                    ? service.description
-                    : TKeys.noDescription.tr,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                  height: 1.5,
-                ),
-              ),
+              service.description.isNotEmpty
+                  ? Html(
+                      data: service.description,
+                      style: {
+                        'body': Style(
+                          margin: Margins.zero,
+                          padding: HtmlPaddings.zero,
+                          fontSize: FontSize(
+                              theme.textTheme.bodyMedium?.fontSize ?? 14),
+                          color: colorScheme.onSurfaceVariant,
+                          lineHeight: const LineHeight(1.5),
+                        ),
+                      },
+                    )
+                  : Text(
+                      TKeys.noDescription.tr,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                        height: 1.5,
+                      ),
+                    ),
 
               const SizedBox(height: 20),
 
@@ -158,7 +247,10 @@ class ServiceDetailsPage extends GetView<ServiceDetailsController> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => const BiddingBottomSheet(),
+      builder: (_) => BiddingBottomSheet(
+        isEditMode: controller.hasBid,
+        initialPrice: controller.myBidPrice,
+      ),
     );
   }
 
@@ -397,7 +489,14 @@ class _ImageFallback extends StatelessWidget {
 
 // ── Bidding bottom sheet ───────────────────────────────────────────────────
 class BiddingBottomSheet extends StatefulWidget {
-  const BiddingBottomSheet({super.key});
+  final bool isEditMode;
+  final int? initialPrice;
+
+  const BiddingBottomSheet({
+    super.key,
+    this.isEditMode = false,
+    this.initialPrice,
+  });
 
   @override
   State<BiddingBottomSheet> createState() => _BiddingBottomSheetState();
@@ -412,7 +511,9 @@ class _BiddingBottomSheetState extends State<BiddingBottomSheet> {
   @override
   void initState() {
     super.initState();
-    _priceController = TextEditingController();
+    _priceController = TextEditingController(
+      text: widget.initialPrice != null ? '${widget.initialPrice}' : '',
+    );
     _etaController = TextEditingController();
     _noteController = TextEditingController();
   }
@@ -435,29 +536,37 @@ class _BiddingBottomSheetState extends State<BiddingBottomSheet> {
     }
   }
 
-  void _submitBid() {
+  Future<void> _submitBid() async {
     if (!_formKey.currentState!.validate()) return;
 
-    // Capture values before closing the sheet
-    final price = _priceController.text.trim();
+    final price = double.tryParse(_priceController.text.trim());
     final eta = _etaController.text.trim();
     final note = _noteController.text.trim();
 
-    debugPrint('Bid price: $price');
-    debugPrint('ETA: $eta');
-    debugPrint('Note: $note');
+    if (price == null) return;
 
-    // Close the bottom sheet first
+    final controller = Get.find<ServiceDetailsController>();
+    final success = await controller.submitBid(
+      price: price,
+      estimatedArrival: eta,
+      message: note,
+    );
+
+    if (!success) return;
+
     Get.back();
 
-    // Then show the success dialog using the navigator context
     Future.delayed(const Duration(milliseconds: 200), () {
       if (Get.context != null) {
         showDialog(
           context: Get.context!,
           builder: (_) => SuccessModal(
-            title: TKeys.bidSubmitted.tr,
-            message: TKeys.bidSubmittedMsg.tr,
+            title: widget.isEditMode
+                ? TKeys.bidUpdated.tr
+                : TKeys.bidSubmitted.tr,
+            message: widget.isEditMode
+                ? TKeys.bidUpdatedMsg.tr
+                : TKeys.bidSubmittedMsg.tr,
             yesText: TKeys.ok.tr,
             onYes: () => Get.back(),
             onClose: () => Get.back(),
@@ -511,7 +620,9 @@ class _BiddingBottomSheetState extends State<BiddingBottomSheet> {
                     const SizedBox(height: 16),
 
                     Text(
-                      TKeys.placeYourBid.tr,
+                      widget.isEditMode
+                          ? TKeys.editYourBid.tr
+                          : TKeys.placeYourBid.tr,
                       style: theme.textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: colorScheme.onSurface,
@@ -603,16 +714,31 @@ class _BiddingBottomSheetState extends State<BiddingBottomSheet> {
                         ),
                         const SizedBox(width: 12),
                         Expanded(
-                          child: FilledButton(
-                            onPressed: _submitBid,
-                            style: FilledButton.styleFrom(
-                              minimumSize: const Size.fromHeight(50),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14),
+                          child: Obx(() {
+                            final loading = Get.find<ServiceDetailsController>()
+                                .isBidLoading
+                                .value;
+                            return FilledButton(
+                              onPressed: loading ? null : _submitBid,
+                              style: FilledButton.styleFrom(
+                                minimumSize: const Size.fromHeight(50),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
                               ),
-                            ),
-                            child: Text(TKeys.submitBid.tr),
-                          ),
+                              child: loading
+                                  ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: Colors.white),
+                                    )
+                                  : Text(widget.isEditMode
+                                        ? TKeys.updateBid.tr
+                                        : TKeys.submitBid.tr),
+                            );
+                          }),
                         ),
                       ],
                     ),

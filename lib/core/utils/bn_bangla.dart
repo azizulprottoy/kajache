@@ -64,9 +64,11 @@ const Map<String, String> bnBD = {
   TKeys.noAvailableJobs:   'এই মুহূর্তে কোনো কাজ নেই।\nরিফ্রেশ করতে নিচে টানুন।',
   TKeys.recentActivities:  'সাম্প্রতিক কার্যক্রম',
   TKeys.customer:          'গ্রাহক',
+  TKeys.customerBudget:    'গ্রাহকের বাজেট',
   TKeys.request:           'অনুরোধ',
   TKeys.bids:              'বিড',
   TKeys.noBidsYet:         'এখনো কোনো বিড নেই',
+  TKeys.bidPlaced:         'বিড দেওয়া হয়েছে',
 
   // Services
   TKeys.services:          'সেবাসমূহ',
@@ -230,6 +232,10 @@ const Map<String, String> bnBD = {
 
   // Service Details / Bidding
   TKeys.bidNow:                 'বিড করুন',
+  TKeys.editBid:                'বিড সম্পাদনা',
+  TKeys.myCurrentBid:          'আমার বর্তমান বিড',
+  TKeys.updateBid:              'বিড আপডেট করুন',
+  TKeys.editYourBid:            'আপনার বিড সম্পাদনা করুন',
   TKeys.viewProviderBids:       'প্রদানকারীর বিড দেখুন',
   TKeys.serviceNotFound:        'সেবা পাওয়া যায়নি',
   TKeys.noDescription:          'কোনো বিবরণ নেই',
@@ -238,6 +244,8 @@ const Map<String, String> bnBD = {
   TKeys.compareOffers:          'অফার তুলনা করুন এবং আপনার অনুরোধের জন্য সেরা প্রদানকারী বেছে নিন।',
   TKeys.bidSubmitted:           'বিড জমা হয়েছে',
   TKeys.bidSubmittedMsg:        'আপনার বিড সফলভাবে জমা হয়েছে।',
+  TKeys.bidUpdated:             'বিড আপডেট হয়েছে',
+  TKeys.bidUpdatedMsg:          'আপনার বিড সফলভাবে আপডেট হয়েছে।',
   TKeys.placeYourBid:           'আপনার বিড দিন',
   TKeys.placeBidSubtitle:       'এই সেবার অনুরোধের জন্য আপনার মূল্য এবং আনুমানিক আগমন সময় জমা দিন।',
   TKeys.enterBidPriceError:     'অনুগ্রহ করে আপনার বিড মূল্য দিন',

@@ -3,8 +3,8 @@ import 'package:get/get.dart';
 import '../../../app/routes/app_routes.dart';
 import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/common_app_bar.dart';
-import '../../services/arguments/service_argument.dart';
 import '../controllers/shome_controller.dart';
+import '../../service_details/arguments/service_details_arguments.dart';
 import '../models/available_booking_response_model.dart';
 
 class SHomePage extends GetView<SHomeController> {
@@ -137,12 +137,16 @@ class SHomePage extends GetView<SHomeController> {
                 ...controller.availableBookings.map(
                   (item) => GestureDetector(
                     onTap: () {
+                      debugPrint('[SHome] booking id=${item.id} slug=${item.serviceSlug}');
                       Get.toNamed(
                         AppRoutes.serviceDetails,
-                        arguments: ServiceArgument(
-                          ServiceID: item.serviceId,
-                          isbooking: false,
+                        arguments: ServiceDetailsArgument(
+                          serviceSlug: item.serviceSlug,
                           isProviderBidFlow: true,
+                          minLimit: item.minLimit,
+                          bookingId: item.id,
+                          hasBid: item.hasBid,
+                          myBidPrice: item.myBidPrice,
                         ),
                       );
                     },
@@ -237,6 +241,18 @@ class _BookedServiceTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final alreadyBid = booking.hasBid;
+
+    final cardColor = alreadyBid
+        ? Colors.green.shade50
+        : colorScheme.surface;
+    final borderColor = alreadyBid
+        ? Colors.green.shade300
+        : colorScheme.outlineVariant.withOpacity(0.2);
+    final iconBg = alreadyBid
+        ? Colors.green.withOpacity(0.12)
+        : colorScheme.primary.withOpacity(0.1);
+    final iconColor = alreadyBid ? Colors.green.shade700 : colorScheme.primary;
 
     final statusColor = booking.hasBids ? Colors.blue : Colors.orange;
     final statusLabel = booking.hasBids
@@ -247,11 +263,9 @@ class _BookedServiceTile extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: colorScheme.surface,
+        color: cardColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: colorScheme.outlineVariant.withOpacity(0.2),
-        ),
+        border: Border.all(color: borderColor),
       ),
       child: Column(
         children: [
@@ -261,12 +275,12 @@ class _BookedServiceTile extends StatelessWidget {
                 width: 46,
                 height: 46,
                 decoration: BoxDecoration(
-                  color: colorScheme.primary.withOpacity(0.1),
+                  color: iconBg,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
                   Icons.home_repair_service_outlined,
-                  color: colorScheme.primary,
+                  color: iconColor,
                 ),
               ),
               const SizedBox(width: 12),
@@ -291,12 +305,25 @@ class _BookedServiceTile extends StatelessWidget {
                   ],
                 ),
               ),
-              Text(
-                booking.budgetLabel,
-                style: theme.textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: colorScheme.primary,
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    booking.budgetLabel,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.primary,
+                    ),
+                  ),
+                  if (alreadyBid && booking.myBidPrice != null)
+                    Text(
+                      'My bid: ৳${booking.myBidPrice}',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: Colors.green.shade700,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                ],
               ),
             ],
           ),
@@ -329,23 +356,38 @@ class _BookedServiceTile extends StatelessWidget {
                 ),
               ),
               const Spacer(),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 5,
-                ),
-                decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  statusLabel,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: statusColor,
-                    fontWeight: FontWeight.w600,
+              if (alreadyBid)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: Colors.green.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    TKeys.bidPlaced.tr,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: Colors.green.shade700,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                )
+              else
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: statusColor.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    statusLabel,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: statusColor,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
-              ),
             ],
           ),
         ],

@@ -29,4 +29,26 @@ class ServiceDetailsRepository {
 
     return result.data;
   }
+
+  Future<void> placeBid({
+    required String bookingId,
+    required double price,
+    required String estimatedArrival,
+    String message = '',
+  }) async {
+    final isConnected = await _networkInfo.isConnected;
+
+    if (!isConnected) {
+      throw Exception('No internet connection.');
+    }
+
+    await _dio.post(
+      ApiEndpoints.placeBid(bookingId),
+      data: {
+        'price': price,
+        'estimatedArrival': estimatedArrival,
+        if (message.isNotEmpty) 'message': message,
+      },
+    );
+  }
 }

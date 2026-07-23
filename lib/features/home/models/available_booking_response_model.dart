@@ -115,6 +115,9 @@ class AvailableBookingModel {
   final String paymentStatus;
   final String orderNumber;
   final String createdAt;
+  final bool hasBid;
+  final int? myBidPrice;
+  final String? myBidStatus;
 
   AvailableBookingModel({
     required this.id,
@@ -135,6 +138,9 @@ class AvailableBookingModel {
     required this.paymentStatus,
     required this.orderNumber,
     required this.createdAt,
+    this.hasBid = false,
+    this.myBidPrice,
+    this.myBidStatus,
   });
 
   factory AvailableBookingModel.fromJson(Map<String, dynamic> json) {
@@ -158,6 +164,10 @@ class AvailableBookingModel {
         ? Map<String, dynamic>.from(json['schedule'])
         : <String, dynamic>{};
 
+    final myBid = json['myBid'] is Map
+        ? Map<String, dynamic>.from(json['myBid'])
+        : null;
+
     return AvailableBookingModel(
       id: json['_id']?.toString() ?? '',
       serviceId: service['_id']?.toString() ?? '',
@@ -179,6 +189,11 @@ class AvailableBookingModel {
       paymentStatus: json['paymentStatus']?.toString() ?? '',
       orderNumber: json['orderNumber']?.toString() ?? '',
       createdAt: json['createdAt']?.toString() ?? '',
+      hasBid: json['hasBid'] == true,
+      myBidPrice: myBid != null
+          ? int.tryParse(myBid['price']?.toString() ?? '')
+          : null,
+      myBidStatus: myBid?['status']?.toString(),
     );
   }
 

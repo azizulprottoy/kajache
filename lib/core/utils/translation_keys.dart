@@ -62,9 +62,11 @@ class TKeys {
   static const noAvailableJobs   = 'no_available_jobs';
   static const recentActivities  = 'recent_activities';
   static const customer          = 'customer';
+  static const customerBudget    = 'customer_budget';
   static const request           = 'request';
   static const bids              = 'bids';
   static const noBidsYet         = 'no_bids_yet';
+  static const bidPlaced         = 'bid_placed';
 
   // ── Services ────────────────────────────────────────────────────────────────
   static const services       = 'services';
@@ -228,6 +230,10 @@ class TKeys {
 
   // ── Service Details / Bidding ─────────────────────────────────────────────────────
   static const bidNow                   = 'bid_now';
+  static const editBid                  = 'edit_bid';
+  static const myCurrentBid            = 'my_current_bid';
+  static const updateBid               = 'update_bid';
+  static const editYourBid             = 'edit_your_bid';
   static const viewProviderBids         = 'view_provider_bids';
   static const serviceNotFound          = 'service_not_found';
   static const noDescription            = 'no_description';
@@ -236,6 +242,8 @@ class TKeys {
   static const compareOffers            = 'compare_offers';
   static const bidSubmitted             = 'bid_submitted';
   static const bidSubmittedMsg          = 'bid_submitted_msg';
+  static const bidUpdated               = 'bid_updated';
+  static const bidUpdatedMsg            = 'bid_updated_msg';
   static const placeYourBid             = 'place_your_bid';
   static const placeBidSubtitle         = 'place_bid_subtitle';
   static const enterBidPriceError       = 'enter_bid_price_error';

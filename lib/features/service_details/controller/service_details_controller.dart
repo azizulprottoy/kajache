@@ -11,8 +11,13 @@ class ServiceDetailsController extends GetxController {
   late final String serviceSlug;
   bool isBooking = false;
   bool isProviderBidFlow = false;
+  int minLimit = 0;
+  String bookingId = '';
+  bool hasBid = false;
+  int? myBidPrice;
   bool _hasInvalidArgument = false;
   final RxBool isLoading = false.obs;
+  final RxBool isBidLoading = false.obs;
   final Rxn<ServiceModel> service = Rxn<ServiceModel>();
 
 
@@ -23,8 +28,13 @@ class ServiceDetailsController extends GetxController {
     final args = Get.arguments;
     if (args is ServiceDetailsArgument && args.serviceSlug.isNotEmpty) {
       serviceSlug = args.serviceSlug;
-      isBooking = args.isbooking ?? false;
-      isProviderBidFlow = args.isProviderBidFlow ?? false;
+      isBooking = args.isbooking;
+      isProviderBidFlow = args.isProviderBidFlow;
+      minLimit = args.minLimit;
+      bookingId = args.bookingId;
+      hasBid = args.hasBid;
+      myBidPrice = args.myBidPrice;
+      debugPrint('[ServiceDetails] bookingId=$bookingId slug=$serviceSlug hasBid=$hasBid');
     } else {
       _hasInvalidArgument = true;
     }
@@ -49,10 +59,46 @@ class ServiceDetailsController extends GetxController {
     fetchServiceDetails();
   }
 
+  Future<bool> submitBid({
+    required double price,
+    required String estimatedArrival,
+    String message = '',
+  }) async {
+    debugPrint('[submitBid] bookingId=$bookingId price=$price eta=$estimatedArrival');
+    if (bookingId.isEmpty) {
+      Get.snackbar('Error', 'Booking ID missing — cannot place bid.',
+          snackPosition: SnackPosition.BOTTOM);
+      return false;
+    }
+    isBidLoading.value = true;
+    try {
+      await _repository.placeBid(
+        bookingId: bookingId,
+        price: price,
+        estimatedArrival: estimatedArrival,
+        message: message,
+      );
+      return true;
+    } catch (e) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!isClosed) {
+          Get.snackbar(
+            'Error',
+            e.toString().replaceFirst('Exception: ', ''),
+            snackPosition: SnackPosition.BOTTOM,
+          );
+        }
+      });
+      return false;
+    } finally {
+      if (!isClosed) isBidLoading.value = false;
+    }
+  }
+
   Future<void> fetchServiceDetails() {
     final slug = serviceSlug;
 
-    if (slug == null || slug.isEmpty) {
+    if (slug.isEmpty) {
       return Future.value();
     }
 

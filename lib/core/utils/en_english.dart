@@ -62,9 +62,11 @@ const Map<String, String> enUS = {
   TKeys.noAvailableJobs:   'No available jobs right now.\nPull down to refresh.',
   TKeys.recentActivities:  'Recent Activities',
   TKeys.customer:          'Customer',
+  TKeys.customerBudget:    'Customer Budget',
   TKeys.request:           'request',
   TKeys.bids:              'bids',
   TKeys.noBidsYet:         'No bids yet',
+  TKeys.bidPlaced:         'Bid Placed',
 
   // Services
   TKeys.services:          'Services',
@@ -228,6 +230,10 @@ const Map<String, String> enUS = {
 
   // Service Details / Bidding
   TKeys.bidNow:                 'Bid Now',
+  TKeys.editBid:                'Edit Bid',
+  TKeys.myCurrentBid:          'My Current Bid',
+  TKeys.updateBid:              'Update Bid',
+  TKeys.editYourBid:            'Edit Your Bid',
   TKeys.viewProviderBids:       'View Provider Bids',
   TKeys.serviceNotFound:        'Service not found',
   TKeys.noDescription:          'No description available',
@@ -236,6 +242,8 @@ const Map<String, String> enUS = {
   TKeys.compareOffers:          'Compare offers and choose the best provider for your request.',
   TKeys.bidSubmitted:           'Bid Submitted',
   TKeys.bidSubmittedMsg:        'Your bid has been submitted successfully.',
+  TKeys.bidUpdated:             'Bid Updated',
+  TKeys.bidUpdatedMsg:          'Your bid has been updated successfully.',
   TKeys.placeYourBid:           'Place Your Bid',
   TKeys.placeBidSubtitle:       'Submit your price and estimated arrival time for this service request.',
   TKeys.enterBidPriceError:     'Please enter your bid price',
