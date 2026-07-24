@@ -42,6 +42,8 @@ import '../../features/profile/bindings/profile_binding.dart';
 import '../../features/profile/views/complete_profile_page.dart';
 import '../../features/profile/views/edit_profile_page.dart';
 import '../../features/profile/views/profile_page.dart';
+import '../../features/sbooking/booking_details_binding.dart';
+import '../../features/sbooking/booking_details_page.dart';
 import '../../features/service_details/binding/service_details_binding.dart';
 import '../../features/service_details/view/service_details_page.dart';
 import '../../features/services/bindings/service_binding.dart';
@@ -100,6 +102,11 @@ class AppPages {
       name: AppRoutes.serviceDetails,
       page: () =>  const ServiceDetailsPage(),
       binding: ServiceDetailsBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.bookingDetails,
+      page: () => const BookingDetailsPage(),
+      binding: BookingDetailsBinding(),
     ),
     GetPage(
       name: AppRoutes.myProfile,
@@ -165,9 +172,9 @@ class AppPages {
       binding: TermsConditionBinding(),
     ),
     GetPage(
-      name: AppRoutes.chatPage,
-      page: () => const ChatPage(),
-      binding: ChatBinding()
+        name: AppRoutes.chatPage,
+        page: () => const ChatPage(),
+        binding: ChatBinding()
     ),
     GetPage(
       name: AppRoutes.privacyPolicyPage,

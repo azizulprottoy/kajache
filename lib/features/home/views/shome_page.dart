@@ -3,8 +3,8 @@ import 'package:get/get.dart';
 import '../../../app/routes/app_routes.dart';
 import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/common_app_bar.dart';
+import '../../sbooking/booking_details_arguments.dart';
 import '../controllers/shome_controller.dart';
-import '../../service_details/arguments/service_details_arguments.dart';
 import '../models/available_booking_response_model.dart';
 
 class SHomePage extends GetView<SHomeController> {
@@ -34,143 +34,139 @@ class SHomePage extends GetView<SHomeController> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(18),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      colorScheme.primary,
-                      colorScheme.primary.withOpacity(0.75),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        colorScheme.primary,
+                        colorScheme.primary.withOpacity(0.75),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${TKeys.welcomeBack.tr}!',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: colorScheme.onPrimary.withOpacity(0.9),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        TKeys.dashboardSubtitle.tr,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onPrimary,
+                        ),
+                      ),
                     ],
                   ),
-                  borderRadius: BorderRadius.circular(20),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+
+                const SizedBox(height: 20),
+
+                Text(
+                  TKeys.todayOverview.tr,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: colorScheme.onSurface,
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                Row(
                   children: [
-                    Text(
-                      '${TKeys.welcomeBack.tr}!',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        color: colorScheme.onPrimary.withOpacity(0.9),
+                    Expanded(
+                      child: _OverviewCard(
+                        title: TKeys.availableJobs.tr,
+                        value: '${controller.newOrders.value}',
+                        icon: Icons.receipt_long_outlined,
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      TKeys.dashboardSubtitle.tr,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onPrimary,
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _OverviewCard(
+                        title: TKeys.ongoing.tr,
+                        value: '${controller.ongoing.value}',
+                        icon: Icons.pending_actions_outlined,
                       ),
                     ),
                   ],
                 ),
-              ),
+                const SizedBox(height: 12),
 
-              const SizedBox(height: 20),
-
-              Text(
-                TKeys.todayOverview.tr,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: colorScheme.onSurface,
+                Row(
+                  children: [
+                    Expanded(
+                      child: _OverviewCard(
+                        title: TKeys.completed.tr,
+                        value: '${controller.completed.value}',
+                        icon: Icons.check_circle_outline,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _OverviewCard(
+                        title: TKeys.earnings.tr,
+                        value: controller.earnings.value,
+                        icon: Icons.account_balance_wallet_outlined,
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(height: 12),
 
-              Row(
-                children: [
-                  Expanded(
-                    child: _OverviewCard(
-                      title: TKeys.availableJobs.tr,
-                      value: '${controller.newOrders.value}',
-                      icon: Icons.receipt_long_outlined,
+                const SizedBox(height: 24),
+
+                Text(
+                  TKeys.availableJobs.tr,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: colorScheme.onSurface,
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                if (controller.availableBookings.isEmpty)
+                  _EmptyState(
+                    message: TKeys.noAvailableJobs.tr,
+                  )
+                else
+                  ...controller.availableBookings.map(
+                        (item) => GestureDetector(
+                      onTap: () async {
+                        debugPrint('[SHome] booking id=${item.id} slug=${item.serviceSlug}');
+                        await Get.toNamed(
+                          AppRoutes.bookingDetails,
+                          arguments: BookingDetailsArgument(
+                            bookingId: item.id,
+                          ),
+                        );
+                        await controller.fetchDashboardData();
+                      },
+                      child: _BookedServiceTile(booking: item),
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _OverviewCard(
-                      title: TKeys.ongoing.tr,
-                      value: '${controller.ongoing.value}',
-                      icon: Icons.pending_actions_outlined,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
 
-              Row(
-                children: [
-                  Expanded(
-                    child: _OverviewCard(
-                      title: TKeys.completed.tr,
-                      value: '${controller.completed.value}',
-                      icon: Icons.check_circle_outline,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _OverviewCard(
-                      title: TKeys.earnings.tr,
-                      value: controller.earnings.value,
-                      icon: Icons.account_balance_wallet_outlined,
-                    ),
-                  ),
-                ],
-              ),
+                const SizedBox(height: 24),
 
-              const SizedBox(height: 24),
-
-              Text(
-                TKeys.availableJobs.tr,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: colorScheme.onSurface,
-                ),
-              ),
-              const SizedBox(height: 12),
-
-              if (controller.availableBookings.isEmpty)
-                _EmptyState(
-                  message: TKeys.noAvailableJobs.tr,
-                )
-              else
-                ...controller.availableBookings.map(
-                  (item) => GestureDetector(
-                    onTap: () {
-                      debugPrint('[SHome] booking id=${item.id} slug=${item.serviceSlug}');
-                      Get.toNamed(
-                        AppRoutes.serviceDetails,
-                        arguments: ServiceDetailsArgument(
-                          serviceSlug: item.serviceSlug,
-                          isProviderBidFlow: true,
-                          minLimit: item.minLimit,
-                          bookingId: item.id,
-                          hasBid: item.hasBid,
-                          myBidPrice: item.myBidPrice,
-                        ),
-                      );
-                    },
-                    child: _BookedServiceTile(booking: item),
+                Text(
+                  TKeys.recentActivities.tr,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: colorScheme.onSurface,
                   ),
                 ),
+                const SizedBox(height: 12),
 
-              const SizedBox(height: 24),
-
-              Text(
-                TKeys.recentActivities.tr,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: colorScheme.onSurface,
+                ...controller.recentActivities.map(
+                      (item) => _ActivityTile(
+                    title: item.title,
+                    subtitle: item.subtitle,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 12),
-
-              ...controller.recentActivities.map(
-                (item) => _ActivityTile(
-                  title: item.title,
-                  subtitle: item.subtitle,
-                ),
-              ),
               ],
             ),
           ),

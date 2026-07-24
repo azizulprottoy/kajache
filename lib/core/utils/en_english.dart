@@ -67,6 +67,7 @@ const Map<String, String> enUS = {
   TKeys.bids:              'bids',
   TKeys.noBidsYet:         'No bids yet',
   TKeys.bidPlaced:         'Bid Placed',
+  TKeys.postedBy:          'Posted by',
 
   // Services
   TKeys.services:          'Services',

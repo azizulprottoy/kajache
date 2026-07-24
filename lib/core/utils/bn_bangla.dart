@@ -69,6 +69,7 @@ const Map<String, String> bnBD = {
   TKeys.bids:              'বিড',
   TKeys.noBidsYet:         'এখনো কোনো বিড নেই',
   TKeys.bidPlaced:         'বিড দেওয়া হয়েছে',
+  TKeys.postedBy:          'পোস্ট করেছেন',
 
   // Services
   TKeys.services:          'সেবাসমূহ',

@@ -33,10 +33,10 @@ class SHomeDashboardModel {
       ),
       availableJobs: data['availableJobs'] is List
           ? (data['availableJobs'] as List)
-              .map((item) => AvailableBookingModel.fromJson(
-                    Map<String, dynamic>.from(item),
-                  ))
-              .toList()
+          .map((item) => AvailableBookingModel.fromJson(
+        Map<String, dynamic>.from(item),
+      ))
+          .toList()
           : [],
     );
   }
@@ -87,10 +87,10 @@ class AvailableBookingResponseModel {
       count: json['count'] ?? 0,
       data: json['data'] is List
           ? (json['data'] as List)
-              .map((item) => AvailableBookingModel.fromJson(
-                    Map<String, dynamic>.from(item),
-                  ))
-              .toList()
+          .map((item) => AvailableBookingModel.fromJson(
+        Map<String, dynamic>.from(item),
+      ))
+          .toList()
           : [],
     );
   }
@@ -101,9 +101,12 @@ class AvailableBookingModel {
   final String serviceId;
   final String serviceTitle;
   final String serviceSlug;
-  final String clientName;
+  final String serviceDescription;
+  final String serviceImage;
+  final JobPosterModel poster;
   final String details;
   final List<String> subServices;
+  final List<BookingBidModel> bids;
   final String address;
   final String district;
   final String scheduleDate;
@@ -116,7 +119,10 @@ class AvailableBookingModel {
   final String orderNumber;
   final String createdAt;
   final bool hasBid;
+  final String? myBidId;
   final int? myBidPrice;
+  final String? myBidEstimatedArrival;
+  final String? myBidMessage;
   final String? myBidStatus;
 
   AvailableBookingModel({
@@ -124,9 +130,12 @@ class AvailableBookingModel {
     required this.serviceId,
     required this.serviceTitle,
     required this.serviceSlug,
-    required this.clientName,
+    required this.serviceDescription,
+    required this.serviceImage,
+    required this.poster,
     required this.details,
     required this.subServices,
+    required this.bids,
     required this.address,
     required this.district,
     required this.scheduleDate,
@@ -139,7 +148,10 @@ class AvailableBookingModel {
     required this.orderNumber,
     required this.createdAt,
     this.hasBid = false,
+    this.myBidId,
     this.myBidPrice,
+    this.myBidEstimatedArrival,
+    this.myBidMessage,
     this.myBidStatus,
   });
 
@@ -149,7 +161,7 @@ class AvailableBookingModel {
         ? Map<String, dynamic>.from(json['service'])
         : <String, dynamic>{};
 
-    // `client` is populated to { _id, username }
+    // `client` is populated with safe public poster profile details.
     final client = json['client'] is Map
         ? Map<String, dynamic>.from(json['client'])
         : <String, dynamic>{};
@@ -168,18 +180,57 @@ class AvailableBookingModel {
         ? Map<String, dynamic>.from(json['myBid'])
         : null;
 
+    String serviceImage() {
+      for (final key in const ['image', 'imageLink']) {
+        final value = service[key]?.toString().trim() ?? '';
+        if (value.isNotEmpty) return value;
+      }
+
+      final images = service['images'];
+      if (images is List && images.isNotEmpty) {
+        final first = images.first;
+        if (first is Map) {
+          final image = Map<String, dynamic>.from(first);
+          return (image['url'] ?? image['image'] ?? image['imageLink'])
+                  ?.toString()
+                  .trim() ??
+              '';
+        }
+        return first?.toString().trim() ?? '';
+      }
+      return '';
+    }
+
     return AvailableBookingModel(
       id: json['_id']?.toString() ?? '',
       serviceId: service['_id']?.toString() ?? '',
       serviceTitle: service['title']?.toString() ?? 'Service',
       serviceSlug: service['slug']?.toString() ?? '',
-      clientName: client['username']?.toString() ?? 'Customer',
+      serviceDescription:
+          (service['description'] ?? service['shortDescription'])
+                  ?.toString() ??
+              '',
+      serviceImage: serviceImage(),
+      poster: JobPosterModel.fromJson(client),
       details: json['details']?.toString() ?? '',
       subServices: json['subServices'] is List
           ? (json['subServices'] as List).map((e) => e.toString()).toList()
           : const [],
+      bids: json['bids'] is List
+          ? (json['bids'] as List)
+              .whereType<Map>()
+              .map(
+                (item) => BookingBidModel.fromJson(
+                  Map<String, dynamic>.from(item),
+                ),
+              )
+              .toList()
+          : const [],
       address: location['address']?.toString() ?? '',
-      district: (location['district'] ?? json['district'])?.toString() ?? '',
+      district:
+          (location['district'] ?? location['city'] ?? json['district'])
+                  ?.toString() ??
+              '',
       scheduleDate: schedule['date']?.toString() ?? '',
       scheduleTime: schedule['time']?.toString() ?? '',
       minLimit: int.tryParse(json['minLimit']?.toString() ?? '0') ?? 0,
@@ -190,10 +241,45 @@ class AvailableBookingModel {
       orderNumber: json['orderNumber']?.toString() ?? '',
       createdAt: json['createdAt']?.toString() ?? '',
       hasBid: json['hasBid'] == true,
+      myBidId: myBid?['_id']?.toString(),
       myBidPrice: myBid != null
           ? int.tryParse(myBid['price']?.toString() ?? '')
           : null,
+      myBidEstimatedArrival: myBid?['estimatedArrival']?.toString(),
+      myBidMessage: myBid?['message']?.toString(),
       myBidStatus: myBid?['status']?.toString(),
+    );
+  }
+
+  AvailableBookingModel withMyBid(ProviderBidModel bid) {
+    return AvailableBookingModel(
+      id: id,
+      serviceId: serviceId,
+      serviceTitle: serviceTitle,
+      serviceSlug: serviceSlug,
+      serviceDescription: serviceDescription,
+      serviceImage: serviceImage,
+      poster: poster,
+      details: details,
+      subServices: subServices,
+      bids: bids,
+      address: address,
+      district: district,
+      scheduleDate: scheduleDate,
+      scheduleTime: scheduleTime,
+      minLimit: minLimit,
+      bookingFee: bookingFee,
+      bidsCount: bidsCount,
+      status: status,
+      paymentStatus: paymentStatus,
+      orderNumber: orderNumber,
+      createdAt: createdAt,
+      hasBid: true,
+      myBidId: bid.id,
+      myBidPrice: bid.price,
+      myBidEstimatedArrival: bid.estimatedArrival,
+      myBidMessage: bid.message,
+      myBidStatus: bid.status,
     );
   }
 
@@ -202,4 +288,139 @@ class AvailableBookingModel {
 
   /// Human-facing budget label, e.g. "৳500".
   String get budgetLabel => '৳$minLimit';
+
+  String get clientName => poster.name;
+}
+
+class BookingBidModel {
+  final String id;
+  final String providerName;
+  final String providerAvatar;
+  final int price;
+  final String estimatedArrival;
+  final String message;
+  final String status;
+
+  const BookingBidModel({
+    required this.id,
+    required this.providerName,
+    required this.providerAvatar,
+    required this.price,
+    required this.estimatedArrival,
+    required this.message,
+    required this.status,
+  });
+
+  factory BookingBidModel.fromJson(Map<String, dynamic> json) {
+    final provider = json['provider'] is Map
+        ? Map<String, dynamic>.from(json['provider'])
+        : <String, dynamic>{};
+    final profile = provider['profileDetail'] is Map
+        ? Map<String, dynamic>.from(provider['profileDetail'])
+        : <String, dynamic>{};
+
+    final fullName = profile['fullName']?.toString().trim() ?? '';
+    final username = provider['username']?.toString().trim() ?? '';
+
+    return BookingBidModel(
+      id: json['_id']?.toString() ?? '',
+      providerName: fullName.isNotEmpty
+          ? fullName
+          : (username.isNotEmpty ? username : 'Technician'),
+      providerAvatar: profile['avatar']?.toString() ?? '',
+      price: int.tryParse(json['price']?.toString() ?? '0') ?? 0,
+      estimatedArrival: json['estimatedArrival']?.toString() ?? '',
+      message: json['message']?.toString() ?? '',
+      status: json['status']?.toString() ?? '',
+    );
+  }
+}
+
+class JobPosterModel {
+  final String id;
+  final String username;
+  final String fullName;
+  final String avatar;
+  final String address;
+  final String district;
+  final String area;
+  final int jobPostCount;
+  final num trustScore;
+
+  const JobPosterModel({
+    required this.id,
+    required this.username,
+    required this.fullName,
+    required this.avatar,
+    required this.address,
+    required this.district,
+    required this.area,
+    required this.jobPostCount,
+    required this.trustScore,
+  });
+
+  factory JobPosterModel.fromJson(Map<String, dynamic> json) {
+    final detail = json['profileDetail'] is Map
+        ? Map<String, dynamic>.from(json['profileDetail'])
+        : <String, dynamic>{};
+
+    return JobPosterModel(
+      id: json['_id']?.toString() ?? '',
+      username: json['username']?.toString() ?? '',
+      fullName: detail['fullName']?.toString() ?? '',
+      avatar: detail['avatar']?.toString() ?? '',
+      address: detail['address']?.toString() ?? '',
+      district: detail['district']?.toString() ?? '',
+      area: detail['area']?.toString() ?? '',
+      jobPostCount:
+      int.tryParse(detail['jobPostCount']?.toString() ?? '0') ?? 0,
+      trustScore:
+      num.tryParse(detail['trustScore']?.toString() ?? '0') ?? 0,
+    );
+  }
+
+  String get name {
+    if (fullName.trim().isNotEmpty) return fullName.trim();
+    if (username.trim().isNotEmpty) return username.trim();
+    return 'Customer';
+  }
+
+  String get location =>
+      [address, area, district]
+          .where((value) => value.trim().isNotEmpty)
+          .join(', ');
+}
+
+class ProviderBidModel {
+  final String id;
+  final String bookingId;
+  final int? price;
+  final String estimatedArrival;
+  final String message;
+  final String status;
+
+  ProviderBidModel({
+    required this.id,
+    required this.bookingId,
+    this.price,
+    required this.estimatedArrival,
+    required this.message,
+    required this.status,
+  });
+
+  factory ProviderBidModel.fromJson(Map<String, dynamic> json) {
+    final booking = json['booking'];
+    final bookingId = booking is Map
+        ? booking['_id']?.toString() ?? ''
+        : booking?.toString() ?? '';
+
+    return ProviderBidModel(
+      id: json['_id']?.toString() ?? '',
+      bookingId: bookingId,
+      price: int.tryParse(json['price']?.toString() ?? ''),
+      estimatedArrival: json['estimatedArrival']?.toString() ?? '',
+      message: json['message']?.toString() ?? '',
+      status: json['status']?.toString() ?? '',
+    );
+  }
 }

@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../app/routes/app_routes.dart';
 import '../../../core/utils/translation_keys.dart';
+import '../../../core/utils/media_url_helper.dart';
 import '../../../shared/widgets/common_app_bar.dart';
 import '../../../shared/widgets/custom_button.dart';
 import '../../../shared/widgets/success_model.dart';
 import 'package:flutter_html/flutter_html.dart';
 import '../../booking/arguments/service_booking_arguments.dart';
+import '../../home/models/available_booking_response_model.dart';
 import '../controller/service_details_controller.dart';
 
 class ServiceDetailsPage extends GetView<ServiceDetailsController> {
@@ -149,6 +151,11 @@ class ServiceDetailsPage extends GetView<ServiceDetailsController> {
                 ),
               ],
 
+              if (isProviderBidFlow && controller.poster != null) ...[
+                const SizedBox(height: 12),
+                _PosterDetailsCard(poster: controller.poster!),
+              ],
+
               if (isProviderBidFlow && controller.hasBid &&
                   controller.myBidPrice != null) ...[
                 const SizedBox(height: 12),
@@ -196,25 +203,25 @@ class ServiceDetailsPage extends GetView<ServiceDetailsController> {
 
               service.description.isNotEmpty
                   ? Html(
-                      data: service.description,
-                      style: {
-                        'body': Style(
-                          margin: Margins.zero,
-                          padding: HtmlPaddings.zero,
-                          fontSize: FontSize(
-                              theme.textTheme.bodyMedium?.fontSize ?? 14),
-                          color: colorScheme.onSurfaceVariant,
-                          lineHeight: const LineHeight(1.5),
-                        ),
-                      },
-                    )
+                data: service.description,
+                style: {
+                  'body': Style(
+                    margin: Margins.zero,
+                    padding: HtmlPaddings.zero,
+                    fontSize: FontSize(
+                        theme.textTheme.bodyMedium?.fontSize ?? 14),
+                    color: colorScheme.onSurfaceVariant,
+                    lineHeight: const LineHeight(1.5),
+                  ),
+                },
+              )
                   : Text(
-                      TKeys.noDescription.tr,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                        height: 1.5,
-                      ),
-                    ),
+                TKeys.noDescription.tr,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                  height: 1.5,
+                ),
+              ),
 
               const SizedBox(height: 20),
 
@@ -250,6 +257,8 @@ class ServiceDetailsPage extends GetView<ServiceDetailsController> {
       builder: (_) => BiddingBottomSheet(
         isEditMode: controller.hasBid,
         initialPrice: controller.myBidPrice,
+        initialEstimatedArrival: controller.myBidEstimatedArrival,
+        initialMessage: controller.myBidMessage,
       ),
     );
   }
@@ -462,6 +471,176 @@ class ServiceDetailsPage extends GetView<ServiceDetailsController> {
   }
 }
 
+class _PosterDetailsCard extends StatelessWidget {
+  final JobPosterModel poster;
+
+  const _PosterDetailsCard({required this.poster});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final avatarUrl = MediaUrlHelper.resolve(poster.avatar);
+    final location = poster.location;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: colorScheme.outlineVariant.withOpacity(0.45),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            TKeys.postedBy.tr,
+            style: theme.textTheme.labelLarge?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              CircleAvatar(
+                radius: 27,
+                backgroundColor: colorScheme.primaryContainer,
+                backgroundImage:
+                avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
+                child: avatarUrl.isEmpty
+                    ? Icon(
+                  Icons.person_outline,
+                  color: colorScheme.onPrimaryContainer,
+                )
+                    : null,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      poster.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                    if (location.isNotEmpty) ...[
+                      const SizedBox(height: 3),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.location_on_outlined,
+                            size: 15,
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                          const SizedBox(width: 3),
+                          Expanded(
+                            child: Text(
+                              location,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              Expanded(
+                child: _PosterStat(
+                  icon: Icons.work_outline,
+                  value: '${poster.jobPostCount}',
+                  label: TKeys.jobsPosted.tr,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _PosterStat(
+                  icon: Icons.verified_user_outlined,
+                  value: '${poster.trustScore}',
+                  label: TKeys.trustScore.tr,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PosterStat extends StatelessWidget {
+  final IconData icon;
+  final String value;
+  final String label;
+
+  const _PosterStat({
+    required this.icon,
+    required this.value,
+    required this.label,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+      decoration: BoxDecoration(
+        color: colorScheme.primaryContainer.withOpacity(0.45),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, size: 18, color: colorScheme.primary),
+          const SizedBox(width: 7),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  value,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.labelLarge?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: colorScheme.onSurface,
+                  ),
+                ),
+                Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 // ── Image fallback ─────────────────────────────────────────────────────────
 class _ImageFallback extends StatelessWidget {
   final ColorScheme colorScheme;
@@ -491,11 +670,15 @@ class _ImageFallback extends StatelessWidget {
 class BiddingBottomSheet extends StatefulWidget {
   final bool isEditMode;
   final int? initialPrice;
+  final String? initialEstimatedArrival;
+  final String? initialMessage;
 
   const BiddingBottomSheet({
     super.key,
     this.isEditMode = false,
     this.initialPrice,
+    this.initialEstimatedArrival,
+    this.initialMessage,
   });
 
   @override
@@ -514,8 +697,12 @@ class _BiddingBottomSheetState extends State<BiddingBottomSheet> {
     _priceController = TextEditingController(
       text: widget.initialPrice != null ? '${widget.initialPrice}' : '',
     );
-    _etaController = TextEditingController();
-    _noteController = TextEditingController();
+    _etaController = TextEditingController(
+      text: widget.initialEstimatedArrival ?? '',
+    );
+    _noteController = TextEditingController(
+      text: widget.initialMessage ?? '',
+    );
   }
 
   @override
@@ -728,15 +915,15 @@ class _BiddingBottomSheetState extends State<BiddingBottomSheet> {
                               ),
                               child: loading
                                   ? const SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          color: Colors.white),
-                                    )
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white),
+                              )
                                   : Text(widget.isEditMode
-                                        ? TKeys.updateBid.tr
-                                        : TKeys.submitBid.tr),
+                                  ? TKeys.updateBid.tr
+                                  : TKeys.submitBid.tr),
                             );
                           }),
                         ),

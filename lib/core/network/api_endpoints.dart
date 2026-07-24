@@ -35,6 +35,7 @@ class ApiEndpoints {
   static const String myBookings = '/booking/me';
   static const String availableBookings = '/booking/available';
   static const String providerDashboard = '/booking/provider/dashboard';
+  static const String providerBids = '/booking/provider/bids';
   static String bookingById(String id) => '/booking/$id';
 
   // Bids

@@ -27,10 +27,36 @@ class SHomeRepository {
       throw Exception('No internet connection.');
     }
 
-    final response = await _dio.get(ApiEndpoints.providerDashboard);
+    final responses = await Future.wait([
+      _dio.get(ApiEndpoints.providerDashboard),
+      _dio.get(ApiEndpoints.providerBids),
+    ]);
 
-    return SHomeDashboardModel.fromJson(
-      Map<String, dynamic>.from(response.data),
+    final dashboard = SHomeDashboardModel.fromJson(
+      Map<String, dynamic>.from(responses[0].data),
+    );
+    final bidsPayload = Map<String, dynamic>.from(responses[1].data);
+    final bids = bidsPayload['data'] is List
+        ? (bidsPayload['data'] as List)
+        .map(
+          (item) => ProviderBidModel.fromJson(
+        Map<String, dynamic>.from(item),
+      ),
+    )
+        .toList()
+        : <ProviderBidModel>[];
+    final bidsByBooking = {
+      for (final bid in bids)
+        if (bid.bookingId.isNotEmpty) bid.bookingId: bid,
+    };
+
+    return SHomeDashboardModel(
+      success: dashboard.success,
+      stats: dashboard.stats,
+      availableJobs: dashboard.availableJobs.map((job) {
+        final bid = bidsByBooking[job.id];
+        return bid == null ? job : job.withMyBid(bid);
+      }).toList(),
     );
   }
 

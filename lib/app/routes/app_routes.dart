@@ -8,6 +8,7 @@ class AppRoutes {
   static const menuPage = '/menuPage';
   static const services = '/services';
   static const serviceDetails = '/serviceDetails';
+  static const bookingDetails = '/bookingDetails';
   static const main = '/mainpage';
   static const register = '/register';
   static const otpPage = '/otpPage';
@@ -26,7 +27,7 @@ class AppRoutes {
   static const termsConditionPage = '/termsCondition';
   static const bookingPage = '/bookingPage';
   static const categoryDetails = '/categoryDetails';
-   static const myBookings       = '/myBookings';
+  static const myBookings       = '/myBookings';
 
 }
 //   static const onboarding = '/onboarding';

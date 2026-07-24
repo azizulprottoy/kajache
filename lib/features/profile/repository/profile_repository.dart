@@ -23,6 +23,24 @@ class ProfileRepository {
     return ProfileModel.fromJson(Map<String, dynamic>.from(data));
   }
 
+  Future<List<String>> getCategoryNames() async {
+    final isConnected = await _networkInfo.isConnected;
+    if (!isConnected) throw Exception('No internet connection.');
+
+    final response = await _dio.get(ApiEndpoints.categories);
+    final body = Map<String, dynamic>.from(response.data);
+    final data = body['data'];
+
+    if (data is! List) return <String>[];
+
+    return data
+        .whereType<Map>()
+        .map((item) => item['name']?.toString().trim() ?? '')
+        .where((name) => name.isNotEmpty)
+        .toSet()
+        .toList();
+  }
+
   Future<Map<String, dynamic>> updateProfile({
     required Map<String, dynamic> fields,
     File? avatar,

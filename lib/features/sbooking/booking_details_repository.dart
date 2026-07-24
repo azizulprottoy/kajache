@@ -1,57 +1,48 @@
 import 'package:dio/dio.dart';
 
-import '../../../core/network/api_client.dart';
-import '../../../core/network/api_endpoints.dart';
-import '../../../core/network/network_info.dart';
-import '../../home/models/services_response_model.dart';
-import '../../home/models/available_booking_response_model.dart';
-import '../model/service_details_response_model.dart';
+import '../../core/network/api_client.dart';
+import '../../core/network/api_endpoints.dart';
+import '../../core/network/network_info.dart';
+import '../home/models/available_booking_response_model.dart';
 
-class ServiceDetailsRepository {
+class BookingDetailsRepository {
   final Dio _dio;
   final NetworkInfo _networkInfo;
 
-  ServiceDetailsRepository({Dio? dio, NetworkInfo? networkInfo})
+  BookingDetailsRepository({Dio? dio, NetworkInfo? networkInfo})
       : _dio = dio ?? ApiClient.instance,
         _networkInfo = networkInfo ?? NetworkInfo();
 
-  Future<ServiceModel?> getServiceBySlug(String slug) async {
-    final isConnected = await _networkInfo.isConnected;
-
-    if (!isConnected) {
+  Future<void> _requireConnection() async {
+    if (!await _networkInfo.isConnected) {
       throw Exception('No internet connection.');
     }
+  }
 
-    final response = await _dio.get(ApiEndpoints.serviceByslug(slug));
-
-    final result = ServiceDetailsResponseModel.fromJson(
-      Map<String, dynamic>.from(response.data),
+  Future<AvailableBookingModel> getBooking(String bookingId) async {
+    await _requireConnection();
+    final response = await _dio.get(ApiEndpoints.bookingById(bookingId));
+    final payload = Map<String, dynamic>.from(response.data);
+    return AvailableBookingModel.fromJson(
+      Map<String, dynamic>.from(payload['data']),
     );
-
-    return result.data;
   }
 
   Future<ProviderBidModel> placeBid({
     required String bookingId,
     required double price,
     required String estimatedArrival,
-    String message = '',
+    required String message,
   }) async {
-    final isConnected = await _networkInfo.isConnected;
-
-    if (!isConnected) {
-      throw Exception('No internet connection.');
-    }
-
+    await _requireConnection();
     final response = await _dio.post(
       ApiEndpoints.placeBid(bookingId),
       data: {
         'price': price,
         'estimatedArrival': estimatedArrival,
-        if (message.isNotEmpty) 'message': message,
+        'message': message,
       },
     );
-
     final payload = Map<String, dynamic>.from(response.data);
     return ProviderBidModel.fromJson(
       Map<String, dynamic>.from(payload['data']),
@@ -65,12 +56,7 @@ class ServiceDetailsRepository {
     required String estimatedArrival,
     required String message,
   }) async {
-    final isConnected = await _networkInfo.isConnected;
-
-    if (!isConnected) {
-      throw Exception('No internet connection.');
-    }
-
+    await _requireConnection();
     final response = await _dio.put(
       ApiEndpoints.updateBid(bookingId, bidId),
       data: {
@@ -79,7 +65,6 @@ class ServiceDetailsRepository {
         'message': message,
       },
     );
-
     final payload = Map<String, dynamic>.from(response.data);
     return ProviderBidModel.fromJson(
       Map<String, dynamic>.from(payload['data']),

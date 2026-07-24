@@ -144,7 +144,7 @@ class MyProfilePage extends GetView<ProfileController> {
                           value: controller.businessNameController.text),
                       _InfoRow(
                           label: TKeys.category.tr,
-                          value: controller.categoryController.text),
+                          value: controller.selectedCategory.value ?? ''),
                       _InfoRow(
                           label: TKeys.experience.tr,
                           value: controller.experienceController.text),

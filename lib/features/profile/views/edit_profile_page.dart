@@ -123,10 +123,17 @@ class EditProfilePage extends GetView<ProfileController> {
                     icon: Icons.business_outlined,
                   ),
                   const SizedBox(height: 14),
-                  ProfileField(
-                    controller: controller.categoryController,
+                  SearchableDropdownField(
                     label: TKeys.serviceCategory.tr,
                     icon: Icons.miscellaneous_services_outlined,
+                    value: controller.selectedCategory.value,
+                    items: controller.categories,
+                    enabled: !controller.isCategoriesLoading.value &&
+                        controller.categories.isNotEmpty,
+                    hint: controller.isCategoriesLoading.value
+                        ? TKeys.loading.tr
+                        : TKeys.serviceCategory.tr,
+                    onSelected: controller.onCategorySelected,
                   ),
                   const SizedBox(height: 14),
                   ProfileField(

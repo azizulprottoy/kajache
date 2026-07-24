@@ -67,6 +67,7 @@ class TKeys {
   static const bids              = 'bids';
   static const noBidsYet         = 'no_bids_yet';
   static const bidPlaced         = 'bid_placed';
+  static const postedBy          = 'posted_by';
 
   // ── Services ────────────────────────────────────────────────────────────────
   static const services       = 'services';

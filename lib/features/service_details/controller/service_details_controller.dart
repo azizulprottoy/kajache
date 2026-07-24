@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../home/models/services_response_model.dart';
+import '../../home/models/available_booking_response_model.dart';
 import '../arguments/service_details_arguments.dart';
 import '../repository/service_details_repository.dart';
 
@@ -14,7 +15,11 @@ class ServiceDetailsController extends GetxController {
   int minLimit = 0;
   String bookingId = '';
   bool hasBid = false;
+  String? myBidId;
   int? myBidPrice;
+  String? myBidEstimatedArrival;
+  String? myBidMessage;
+  JobPosterModel? poster;
   bool _hasInvalidArgument = false;
   final RxBool isLoading = false.obs;
   final RxBool isBidLoading = false.obs;
@@ -33,7 +38,11 @@ class ServiceDetailsController extends GetxController {
       minLimit = args.minLimit;
       bookingId = args.bookingId;
       hasBid = args.hasBid;
+      myBidId = args.myBidId;
       myBidPrice = args.myBidPrice;
+      myBidEstimatedArrival = args.myBidEstimatedArrival;
+      myBidMessage = args.myBidMessage;
+      poster = args.poster;
       debugPrint('[ServiceDetails] bookingId=$bookingId slug=$serviceSlug hasBid=$hasBid');
     } else {
       _hasInvalidArgument = true;
@@ -72,12 +81,29 @@ class ServiceDetailsController extends GetxController {
     }
     isBidLoading.value = true;
     try {
-      await _repository.placeBid(
-        bookingId: bookingId,
-        price: price,
-        estimatedArrival: estimatedArrival,
-        message: message,
-      );
+      if (hasBid) {
+        final bidId = myBidId;
+        if (bidId == null || bidId.isEmpty) {
+          throw Exception('Bid ID missing — cannot update bid.');
+        }
+        await _repository.updateBid(
+          bookingId: bookingId,
+          bidId: bidId,
+          price: price,
+          estimatedArrival: estimatedArrival,
+          message: message,
+        );
+      } else {
+        await _repository.placeBid(
+          bookingId: bookingId,
+          price: price,
+          estimatedArrival: estimatedArrival,
+          message: message,
+        );
+      }
+      myBidPrice = price.round();
+      myBidEstimatedArrival = estimatedArrival;
+      myBidMessage = message;
       return true;
     } catch (e) {
       WidgetsBinding.instance.addPostFrameCallback((_) {

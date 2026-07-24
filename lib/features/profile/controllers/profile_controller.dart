@@ -26,9 +26,12 @@ class ProfileController extends GetxController {
 
   // Service provider fields
   late TextEditingController businessNameController;
-  late TextEditingController categoryController;
   late TextEditingController experienceController;
   late TextEditingController serviceAreaController;
+
+  final RxList<String> categories = <String>[].obs;
+  final selectedCategory = RxnString();
+  final RxBool isCategoriesLoading = false.obs;
 
   bool get isBuyer => profileType.value == ProfileType.buyer;
   bool get isServiceProvider =>
@@ -70,6 +73,10 @@ class ProfileController extends GetxController {
 
   void onAreaSelected(String area) => selectedArea.value = area;
 
+  void onCategorySelected(String category) {
+    selectedCategory.value = category;
+  }
+
   @override
   void onInit() {
     super.onInit();
@@ -79,14 +86,30 @@ class ProfileController extends GetxController {
     phoneController = TextEditingController();
     addressController = TextEditingController();
     businessNameController = TextEditingController();
-    categoryController = TextEditingController();
     experienceController = TextEditingController();
     serviceAreaController = TextEditingController();
 
     final args = Get.arguments;
     if (args is ProfileType) profileType.value = args;
 
-    fetchMyProfile();
+    _loadProfileData();
+  }
+
+  Future<void> _loadProfileData() async {
+    await fetchCategories();
+    await fetchMyProfile();
+  }
+
+  Future<void> fetchCategories() async {
+    try {
+      isCategoriesLoading.value = true;
+      categories.assignAll(await _repository.getCategoryNames());
+    } catch (e) {
+      Get.snackbar('Error', e.toString(),
+          snackPosition: SnackPosition.BOTTOM);
+    } finally {
+      isCategoriesLoading.value = false;
+    }
   }
 
   Future<void> fetchMyProfile() async {
@@ -106,7 +129,12 @@ class ProfileController extends GetxController {
       phoneController.text = p.phone;
       addressController.text = p.address;
       businessNameController.text = p.businessName;
-      categoryController.text = p.category;
+      final savedCategory = p.category.trim();
+      final matchingCategories = categories.where(
+            (category) => category.toLowerCase() == savedCategory.toLowerCase(),
+      );
+      selectedCategory.value =
+      matchingCategories.isEmpty ? null : matchingCategories.first;
       experienceController.text = p.experience;
       serviceAreaController.text = p.serviceArea;
 
@@ -139,6 +167,12 @@ class ProfileController extends GetxController {
       return;
     }
 
+    if (isServiceProvider && selectedCategory.value == null) {
+      Get.snackbar('Missing', 'Please select a service category',
+          snackPosition: SnackPosition.BOTTOM);
+      return;
+    }
+
     try {
       isLoading.value = true;
 
@@ -150,7 +184,7 @@ class ProfileController extends GetxController {
         'area': selectedArea.value,
         if (isServiceProvider) ...{
           'businessName': businessNameController.text.trim(),
-          'category': categoryController.text.trim(),
+          'category': selectedCategory.value,
           'experience': experienceController.text.trim(),
           'serviceArea': serviceAreaController.text.trim(),
         },
@@ -180,7 +214,6 @@ class ProfileController extends GetxController {
     phoneController.dispose();
     addressController.dispose();
     businessNameController.dispose();
-    categoryController.dispose();
     experienceController.dispose();
     serviceAreaController.dispose();
     super.onClose();
