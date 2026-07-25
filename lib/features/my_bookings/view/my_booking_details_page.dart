@@ -4,12 +4,9 @@ import 'package:get/get.dart';
 import '../../../core/utils/media_url_helper.dart';
 import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/common_app_bar.dart';
-import '../../../shared/widgets/custom_button.dart';
 import '../../home/models/available_booking_response_model.dart';
 import '../../sbooking/booking_details_controller.dart';
 import '../controller/my_booking_details_controller.dart';
-
-
 
 class MyBookingDetailsPage extends GetView<MyBookingDetailsController> {
   const MyBookingDetailsPage({super.key});
@@ -42,6 +39,48 @@ class MyBookingDetailsPage extends GetView<MyBookingDetailsController> {
 
               _BookingCard(booking: booking),
 
+              if (booking.status.trim().toLowerCase() == 'in_progress') ...[
+                const SizedBox(height: 14),
+                Obx(
+                  () => SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.icon(
+                      onPressed: controller.isCompletingTask.value
+                          ? null
+                          : () async {
+                              final confirmed =
+                                  await _confirmTaskCompletion(context);
+                              if (!confirmed) return;
+
+                              final success =
+                                  await controller.completeTask();
+                              if (!success) return;
+
+                              Get.snackbar(
+                                'Task completed',
+                                'The booking has been marked as completed',
+                                snackPosition: SnackPosition.BOTTOM,
+                              );
+                            },
+                      icon: controller.isCompletingTask.value
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : const Icon(Icons.task_alt_rounded),
+                      label: Text(
+                        controller.isCompletingTask.value
+                            ? 'Completing...'
+                            : 'Task Completed',
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+
               _SectionTitle(
                 icon: Icons.gavel_outlined,
                 title: "Submitted bids",
@@ -52,14 +91,17 @@ class MyBookingDetailsPage extends GetView<MyBookingDetailsController> {
                 const _EmptyBids()
               else
                 ...booking.bids.map(
-                      (bid) => _BidCard(
+                  (bid) => _BidCard(
                     bid: bid,
                     isMine: bid.id == booking.myBidId,
                     onTap: () {
-                      controller.selectBidder(bid);
+                      controller.viewBidder(bid);
 
                       Get.bottomSheet(
-                        _BidderProfileSheet(bid: bid),
+                        _BidderProfileSheet(
+                          bid: bid,
+                          controller: controller,
+                        ),
                         isScrollControlled: true,
                         backgroundColor: Colors.transparent,
                       );
@@ -70,17 +112,41 @@ class MyBookingDetailsPage extends GetView<MyBookingDetailsController> {
           ),
         );
       }),
-
     );
   }
 
+  Future<bool> _confirmTaskCompletion(BuildContext context) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Mark task as completed?'),
+        content: const Text(
+          'Confirm that the technician has finished this job.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text('Confirm'),
+          ),
+        ],
+      ),
+    );
 
+    return result ?? false;
+  }
 }
+
 class _BidderProfileSheet extends StatelessWidget {
   final BookingBidModel bid;
+  final MyBookingDetailsController controller;
 
   const _BidderProfileSheet({
     required this.bid,
+    required this.controller,
   });
 
   @override
@@ -102,27 +168,44 @@ class _BidderProfileSheet extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 44,
-              height: 4,
-              decoration: BoxDecoration(
-                color: colors.outlineVariant,
-                borderRadius: BorderRadius.circular(20),
+            SizedBox(
+              height: 42,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Container(
+                    width: 44,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: colors.outlineVariant,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: IconButton(
+                      tooltip: 'Close',
+                      onPressed: Get.back,
+                      icon: const Icon(Icons.close_rounded),
+                    ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 22),
+            const SizedBox(height: 10),
 
             CircleAvatar(
               radius: 46,
               backgroundColor: colors.primaryContainer,
-              backgroundImage:
-              avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
+              backgroundImage: avatarUrl.isNotEmpty
+                  ? NetworkImage(avatarUrl)
+                  : null,
               child: avatarUrl.isEmpty
                   ? Icon(
-                Icons.engineering_outlined,
-                size: 44,
-                color: colors.onPrimaryContainer,
-              )
+                      Icons.engineering_outlined,
+                      size: 44,
+                      color: colors.onPrimaryContainer,
+                    )
                   : null,
             ),
             const SizedBox(height: 14),
@@ -194,13 +277,51 @@ class _BidderProfileSheet extends StatelessWidget {
 
             const SizedBox(height: 18),
 
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton(
-                onPressed: Get.back,
-                child: const Text('Close'),
-              ),
-            ),
+            Obx(() {
+              final bookingStatus =
+                  controller.booking.value?.status.trim().toLowerCase() ?? '';
+              final canBookTechnician = bookingStatus == 'bidding_open';
+
+              if (!canBookTechnician) {
+                return const SizedBox.shrink();
+              }
+
+              return SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  onPressed: controller.isBookingTechnician.value
+                      ? null
+                      : () async {
+                          final success =
+                              await controller.bookTechnician(bid);
+                          if (!success) return;
+
+                          if (Get.isBottomSheetOpen ?? false) {
+                            Get.back();
+                          }
+                          Get.snackbar(
+                            'Success',
+                            'Technician booked successfully',
+                            snackPosition: SnackPosition.BOTTOM,
+                          );
+                        },
+                  icon: controller.isBookingTechnician.value
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : const Icon(Icons.event_available_rounded),
+                  label: Text(
+                    controller.isBookingTechnician.value
+                        ? 'Booking...'
+                        : 'Book Now',
+                  ),
+                ),
+              );
+            }),
           ],
         ),
       ),

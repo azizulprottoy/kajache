@@ -15,6 +15,10 @@ class ApiEndpoints {
   // Upload
   static const String upload = '/upload';
 
+  // Portfolio
+  static const String portfolio = '/portfolio';
+  static String portfolioById(String id) => '/portfolio/$id';
+
   // Banner
   static const String banner = '/banner';
 
@@ -37,6 +41,10 @@ class ApiEndpoints {
   static const String providerDashboard = '/booking/provider/dashboard';
   static const String providerBids = '/booking/provider/bids';
   static String bookingById(String id) => '/booking/$id';
+  static String selectBid(String bookingId) =>
+      '/booking/$bookingId/select-bid';
+  static String completeBooking(String bookingId) =>
+      '/booking/$bookingId/complete';
 
   // Bids
   static String bookingBids(String bookingId) => '/booking/$bookingId/bids';

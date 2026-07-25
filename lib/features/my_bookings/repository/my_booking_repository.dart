@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_endpoints.dart';
 import '../../../core/network/network_info.dart';
@@ -33,11 +34,12 @@ class MyBookingRepository {
     return bookings
         .map(
           (e) => MyBookingModel.fromJson(
-        Map<String, dynamic>.from(e),
-      ),
-    )
+            Map<String, dynamic>.from(e),
+          ),
+        )
         .toList();
   }
+
   Future<AvailableBookingModel> getBooking(String bookingId) async {
     final isConnected = await _networkInfo.isConnected;
 
@@ -57,6 +59,34 @@ class MyBookingRepository {
 
     return AvailableBookingModel.fromJson(
       Map<String, dynamic>.from(json['data']),
+    );
+  }
+
+  Future<void> selectBid({
+    required String bookingId,
+    required String bidId,
+  }) async {
+    final isConnected = await _networkInfo.isConnected;
+
+    if (!isConnected) {
+      throw Exception('No internet connection');
+    }
+
+    await _dio.post(
+      ApiEndpoints.selectBid(bookingId),
+      data: {'bidId': bidId},
+    );
+  }
+
+  Future<void> completeBooking(String bookingId) async {
+    final isConnected = await _networkInfo.isConnected;
+
+    if (!isConnected) {
+      throw Exception('No internet connection');
+    }
+
+    await _dio.post(
+      ApiEndpoints.completeBooking(bookingId),
     );
   }
 }
