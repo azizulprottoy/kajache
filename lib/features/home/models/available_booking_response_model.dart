@@ -294,8 +294,15 @@ class AvailableBookingModel {
 
 class BookingBidModel {
   final String id;
+
+  final String providerId;
+  final String providerUsername;
   final String providerName;
   final String providerAvatar;
+
+  final int totalJobsCompleted;
+  final double rating;
+
   final int price;
   final String estimatedArrival;
   final String message;
@@ -303,8 +310,12 @@ class BookingBidModel {
 
   const BookingBidModel({
     required this.id,
+    required this.providerId,
+    required this.providerUsername,
     required this.providerName,
     required this.providerAvatar,
+    required this.totalJobsCompleted,
+    required this.rating,
     required this.price,
     required this.estimatedArrival,
     required this.message,
@@ -315,6 +326,7 @@ class BookingBidModel {
     final provider = json['provider'] is Map
         ? Map<String, dynamic>.from(json['provider'])
         : <String, dynamic>{};
+
     final profile = provider['profileDetail'] is Map
         ? Map<String, dynamic>.from(provider['profileDetail'])
         : <String, dynamic>{};
@@ -324,10 +336,20 @@ class BookingBidModel {
 
     return BookingBidModel(
       id: json['_id']?.toString() ?? '',
+
+      providerId: provider['_id']?.toString() ?? '',
+      providerUsername: username,
       providerName: fullName.isNotEmpty
           ? fullName
           : (username.isNotEmpty ? username : 'Technician'),
       providerAvatar: profile['avatar']?.toString() ?? '',
+
+      totalJobsCompleted:
+      int.tryParse(profile['totalJobsCompleted']?.toString() ?? '0') ?? 0,
+
+      rating:
+      double.tryParse(profile['rating']?.toString() ?? '0') ?? 0.0,
+
       price: int.tryParse(json['price']?.toString() ?? '0') ?? 0,
       estimatedArrival: json['estimatedArrival']?.toString() ?? '',
       message: json['message']?.toString() ?? '',
@@ -335,7 +357,6 @@ class BookingBidModel {
     );
   }
 }
-
 class JobPosterModel {
   final String id;
   final String username;

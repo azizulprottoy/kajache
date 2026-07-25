@@ -28,7 +28,7 @@ class AppRoutes {
   static const bookingPage = '/bookingPage';
   static const categoryDetails = '/categoryDetails';
   static const myBookings       = '/myBookings';
-
+  static const myBookingDetails   ='/myBookingDetails';
 }
 //   static const onboarding = '/onboarding';
 //   // Main

@@ -1,60 +1,100 @@
 class MyBookingModel {
   final String id;
+  final String clientId;
+
+  final String serviceId;
   final String serviceName;
   final String serviceSlug;
-  final String details;
-  final String status;
+  final String categoryId;
 
+  final String details;
+  final List<dynamic> subServices;
+
+  final int bidsCount;
   final int minLimit;
   final int bookingFee;
 
   final String paymentStatus;
+  final String status;
 
   final String address;
   final String city;
   final String date;
   final String time;
 
-  MyBookingModel({
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+
+  const MyBookingModel({
     required this.id,
+    required this.clientId,
+    required this.serviceId,
     required this.serviceName,
     required this.serviceSlug,
+    required this.categoryId,
     required this.details,
-    required this.status,
+    required this.subServices,
+    required this.bidsCount,
     required this.minLimit,
     required this.bookingFee,
     required this.paymentStatus,
+    required this.status,
     required this.address,
     required this.city,
     required this.date,
     required this.time,
+    this.createdAt,
+    this.updatedAt,
   });
 
   factory MyBookingModel.fromJson(Map<String, dynamic> json) {
+    final service = json['service'] is Map
+        ? Map<String, dynamic>.from(json['service'] as Map)
+        : <String, dynamic>{};
+
+    final location = json['location'] is Map
+        ? Map<String, dynamic>.from(json['location'] as Map)
+        : <String, dynamic>{};
+
+    final schedule = json['schedule'] is Map
+        ? Map<String, dynamic>.from(json['schedule'] as Map)
+        : <String, dynamic>{};
+
     return MyBookingModel(
       id: json['_id']?.toString() ?? '',
+      clientId: json['client']?.toString() ?? '',
 
-      serviceName: json['service']?['title']?.toString() ?? 'Unknown Service',
-      serviceSlug: json['service']?['slug']?.toString() ?? '',
+      serviceId: service['_id']?.toString() ?? '',
+      serviceName: service['title']?.toString() ?? 'Unknown Service',
+      serviceSlug: service['slug']?.toString() ?? '',
+      categoryId: service['category']?.toString() ?? '',
 
       details: json['details']?.toString() ?? '',
-      status: json['status']?.toString() ?? '',
 
-      minLimit: (json['minLimit'] ?? 0) is int
-          ? json['minLimit']
-          : int.tryParse(json['minLimit']?.toString() ?? '0') ?? 0,
+      subServices: json['subServices'] is List
+          ? List<dynamic>.from(json['subServices'] as List)
+          : <dynamic>[],
 
-      bookingFee: (json['bookingFee'] ?? 0) is int
-          ? json['bookingFee']
-          : int.tryParse(json['bookingFee']?.toString() ?? '0') ?? 0,
+      bidsCount: _toInt(json['bidsCount']),
+      minLimit: _toInt(json['minLimit']),
+      bookingFee: _toInt(json['bookingFee']),
 
       paymentStatus: json['paymentStatus']?.toString() ?? '',
+      status: json['status']?.toString() ?? '',
 
-      address: json['location']?['address']?.toString() ?? '',
-      city: json['location']?['city']?.toString() ?? '',
+      address: location['address']?.toString() ?? '',
+      city: location['city']?.toString() ?? '',
 
-      date: json['schedule']?['date']?.toString() ?? '',
-      time: json['schedule']?['time']?.toString() ?? '',
+      date: schedule['date']?.toString() ?? '',
+      time: schedule['time']?.toString() ?? '',
+
+      createdAt: DateTime.tryParse(json['createdAt']?.toString() ?? ''),
+      updatedAt: DateTime.tryParse(json['updatedAt']?.toString() ?? ''),
     );
+  }
+
+  static int _toInt(dynamic value) {
+    if (value is num) return value.toInt();
+    return int.tryParse(value?.toString() ?? '') ?? 0;
   }
 }

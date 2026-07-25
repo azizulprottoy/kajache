@@ -32,7 +32,9 @@ import '../../features/home/views/home_page.dart';
 import '../../features/main/binding/main_binding.dart';
 import '../../features/main/view/main_page.dart';
 import '../../features/menu/views/menu_page.dart';
+import '../../features/my_bookings/bindings/MyBookDetailsBinding.dart';
 import '../../features/my_bookings/bindings/my_booking_binding.dart';
+import '../../features/my_bookings/view/my_booking_details_page.dart';
 import '../../features/my_bookings/view/my_bookings_page.dart';
 import '../../features/orders/bindings/order_binding.dart';
 import '../../features/orders/views/orders_page.dart';
@@ -185,6 +187,11 @@ class AppPages {
       name: AppRoutes.customerSupportPage,
       page: () => const CustomerSupportPage(),
       binding: CustomerSupportBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.myBookingDetails ,
+      page: () => const MyBookingDetailsPage(),
+      binding: MyBookingDetailsBinding(),
     ),
   ];
 }

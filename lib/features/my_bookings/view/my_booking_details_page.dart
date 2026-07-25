@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../core/utils/media_url_helper.dart';
-import '../../shared/widgets/common_app_bar.dart';
-import '../../shared/widgets/custom_button.dart';
-import '../../core/utils/translation_keys.dart';
-import '../home/models/available_booking_response_model.dart';
-import 'booking_details_controller.dart';
+import '../../../core/utils/media_url_helper.dart';
+import '../../../core/utils/translation_keys.dart';
+import '../../../shared/widgets/common_app_bar.dart';
+import '../../../shared/widgets/custom_button.dart';
+import '../../home/models/available_booking_response_model.dart';
+import '../../sbooking/booking_details_controller.dart';
+import '../controller/my_booking_details_controller.dart';
 
 
-class BookingDetailsPage extends GetView<BookingDetailsController> {
-  const BookingDetailsPage({super.key});
+
+class MyBookingDetailsPage extends GetView<MyBookingDetailsController> {
+  const MyBookingDetailsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -39,9 +41,7 @@ class BookingDetailsPage extends GetView<BookingDetailsController> {
               _ServiceCard(booking: booking),
 
               _BookingCard(booking: booking),
-              const SizedBox(height: 20),
-              _ClientCard(poster: booking.poster),
-              const SizedBox(height: 20),
+
               _SectionTitle(
                 icon: Icons.gavel_outlined,
                 title: "Submitted bids",
@@ -52,56 +52,255 @@ class BookingDetailsPage extends GetView<BookingDetailsController> {
                 const _EmptyBids()
               else
                 ...booking.bids.map(
-                  (bid) => _BidCard(
+                      (bid) => _BidCard(
                     bid: bid,
                     isMine: bid.id == booking.myBidId,
+                    onTap: () {
+                      controller.selectBidder(bid);
+
+                      Get.bottomSheet(
+                        _BidderProfileSheet(bid: bid),
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                      );
+                    },
                   ),
                 ),
             ],
           ),
         );
       }),
-      bottomNavigationBar: Obx(() {
-        final booking = controller.booking.value;
-        if (booking == null || booking.status != 'bidding_open') {
-          return const SizedBox.shrink();
-        }
-        return SafeArea(
-          top: false,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-            child: CustomButton(
-              label: booking.hasBid ? TKeys.editBid.tr : TKeys.bidNow.tr,
-              isFullWidth: true,
-              isLoading: controller.isBidLoading.value,
-              onPressed: controller.isBidLoading.value
-                  ? null
-                  : () => _showBidSheet(context, booking),
-            ),
-          ),
-        );
-      }),
+
     );
   }
 
-  void _showBidSheet(
-    BuildContext context,
-    AvailableBookingModel booking,
-  ) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => _BidSheet(
-        isEditMode: booking.hasBid,
-        initialPrice: booking.myBidPrice,
-        initialEta: booking.myBidEstimatedArrival,
-        initialMessage: booking.myBidMessage,
+
+}
+class _BidderProfileSheet extends StatelessWidget {
+  final BookingBidModel bid;
+
+  const _BidderProfileSheet({
+    required this.bid,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final avatarUrl = MediaUrlHelper.resolve(bid.providerAvatar);
+
+    return SafeArea(
+      top: false,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+        decoration: BoxDecoration(
+          color: colors.surface,
+          borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(26),
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 44,
+              height: 4,
+              decoration: BoxDecoration(
+                color: colors.outlineVariant,
+                borderRadius: BorderRadius.circular(20),
+              ),
+            ),
+            const SizedBox(height: 22),
+
+            CircleAvatar(
+              radius: 46,
+              backgroundColor: colors.primaryContainer,
+              backgroundImage:
+              avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
+              child: avatarUrl.isEmpty
+                  ? Icon(
+                Icons.engineering_outlined,
+                size: 44,
+                color: colors.onPrimaryContainer,
+              )
+                  : null,
+            ),
+            const SizedBox(height: 14),
+
+            Text(
+              bid.providerName,
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+
+            if (bid.providerUsername.isNotEmpty) ...[
+              const SizedBox(height: 4),
+              Text(
+                '@${bid.providerUsername}',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: colors.onSurfaceVariant,
+                ),
+              ),
+            ],
+
+            const SizedBox(height: 22),
+
+            Row(
+              children: [
+                Expanded(
+                  child: _ProfileStat(
+                    icon: Icons.star_rounded,
+                    label: 'Rating',
+                    value: bid.rating.toStringAsFixed(1),
+                    color: Colors.amber.shade700,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _ProfileStat(
+                    icon: Icons.task_alt_rounded,
+                    label: 'Jobs completed',
+                    value: '${bid.totalJobsCompleted}',
+                    color: Colors.green,
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 18),
+            const Divider(),
+            const SizedBox(height: 10),
+
+            _ProfileInformationRow(
+              icon: Icons.payments_outlined,
+              label: 'Bid amount',
+              value: '৳${bid.price}',
+            ),
+
+            if (bid.estimatedArrival.isNotEmpty)
+              _ProfileInformationRow(
+                icon: Icons.access_time_outlined,
+                label: 'Estimated arrival',
+                value: bid.estimatedArrival,
+              ),
+
+            if (bid.message.isNotEmpty)
+              _ProfileInformationRow(
+                icon: Icons.message_outlined,
+                label: 'Bid message',
+                value: bid.message,
+              ),
+
+            const SizedBox(height: 18),
+
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                onPressed: Get.back,
+                child: const Text('Close'),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
+class _ProfileStat extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color color;
+
+  const _ProfileStat({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: colors.surfaceContainerHighest.withOpacity(0.45),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: color),
+          const SizedBox(height: 6),
+          Text(
+            value,
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: colors.onSurfaceVariant,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ProfileInformationRow extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+
+  const _ProfileInformationRow({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 7),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 20, color: colors.primary),
+          const SizedBox(width: 10),
+          SizedBox(
+            width: 115,
+            child: Text(
+              label,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colors.onSurfaceVariant,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 class _ServiceCard extends StatelessWidget {
   final AvailableBookingModel booking;
 
@@ -126,13 +325,13 @@ class _ServiceCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
                 child: imageUrl.isNotEmpty
                     ? Image.network(
-                        imageUrl,
-                        width: 76,
-                        height: 76,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) =>
-                            _ServiceIcon(colors: colors),
-                      )
+                  imageUrl,
+                  width: 76,
+                  height: 76,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) =>
+                      _ServiceIcon(colors: colors),
+                )
                     : _ServiceIcon(colors: colors),
               ),
               const SizedBox(width: 12),
@@ -206,7 +405,7 @@ class _BookingCard extends StatelessWidget {
               spacing: 8,
               runSpacing: 8,
               children:
-                  booking.subServices.map((item) => Chip(label: Text(item))).toList(),
+              booking.subServices.map((item) => Chip(label: Text(item))).toList(),
             ),
           ],
           const Divider(height: 28),
@@ -234,99 +433,17 @@ class _BookingCard extends StatelessWidget {
   }
 }
 
-class _ClientCard extends StatelessWidget {
-  final JobPosterModel poster;
-
-  const _ClientCard({required this.poster});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
-    final avatarUrl = MediaUrlHelper.resolve(poster.avatar);
-    final profileLocation = [poster.address, poster.area, poster.district]
-        .where((part) => part.trim().isNotEmpty)
-        .join(', ');
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: _cardDecoration(colors),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            TKeys.postedBy.tr,
-            style: theme.textTheme.labelLarge?.copyWith(
-              color: colors.onSurfaceVariant,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 28,
-                backgroundColor: colors.primaryContainer,
-                backgroundImage:
-                    avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
-                child: avatarUrl.isEmpty
-                    ? Icon(Icons.person_outline, color: colors.primary)
-                    : null,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      poster.name,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    if (profileLocation.isNotEmpty) ...[
-                      const SizedBox(height: 5),
-                      _InfoRow(
-                        icon: Icons.home_outlined,
-                        text: profileLocation,
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
-          Row(
-            children: [
-              Expanded(
-                child: _Stat(
-                  icon: Icons.work_outline,
-                  value: '${poster.jobPostCount}',
-                  label: TKeys.jobsPosted.tr,
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _Stat(
-                  icon: Icons.verified_user_outlined,
-                  value: '${poster.trustScore}',
-                  label: TKeys.trustScore.tr,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 class _BidCard extends StatelessWidget {
   final BookingBidModel bid;
   final bool isMine;
+  final VoidCallback onTap;
 
-  const _BidCard({required this.bid, required this.isMine});
+  const _BidCard({
+    required this.bid,
+    required this.isMine,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -334,73 +451,97 @@ class _BidCard extends StatelessWidget {
     final colors = theme.colorScheme;
     final avatarUrl = MediaUrlHelper.resolve(bid.providerAvatar);
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: isMine ? Colors.green.shade50 : colors.surfaceContainerLowest,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: isMine
-              ? Colors.green.shade300
-              : colors.outlineVariant.withOpacity(.45),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 10),
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: isMine
+                ? Colors.green.shade50
+                : colors.surfaceContainerLowest,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: isMine
+                  ? Colors.green.shade300
+                  : colors.outlineVariant.withOpacity(0.45),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CircleAvatar(
-                radius: 21,
-                backgroundImage:
-                    avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
-                child: avatarUrl.isEmpty
-                    ? const Icon(Icons.engineering_outlined)
-                    : null,
+              Row(
+                children: [
+                  CircleAvatar(
+                    radius: 23,
+                    backgroundImage: avatarUrl.isNotEmpty
+                        ? NetworkImage(avatarUrl)
+                        : null,
+                    child: avatarUrl.isEmpty
+                        ? const Icon(Icons.engineering_outlined)
+                        : null,
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          bid.providerName,
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          'Tap to view profile',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: colors.primary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Text(
+                    '৳${bid.price}',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: colors.primary,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Icon(
+                    Icons.chevron_right,
+                    color: colors.onSurfaceVariant,
+                  ),
+                ],
               ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  isMine
-                      ? '${bid.providerName} (${TKeys.myCurrentBid.tr})'
-                      : bid.providerName,
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w700,
+              if (bid.estimatedArrival.isNotEmpty) ...[
+                const SizedBox(height: 10),
+                _InfoRow(
+                  icon: Icons.access_time_outlined,
+                  text: 'Estimated arrival: ${bid.estimatedArrival}',
+                ),
+              ],
+              if (bid.message.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Text(
+                  bid.message,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colors.onSurfaceVariant,
                   ),
                 ),
-              ),
-              Text(
-                '৳${bid.price}',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: colors.primary,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
+              ],
             ],
           ),
-          if (bid.estimatedArrival.isNotEmpty) ...[
-            const SizedBox(height: 10),
-            _InfoRow(
-              icon: Icons.access_time_outlined,
-              text: '${TKeys.estimatedArrival.tr}: ${bid.estimatedArrival}',
-            ),
-          ],
-          if (bid.message.isNotEmpty) ...[
-            const SizedBox(height: 8),
-            Text(
-              bid.message,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: colors.onSurfaceVariant,
-              ),
-            ),
-          ],
-        ],
+        ),
       ),
     );
   }
 }
-
 class _BidSheet extends StatefulWidget {
   final bool isEditMode;
   final int? initialPrice;
@@ -534,9 +675,9 @@ class _BidSheetState extends State<_BidSheet> {
                     readOnly: true,
                     onTap: _pickTime,
                     validator: (value) =>
-                        value == null || value.trim().isEmpty
-                            ? TKeys.selectEstimatedTimeError.tr
-                            : null,
+                    value == null || value.trim().isEmpty
+                        ? TKeys.selectEstimatedTimeError.tr
+                        : null,
                     decoration: InputDecoration(
                       labelText: TKeys.estimatedArrival.tr,
                       prefixIcon: const Icon(Icons.access_time_outlined),
@@ -575,17 +716,17 @@ class _BidSheetState extends State<_BidSheet> {
                             onPressed: loading ? null : _submit,
                             child: loading
                                 ? const SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                    ),
-                                  )
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                              ),
+                            )
                                 : Text(
-                                    widget.isEditMode
-                                        ? TKeys.updateBid.tr
-                                        : TKeys.submitBid.tr,
-                                  ),
+                              widget.isEditMode
+                                  ? TKeys.updateBid.tr
+                                  : TKeys.submitBid.tr,
+                            ),
                           ),
                         ),
                       ],
@@ -660,49 +801,6 @@ class _InfoRow extends StatelessWidget {
   }
 }
 
-class _Stat extends StatelessWidget {
-  final IconData icon;
-  final String value;
-  final String label;
-
-  const _Stat({
-    required this.icon,
-    required this.value,
-    required this.label,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: colors.primaryContainer.withOpacity(.45),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, size: 18, color: colors.primary),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
-                Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.labelSmall,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 class _ServiceIcon extends StatelessWidget {
   final ColorScheme colors;
