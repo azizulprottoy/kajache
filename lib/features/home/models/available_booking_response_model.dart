@@ -415,6 +415,10 @@ class JobPosterModel {
 class ProviderBidModel {
   final String id;
   final String bookingId;
+  final String bookingStatus;
+  final String serviceTitle;
+  final String scheduleDate;
+  final String scheduleTime;
   final int? price;
   final String estimatedArrival;
   final String message;
@@ -423,6 +427,10 @@ class ProviderBidModel {
   ProviderBidModel({
     required this.id,
     required this.bookingId,
+    required this.bookingStatus,
+    required this.serviceTitle,
+    required this.scheduleDate,
+    required this.scheduleTime,
     this.price,
     required this.estimatedArrival,
     required this.message,
@@ -430,14 +438,26 @@ class ProviderBidModel {
   });
 
   factory ProviderBidModel.fromJson(Map<String, dynamic> json) {
-    final booking = json['booking'];
-    final bookingId = booking is Map
-        ? booking['_id']?.toString() ?? ''
-        : booking?.toString() ?? '';
+    final rawBooking = json['booking'];
+    final booking = rawBooking is Map
+        ? Map<String, dynamic>.from(rawBooking)
+        : <String, dynamic>{};
+    final service = booking['service'] is Map
+        ? Map<String, dynamic>.from(booking['service'])
+        : <String, dynamic>{};
+    final schedule = booking['schedule'] is Map
+        ? Map<String, dynamic>.from(booking['schedule'])
+        : <String, dynamic>{};
 
     return ProviderBidModel(
       id: json['_id']?.toString() ?? '',
-      bookingId: bookingId,
+      bookingId: booking.isNotEmpty
+          ? booking['_id']?.toString() ?? ''
+          : rawBooking?.toString() ?? '',
+      bookingStatus: booking['status']?.toString() ?? '',
+      serviceTitle: service['title']?.toString() ?? 'Service',
+      scheduleDate: schedule['date']?.toString() ?? '',
+      scheduleTime: schedule['time']?.toString() ?? '',
       price: int.tryParse(json['price']?.toString() ?? ''),
       estimatedArrival: json['estimatedArrival']?.toString() ?? '',
       message: json['message']?.toString() ?? '',
