@@ -16,6 +16,8 @@ class MyBookingModel {
 
   final String paymentStatus;
   final String status;
+  final bool providerRated;
+  final bool serviceRated;
 
   final String address;
   final String city;
@@ -39,6 +41,8 @@ class MyBookingModel {
     required this.bookingFee,
     required this.paymentStatus,
     required this.status,
+    required this.providerRated,
+    required this.serviceRated,
     required this.address,
     required this.city,
     required this.date,
@@ -81,6 +85,8 @@ class MyBookingModel {
 
       paymentStatus: json['paymentStatus']?.toString() ?? '',
       status: json['status']?.toString() ?? '',
+      providerRated: json['providerRated'] == true,
+      serviceRated: json['serviceRated'] == true,
 
       address: location['address']?.toString() ?? '',
       city: location['city']?.toString() ?? '',

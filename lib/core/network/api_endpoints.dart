@@ -31,7 +31,7 @@ class ApiEndpoints {
   static const String services = '/service';
   static const String service = '/service';
   static String serviceByslug(String slug) => '/service/$slug';
-  static String serviceBycategory(String categorySlug) => '/service/category/$categorySlug';
+  static String serviceBycategory(String categorySlug) =>  '/service/category/$categorySlug';
 
   // Booking
   static const String bookings = '/booking';
@@ -41,8 +41,10 @@ class ApiEndpoints {
   static const String providerDashboard = '/booking/provider/dashboard';
   static const String providerBids = '/booking/provider/bids';
   static String bookingById(String id) => '/booking/$id';
-  static String selectBid(String bookingId) => '/booking/$bookingId/select-bid';
-  static String acceptBooking(String bookingId) => '/booking/$bookingId/accept';
+  static String selectBid(String bookingId) =>
+      '/booking/$bookingId/select-bid';
+  static String acceptBooking(String bookingId) =>
+      '/booking/$bookingId/accept';
   static String completeBooking(String bookingId) =>
       '/booking/$bookingId/complete';
 
@@ -57,8 +59,7 @@ class ApiEndpoints {
   static String sendBidMessage(String bidId) => '/booking/bid/$bidId/message';
 
   // Payment
-  static String payment(String bookingId) =>
-      '/booking/$bookingId/confirm-payment';
+  static  String payment(String bookingId) => '/booking/$bookingId/confirm-payment';
 
   // Coupon
   static const String coupons = '/coupon';
@@ -67,6 +68,7 @@ class ApiEndpoints {
   // Review
   static const String reviews = '/review';
   static const String review = '/review';
+  static const String employeeRating = '/employeeRating';
 
   // Comment
   static const String comments = '/comment';

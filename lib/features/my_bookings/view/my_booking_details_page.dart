@@ -81,6 +81,15 @@ class MyBookingDetailsPage extends GetView<MyBookingDetailsController> {
                 ),
               ],
 
+              if (booking.status.trim().toLowerCase() == 'completed' &&
+                  (!booking.providerRated || !booking.serviceRated)) ...[
+                const SizedBox(height: 14),
+                _FeedbackSection(
+                  booking: booking,
+                  controller: controller,
+                ),
+              ],
+
               _SectionTitle(
                 icon: Icons.gavel_outlined,
                 title: "Submitted bids",
@@ -137,6 +146,246 @@ class MyBookingDetailsPage extends GetView<MyBookingDetailsController> {
     );
 
     return result ?? false;
+  }
+}
+
+class _FeedbackSection extends StatelessWidget {
+  final AvailableBookingModel booking;
+  final MyBookingDetailsController controller;
+
+  const _FeedbackSection({
+    required this.booking,
+    required this.controller,
+  });
+
+  void _openForm({
+    required bool isServiceReview,
+  }) {
+    Get.bottomSheet(
+      _RatingAndReviewSheet(
+        controller: controller,
+        isServiceReview: isServiceReview,
+      ),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: _cardDecoration(colors),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Rate your experience',
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Complete the remaining feedback for this booking.',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: colors.onSurfaceVariant,
+            ),
+          ),
+          if (!booking.serviceRated) ...[
+            const SizedBox(height: 14),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () => _openForm(isServiceReview: true),
+                icon: const Icon(Icons.rate_review_outlined),
+                label: const Text('Review Service'),
+              ),
+            ),
+          ],
+          if (!booking.providerRated) ...[
+            const SizedBox(height: 10),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                onPressed: () => _openForm(isServiceReview: false),
+                icon: const Icon(Icons.star_outline_rounded),
+                label: const Text('Rate Technician'),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _RatingAndReviewSheet extends StatefulWidget {
+  final MyBookingDetailsController controller;
+  final bool isServiceReview;
+
+  const _RatingAndReviewSheet({
+    required this.controller,
+    required this.isServiceReview,
+  });
+
+  @override
+  State<_RatingAndReviewSheet> createState() =>
+      _RatingAndReviewSheetState();
+}
+
+class _RatingAndReviewSheetState extends State<_RatingAndReviewSheet> {
+  final _formKey = GlobalKey<FormState>();
+  final _commentController = TextEditingController();
+  int _rating = 5;
+
+  @override
+  void dispose() {
+    _commentController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    final success = widget.isServiceReview
+        ? await widget.controller.submitServiceReview(
+            rating: _rating,
+            review: _commentController.text,
+          )
+        : await widget.controller.submitProviderRating(
+            rating: _rating,
+            comment: _commentController.text,
+          );
+
+    if (!success || !mounted) return;
+
+    Navigator.of(context).pop();
+    Get.snackbar(
+      'Thank you',
+      widget.isServiceReview
+          ? 'Your service review was submitted.'
+          : 'Your technician rating was submitted.',
+      snackPosition: SnackPosition.BOTTOM,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+          decoration: BoxDecoration(
+            color: colors.surface,
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(26),
+            ),
+          ),
+          child: Form(
+            key: _formKey,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 44,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: colors.outlineVariant,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  Text(
+                    widget.isServiceReview
+                        ? 'Review Service'
+                        : 'Rate Technician',
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(5, (index) {
+                      final value = index + 1;
+                      return IconButton(
+                        tooltip: '$value star',
+                        onPressed: () => setState(() => _rating = value),
+                        icon: Icon(
+                          value <= _rating
+                              ? Icons.star_rounded
+                              : Icons.star_border_rounded,
+                          color: Colors.amber.shade700,
+                          size: 34,
+                        ),
+                      );
+                    }),
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: _commentController,
+                    minLines: 3,
+                    maxLines: 5,
+                    validator: (value) {
+                      if (widget.isServiceReview &&
+                          (value == null || value.trim().isEmpty)) {
+                        return 'Please write a service review';
+                      }
+                      return null;
+                    },
+                    decoration: InputDecoration(
+                      labelText: widget.isServiceReview
+                          ? 'Service review'
+                          : 'Comment (optional)',
+                      hintText: widget.isServiceReview
+                          ? 'Tell us about the service'
+                          : 'Add a comment about the technician',
+                      alignLabelWithHint: true,
+                      border: const OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  Obx(() {
+                    final submitting = widget.isServiceReview
+                        ? widget.controller.isSubmittingServiceReview.value
+                        : widget.controller.isSubmittingProviderRating.value;
+
+                    return SizedBox(
+                      width: double.infinity,
+                      child: FilledButton(
+                        onPressed: submitting ? null : _submit,
+                        child: submitting
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Text('Submit'),
+                      ),
+                    );
+                  }),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 

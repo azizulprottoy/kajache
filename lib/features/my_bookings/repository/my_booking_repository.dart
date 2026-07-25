@@ -89,4 +89,47 @@ class MyBookingRepository {
       ApiEndpoints.completeBooking(bookingId),
     );
   }
+
+  Future<void> submitServiceReview({
+    required String bookingId,
+    required int rating,
+    required String review,
+  }) async {
+    final isConnected = await _networkInfo.isConnected;
+
+    if (!isConnected) {
+      throw Exception('No internet connection');
+    }
+
+    await _dio.post(
+      ApiEndpoints.review,
+      data: {
+        'booking': bookingId,
+        'rating': rating,
+        'review': review,
+      },
+    );
+  }
+
+  Future<void> submitProviderRating({
+    required String bookingId,
+    required int rating,
+    String? comment,
+  }) async {
+    final isConnected = await _networkInfo.isConnected;
+
+    if (!isConnected) {
+      throw Exception('No internet connection');
+    }
+
+    await _dio.post(
+      ApiEndpoints.employeeRating,
+      data: {
+        'booking': bookingId,
+        'rating': rating,
+        if (comment != null && comment.trim().isNotEmpty)
+          'comment': comment.trim(),
+      },
+    );
+  }
 }

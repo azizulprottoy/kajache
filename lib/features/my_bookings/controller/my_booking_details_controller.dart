@@ -10,6 +10,8 @@ class MyBookingDetailsController extends GetxController {
   final isLoading = false.obs;
   final isBookingTechnician = false.obs;
   final isCompletingTask = false.obs;
+  final isSubmittingServiceReview = false.obs;
+  final isSubmittingProviderRating = false.obs;
   final booking = Rxn<AvailableBookingModel>();
   final selectedBidder = Rxn<BookingBidModel>();
 
@@ -139,6 +141,72 @@ class MyBookingDetailsController extends GetxController {
       return false;
     } finally {
       isCompletingTask.value = false;
+    }
+  }
+
+  Future<bool> submitServiceReview({
+    required int rating,
+    required String review,
+  }) async {
+    final currentBooking = booking.value;
+    if (currentBooking == null ||
+        currentBooking.status.trim().toLowerCase() != 'completed' ||
+        currentBooking.serviceRated ||
+        isSubmittingServiceReview.value) {
+      return false;
+    }
+
+    try {
+      isSubmittingServiceReview.value = true;
+      await repository.submitServiceReview(
+        bookingId: bookingId,
+        rating: rating,
+        review: review.trim(),
+      );
+      await fetchBooking();
+      return true;
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        e.toString().replaceFirst('Exception: ', ''),
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return false;
+    } finally {
+      isSubmittingServiceReview.value = false;
+    }
+  }
+
+  Future<bool> submitProviderRating({
+    required int rating,
+    String? comment,
+  }) async {
+    final currentBooking = booking.value;
+    if (currentBooking == null ||
+        currentBooking.status.trim().toLowerCase() != 'completed' ||
+        currentBooking.providerRated ||
+        isSubmittingProviderRating.value) {
+      return false;
+    }
+
+    try {
+      isSubmittingProviderRating.value = true;
+      await repository.submitProviderRating(
+        bookingId: bookingId,
+        rating: rating,
+        comment: comment,
+      );
+      await fetchBooking();
+      return true;
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        e.toString().replaceFirst('Exception: ', ''),
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return false;
+    } finally {
+      isSubmittingProviderRating.value = false;
     }
   }
 }

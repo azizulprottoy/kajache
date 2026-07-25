@@ -118,6 +118,8 @@ class AvailableBookingModel {
   final String paymentStatus;
   final String orderNumber;
   final String createdAt;
+  final bool providerRated;
+  final bool serviceRated;
   final bool hasBid;
   final String? myBidId;
   final int? myBidPrice;
@@ -147,6 +149,8 @@ class AvailableBookingModel {
     required this.paymentStatus,
     required this.orderNumber,
     required this.createdAt,
+    this.providerRated = false,
+    this.serviceRated = false,
     this.hasBid = false,
     this.myBidId,
     this.myBidPrice,
@@ -240,6 +244,8 @@ class AvailableBookingModel {
       paymentStatus: json['paymentStatus']?.toString() ?? '',
       orderNumber: json['orderNumber']?.toString() ?? '',
       createdAt: json['createdAt']?.toString() ?? '',
+      providerRated: json['providerRated'] == true,
+      serviceRated: json['serviceRated'] == true,
       hasBid: json['hasBid'] == true,
       myBidId: myBid?['_id']?.toString(),
       myBidPrice: myBid != null
@@ -274,6 +280,8 @@ class AvailableBookingModel {
       paymentStatus: paymentStatus,
       orderNumber: orderNumber,
       createdAt: createdAt,
+      providerRated: providerRated,
+      serviceRated: serviceRated,
       hasBid: true,
       myBidId: bid.id,
       myBidPrice: bid.price,
