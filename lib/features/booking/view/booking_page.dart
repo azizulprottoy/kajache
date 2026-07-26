@@ -220,14 +220,24 @@ class _ServiceContextBar extends StatelessWidget {
           Container(
             width: 48,
             height: 48,
+            clipBehavior: Clip.antiAlias,
             decoration: BoxDecoration(
               color: colorScheme.primary.withOpacity(0.10),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Image.network(
-            SImage,
-            fit: BoxFit.cover,
-          ),
+            child: SImage.isNotEmpty
+                ? Image.network(
+                    SImage,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => Icon(
+                      Icons.home_repair_service_outlined,
+                      color: colorScheme.primary,
+                    ),
+                  )
+                : Icon(
+                    Icons.home_repair_service_outlined,
+                    color: colorScheme.primary,
+                  ),
           ),
           SizedBox(width: 10,),
           Expanded(

@@ -1,3 +1,4 @@
+import '../../../core/utils/localized_text.dart';
 import '../../../core/utils/media_url_helper.dart';
 
 class CategoryResponseModel {
@@ -29,8 +30,10 @@ class CategoryResponseModel {
 class CategoryModel {
   final String id;
   final String name;
+  final String nameBn;
   final String slug;
   final String description;
+  final String descriptionBn;
   final String imageLink;
   final int clicks;
   final String createdAt;
@@ -39,8 +42,10 @@ class CategoryModel {
   CategoryModel({
     required this.id,
     required this.name,
+    required this.nameBn,
     required this.slug,
     required this.description,
+    required this.descriptionBn,
     required this.imageLink,
     required this.clicks,
     required this.createdAt,
@@ -51,12 +56,21 @@ class CategoryModel {
     return CategoryModel(
       id: json['_id']?.toString() ?? '',
       name: json['name']?.toString() ?? '',
+      nameBn: json['nameBn']?.toString() ?? '',
       slug: json['slug']?.toString() ?? '',
       description: json['description']?.toString() ?? '',
+      descriptionBn: json['descriptionBn']?.toString() ?? '',
       imageLink: MediaUrlHelper.resolve(json['imageLink']?.toString()),
       clicks: json['clicks'] ?? 0,
       createdAt: json['createdAt']?.toString() ?? '',
       updatedAt: json['updatedAt']?.toString() ?? '',
     );
   }
+
+  /// Category name in the active locale (Bangla when set, else English).
+  String get localizedName => LocalizedText.pick(name, nameBn);
+
+  /// Category description in the active locale.
+  String get localizedDescription =>
+      LocalizedText.pick(description, descriptionBn);
 }

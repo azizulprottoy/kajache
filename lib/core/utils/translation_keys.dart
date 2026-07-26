@@ -258,6 +258,7 @@ class TKeys {
   static const ratings                  = 'ratings';
   static const noReviewsYet             = 'no_reviews_yet';
   static const ratingsAndReviews        = 'ratings_and_reviews';
+  static const failedToLoadPage         = 'failed_to_load_page';
   static const reply                    = 'reply';
   static const writeReply               = 'write_reply';
 

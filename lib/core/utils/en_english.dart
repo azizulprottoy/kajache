@@ -258,6 +258,7 @@ const Map<String, String> enUS = {
   TKeys.ratings:                'Ratings',
   TKeys.noReviewsYet:           'No reviews yet',
   TKeys.ratingsAndReviews:      'Ratings & Reviews',
+  TKeys.failedToLoadPage:       'Failed to load the page. Please check your connection.',
   TKeys.reply:                  'Reply',
   TKeys.writeReply:             'Write a reply...',
 

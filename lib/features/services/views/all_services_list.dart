@@ -103,7 +103,7 @@ class AllServices extends GetView<AllServicesController> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              service.title,
+                              service.localizedTitle,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: theme.textTheme.titleSmall?.copyWith(
@@ -115,7 +115,7 @@ class AllServices extends GetView<AllServicesController> {
                             const SizedBox(height: 4),
 
                             Text(
-                              service.description,
+                              service.localizedDescription,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: theme.textTheme.labelSmall?.copyWith(

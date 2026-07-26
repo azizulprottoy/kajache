@@ -1,3 +1,4 @@
+import '../../../core/utils/localized_text.dart';
 import '../../../core/utils/media_url_helper.dart';
 
 class ServiceResponseModel {
@@ -29,8 +30,10 @@ class ServiceResponseModel {
 class ServiceModel {
   final String id;
   final String title;
+  final String titleBn;
   final String slug;
   final String description;
+  final String descriptionBn;
   final double basePrice;
   final String status;
   final List<String> features;
@@ -43,8 +46,10 @@ class ServiceModel {
   ServiceModel({
     required this.id,
     required this.title,
+    required this.titleBn,
     required this.slug,
     required this.description,
+    required this.descriptionBn,
     required this.basePrice,
     required this.status,
     required this.features,
@@ -59,8 +64,10 @@ class ServiceModel {
     return ServiceModel(
       id: json['_id']?.toString() ?? '',
       title: json['title']?.toString() ?? '',
+      titleBn: json['titleBn']?.toString() ?? '',
       slug: json['slug']?.toString() ?? '',
       description: json['description']?.toString() ?? '',
+      descriptionBn: json['descriptionBn']?.toString() ?? '',
       basePrice: double.tryParse(json['basePrice']?.toString() ?? '0') ?? 0,
       status: json['status']?.toString() ?? '',
       features: json['features'] is List
@@ -77,6 +84,13 @@ class ServiceModel {
 
     );
   }
+
+  /// Service title in the active locale (Bangla when set, else English).
+  String get localizedTitle => LocalizedText.pick(title, titleBn);
+
+  /// Service description in the active locale.
+  String get localizedDescription =>
+      LocalizedText.pick(description, descriptionBn);
 }
 
 class CreatedByModel {

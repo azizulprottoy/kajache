@@ -61,7 +61,7 @@ class CategoryDetailsPage extends GetView<CategoryDetailsController> {
               const SizedBox(height: 20),
 
               Text(
-                category.name,
+                category.localizedName,
                 style: theme.textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: colorScheme.onSurface,
@@ -81,8 +81,8 @@ class CategoryDetailsPage extends GetView<CategoryDetailsController> {
               const SizedBox(height: 16),
 
               Text(
-                category.description.isNotEmpty
-                    ? category.description
+                category.localizedDescription.isNotEmpty
+                    ? category.localizedDescription
                     : TKeys.noDescription.tr,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: colorScheme.onSurfaceVariant,
@@ -221,7 +221,9 @@ class _ServiceCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    service.title ?? TKeys.untitledService.tr,
+                    service.localizedTitle.isNotEmpty
+                        ? service.localizedTitle
+                        : TKeys.untitledService.tr,
                     style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.w600,
                       color: colorScheme.onSurface,
@@ -229,7 +231,7 @@ class _ServiceCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    service.description ?? '',
+                    service.localizedDescription,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.labelSmall?.copyWith(

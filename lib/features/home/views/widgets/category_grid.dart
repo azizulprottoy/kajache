@@ -80,7 +80,7 @@ class CategoryGrid extends StatelessWidget {
                   ),
                 const SizedBox(height: 4),
                 Text(
-                  category.name,
+                  category.localizedName,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,

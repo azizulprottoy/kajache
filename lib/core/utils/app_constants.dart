@@ -5,6 +5,10 @@ class AppConstants {
   static const String baseUrl = 'http://10.0.2.2:3000/api/v1';
   // static const String baseUrl = 'https://kpi.kajache.com/api/v1';
 
+  // ── Web pages ───────────────────────────────────────────────────────────────
+  static const String termsUrl   = 'https://kajache.com/terms';
+  static const String privacyUrl = 'https://kajache.com/privacy';
+
   // ── User Roles ──────────────────────────────────────────────────────────────
   static const String roleCustomer = 'customer';
   static const String roleWorker   = 'worker';

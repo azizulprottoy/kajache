@@ -70,13 +70,27 @@ class PopularServicesList extends StatelessWidget {
                 Container(
                   width: 72,
                   height: 72,
+                  clipBehavior: Clip.antiAlias,
                   decoration: BoxDecoration(
                     color: colorScheme.surfaceContainerLowest,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   alignment: Alignment.center,
-                  child: Image.network(service.imageLink
-                 ,fit:BoxFit.cover, ),
+                  child: service.imageLink.isNotEmpty
+                      ? Image.network(
+                          service.imageLink,
+                          width: 72,
+                          height: 72,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => Icon(
+                            Icons.home_repair_service_outlined,
+                            color: colorScheme.primary,
+                          ),
+                        )
+                      : Icon(
+                          Icons.home_repair_service_outlined,
+                          color: colorScheme.primary,
+                        ),
                 ),
                 const SizedBox(width: 12),
 
@@ -85,7 +99,7 @@ class PopularServicesList extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        service.title,
+                        service.localizedTitle,
                         style: theme.textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.w600,
                           color: colorScheme.onSurface,
@@ -93,7 +107,7 @@ class PopularServicesList extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        service.description,
+                        service.localizedDescription,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: theme.textTheme.labelSmall?.copyWith(

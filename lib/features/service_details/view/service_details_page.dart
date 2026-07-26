@@ -106,7 +106,7 @@ class ServiceDetailsPage extends GetView<ServiceDetailsController> {
               const SizedBox(height: 20),
 
               Text(
-                service.title,
+                service.localizedTitle,
                 style: theme.textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: colorScheme.onSurface,
@@ -206,9 +206,9 @@ class ServiceDetailsPage extends GetView<ServiceDetailsController> {
 
               const SizedBox(height: 16),
 
-              service.description.isNotEmpty
+              service.localizedDescription.isNotEmpty
                   ? Html(
-                data: service.description,
+                data: service.localizedDescription,
                 style: {
                   'body': Style(
                     margin: Margins.zero,

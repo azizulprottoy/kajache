@@ -260,6 +260,7 @@ const Map<String, String> bnBD = {
   TKeys.ratings:                'রেটিং',
   TKeys.noReviewsYet:           'এখনো কোনো রিভিউ নেই',
   TKeys.ratingsAndReviews:      'রেটিং ও রিভিউ',
+  TKeys.failedToLoadPage:       'পেজটি লোড করা যায়নি। আপনার সংযোগ পরীক্ষা করুন।',
   TKeys.reply:                  'উত্তর',
   TKeys.writeReply:             'একটি উত্তর লিখুন...',
 

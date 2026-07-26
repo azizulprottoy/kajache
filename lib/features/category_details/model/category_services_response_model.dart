@@ -4,6 +4,8 @@
 
 import 'dart:convert';
 
+import '../../../core/utils/localized_text.dart';
+
 CategoryServiceReponseModel categoryServiceReponseModelFromJson(String str) => CategoryServiceReponseModel.fromJson(json.decode(str));
 
 String categoryServiceReponseModelToJson(CategoryServiceReponseModel data) => json.encode(data.toJson());
@@ -35,8 +37,10 @@ class CategoryServiceReponseModel {
 class Datum {
   String? id;
   String? title;
+  String? titleBn;
   String? slug;
   String? description;
+  String? descriptionBn;
   Category? category;
   List<dynamic>? features;
   int? basePrice;
@@ -49,8 +53,10 @@ class Datum {
   Datum({
     this.id,
     this.title,
+    this.titleBn,
     this.slug,
     this.description,
+    this.descriptionBn,
     this.category,
     this.features,
     this.basePrice,
@@ -61,11 +67,20 @@ class Datum {
     this.v,
   });
 
+  /// Service title in the active locale (Bangla when set, else English).
+  String get localizedTitle => LocalizedText.pick(title ?? '', titleBn);
+
+  /// Service description in the active locale.
+  String get localizedDescription =>
+      LocalizedText.pick(description ?? '', descriptionBn);
+
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
     id: json["_id"],
     title: json["title"],
+    titleBn: json["titleBn"],
     slug: json["slug"],
     description: json["description"],
+    descriptionBn: json["descriptionBn"],
     category: json["category"] == null ? null : Category.fromJson(json["category"]),
     features: json["features"] == null ? [] : List<dynamic>.from(json["features"]!.map((x) => x)),
     basePrice: json["basePrice"],
@@ -79,8 +94,10 @@ class Datum {
   Map<String, dynamic> toJson() => {
     "_id": id,
     "title": title,
+    "titleBn": titleBn,
     "slug": slug,
     "description": description,
+    "descriptionBn": descriptionBn,
     "category": category?.toJson(),
     "features": features == null ? [] : List<dynamic>.from(features!.map((x) => x)),
     "basePrice": basePrice,
