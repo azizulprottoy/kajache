@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../../home/models/services_response_model.dart';
 import '../../home/models/available_booking_response_model.dart';
 import '../arguments/service_details_arguments.dart';
+import '../model/comment_model.dart';
 import '../repository/service_details_repository.dart';
 
 class ServiceDetailsController extends GetxController {
@@ -25,7 +26,17 @@ class ServiceDetailsController extends GetxController {
   final RxBool isBidLoading = false.obs;
   final Rxn<ServiceModel> service = Rxn<ServiceModel>();
 
+  // Comments state
+  final RxList<CommentModel> comments = <CommentModel>[].obs;
+  final RxBool isCommentsLoading = false.obs;
+  final RxBool isSubmittingComment = false.obs;
+  final TextEditingController commentInputController = TextEditingController();
 
+  @override
+  void onClose() {
+    commentInputController.dispose();
+    super.onClose();
+  }
 
   @override
   void onInit() {
@@ -134,6 +145,9 @@ class ServiceDetailsController extends GetxController {
         .getServiceBySlug(slug)
         .then((data) {
       service.value = data;
+      if (data != null && data.id.isNotEmpty) {
+        fetchComments(data.id);
+      }
     })
         .catchError((error) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -152,4 +166,65 @@ class ServiceDetailsController extends GetxController {
       }
     });
   }
+
+  Future<void> fetchComments(String serviceId) async {
+    isCommentsLoading.value = true;
+    try {
+      final result = await _repository.getCommentsByServiceId(serviceId);
+      comments.assignAll(result);
+    } catch (e) {
+      debugPrint('[fetchComments] error: $e');
+    } finally {
+      if (!isClosed) isCommentsLoading.value = false;
+    }
+  }
+
+  Future<void> submitComment({String? userName, String? userPropic}) async {
+    final text = commentInputController.text.trim();
+    final serviceId = service.value?.id;
+
+    if (text.isEmpty) {
+      Get.snackbar(
+        'Warning',
+        'Please enter a comment before submitting.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    if (serviceId == null || serviceId.isEmpty) {
+      Get.snackbar(
+        'Error',
+        'Service details not found.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    isSubmittingComment.value = true;
+    try {
+      final newComment = await _repository.addComment(
+        serviceId: serviceId,
+        name: userName ?? 'User',
+        comment: text,
+        propic: userPropic,
+      );
+      comments.insert(0, newComment);
+      commentInputController.clear();
+      Get.snackbar(
+        'Success',
+        'Comment posted successfully!',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        e.toString().replaceFirst('Exception: ', ''),
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } finally {
+      if (!isClosed) isSubmittingComment.value = false;
+    }
+  }
 }
+

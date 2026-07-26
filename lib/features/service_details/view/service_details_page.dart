@@ -9,7 +9,11 @@ import '../../../shared/widgets/success_model.dart';
 import 'package:flutter_html/flutter_html.dart';
 import '../../booking/arguments/service_booking_arguments.dart';
 import '../../home/models/available_booking_response_model.dart';
+import 'package:intl/intl.dart';
 import '../controller/service_details_controller.dart';
+import '../model/comment_model.dart';
+
+
 
 class ServiceDetailsPage extends GetView<ServiceDetailsController> {
   const ServiceDetailsPage({super.key});
@@ -241,6 +245,11 @@ class ServiceDetailsPage extends GetView<ServiceDetailsController> {
                   ),
                 ],
               ),
+
+              const SizedBox(height: 24),
+              const Divider(),
+              const SizedBox(height: 16),
+              _CommentsSection(controller: controller),
             ],
           ),
         );
@@ -939,3 +948,229 @@ class _BiddingBottomSheetState extends State<BiddingBottomSheet> {
     );
   }
 }
+
+class _CommentsSection extends StatelessWidget {
+  final ServiceDetailsController controller;
+
+  const _CommentsSection({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text(
+              'Comments',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: colorScheme.onSurface,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Obx(() => Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    '${controller.comments.length}',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: colorScheme.onPrimaryContainer,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                )),
+          ],
+        ),
+        const SizedBox(height: 12),
+        // Comment Input
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          decoration: BoxDecoration(
+            color: colorScheme.surfaceVariant.withOpacity(0.4),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: colorScheme.outline.withOpacity(0.2),
+            ),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: controller.commentInputController,
+                  maxLines: null,
+                  textInputAction: TextInputAction.send,
+                  onSubmitted: (_) => controller.submitComment(),
+                  decoration: InputDecoration(
+                    hintText: 'Add a comment...',
+                    hintStyle: theme.textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurfaceVariant.withOpacity(0.6),
+                    ),
+                    border: InputBorder.none,
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 8),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Obx(() {
+                if (controller.isSubmittingComment.value) {
+                  return const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  );
+                }
+                return IconButton(
+                  icon: Icon(Icons.send_rounded, color: colorScheme.primary),
+                  onPressed: () => controller.submitComment(),
+                );
+              }),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        // Comments List
+        Obx(() {
+          if (controller.isCommentsLoading.value &&
+              controller.comments.isEmpty) {
+            return const Center(
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 24),
+                child: CircularProgressIndicator(),
+              ),
+            );
+          }
+
+          if (controller.comments.isEmpty) {
+            return Container(
+              padding: const EdgeInsets.symmetric(vertical: 24),
+              alignment: Alignment.center,
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.chat_bubble_outline_rounded,
+                    size: 40,
+                    color: colorScheme.onSurfaceVariant.withOpacity(0.4),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'No comments yet. Be the first to comment!',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          return ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: controller.comments.length,
+            separatorBuilder: (_, __) => const SizedBox(height: 12),
+            itemBuilder: (context, index) {
+              final comment = controller.comments[index];
+              return _CommentCard(comment: comment);
+            },
+          );
+        }),
+      ],
+    );
+  }
+}
+
+class _CommentCard extends StatelessWidget {
+  final CommentModel comment;
+
+  const _CommentCard({required this.comment});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    String dateStr = '';
+    if (comment.createdAt != null) {
+      dateStr = DateFormat('MMM dd, yyyy • hh:mm a').format(comment.createdAt!);
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: colorScheme.outlineVariant.withOpacity(0.5),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              CircleAvatar(
+                radius: 16,
+                backgroundColor: colorScheme.primaryContainer,
+                backgroundImage: comment.propic.isNotEmpty
+                    ? NetworkImage(comment.propic)
+                    : null,
+                child: comment.propic.isEmpty
+                    ? Text(
+                        comment.name.isNotEmpty
+                            ? comment.name[0].toUpperCase()
+                            : 'U',
+                        style: theme.textTheme.labelMedium?.copyWith(
+                          color: colorScheme.onPrimaryContainer,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      )
+                    : null,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      comment.name.isNotEmpty ? comment.name : 'Anonymous',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                    if (dateStr.isNotEmpty)
+                      Text(
+                        dateStr,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                          fontSize: 11,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            comment.comment,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurface,
+              height: 1.4,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+

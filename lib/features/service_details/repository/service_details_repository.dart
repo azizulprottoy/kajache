@@ -5,6 +5,7 @@ import '../../../core/network/api_endpoints.dart';
 import '../../../core/network/network_info.dart';
 import '../../home/models/services_response_model.dart';
 import '../../home/models/available_booking_response_model.dart';
+import '../model/comment_model.dart';
 import '../model/service_details_response_model.dart';
 
 class ServiceDetailsRepository {
@@ -29,6 +30,51 @@ class ServiceDetailsRepository {
     );
 
     return result.data;
+  }
+
+  Future<List<CommentModel>> getCommentsByServiceId(String serviceId) async {
+    final isConnected = await _networkInfo.isConnected;
+    if (!isConnected) {
+      throw Exception('No internet connection.');
+    }
+
+    final response = await _dio.get(
+      ApiEndpoints.comments,
+      queryParameters: {'serviceId': serviceId},
+    );
+
+    final payload = Map<String, dynamic>.from(response.data);
+    final List listData = payload['data'] as List? ?? [];
+    return listData
+        .map((item) => CommentModel.fromJson(Map<String, dynamic>.from(item)))
+        .toList();
+  }
+
+  Future<CommentModel> addComment({
+    required String serviceId,
+    required String name,
+    required String comment,
+    String? propic,
+  }) async {
+    final isConnected = await _networkInfo.isConnected;
+    if (!isConnected) {
+      throw Exception('No internet connection.');
+    }
+
+    final response = await _dio.post(
+      ApiEndpoints.comments,
+      data: {
+        'service': serviceId,
+        'name': name,
+        'comment': comment,
+        if (propic != null && propic.isNotEmpty) 'propic': propic,
+      },
+    );
+
+    final payload = Map<String, dynamic>.from(response.data);
+    return CommentModel.fromJson(
+      Map<String, dynamic>.from(payload['data']),
+    );
   }
 
   Future<ProviderBidModel> placeBid({
@@ -86,3 +132,4 @@ class ServiceDetailsRepository {
     );
   }
 }
+
