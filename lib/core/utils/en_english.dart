@@ -255,6 +255,11 @@ const Map<String, String> enUS = {
   TKeys.note:                   'Note',
   TKeys.noteHint:               'Add a short message for the customer',
   TKeys.submitBid:              'Submit Bid',
+  TKeys.ratings:                'Ratings',
+  TKeys.noReviewsYet:           'No reviews yet',
+  TKeys.ratingsAndReviews:      'Ratings & Reviews',
+  TKeys.reply:                  'Reply',
+  TKeys.writeReply:             'Write a reply...',
 
   // Category Details
   TKeys.categoryDetails:        'Category Details',
@@ -299,9 +304,8 @@ const Map<String, String> enUS = {
   // Rewards
   TKeys.totalRewardPoints:      'Total Reward Points',
   TKeys.rewardPointsSubtitle:   'Use your points for discounts and special offers',
-  TKeys.rewardHistory:          'Reward History',
-  TKeys.rwOrderBonus:           'Order Completed Bonus',
-  TKeys.rwReferral:             'Referral Reward',
-  TKeys.rwFirstBooking:         'First Booking Reward',
-  TKeys.rwCampaign:             'Special Campaign Bonus',
+  TKeys.availableRewards:       'Available Rewards',
+  TKeys.rewardUnlocked:         'Unlocked',
+  TKeys.rewardPointsToUnlock:   'points to unlock',
+  TKeys.noRewardsAvailable:     'No rewards available yet',
 };

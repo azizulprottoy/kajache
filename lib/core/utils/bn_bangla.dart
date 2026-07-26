@@ -257,6 +257,11 @@ const Map<String, String> bnBD = {
   TKeys.note:                   'নোট',
   TKeys.noteHint:               'গ্রাহকের জন্য একটি সংক্ষিপ্ত বার্তা যোগ করুন',
   TKeys.submitBid:              'বিড জমা দিন',
+  TKeys.ratings:                'রেটিং',
+  TKeys.noReviewsYet:           'এখনো কোনো রিভিউ নেই',
+  TKeys.ratingsAndReviews:      'রেটিং ও রিভিউ',
+  TKeys.reply:                  'উত্তর',
+  TKeys.writeReply:             'একটি উত্তর লিখুন...',
 
   // Category Details
   TKeys.categoryDetails:        'ক্যাটাগরির বিবরণ',
@@ -301,9 +306,8 @@ const Map<String, String> bnBD = {
   // Rewards
   TKeys.totalRewardPoints:      'মোট পুরস্কার পয়েন্ট',
   TKeys.rewardPointsSubtitle:   'ছাড় এবং বিশেষ অফারের জন্য আপনার পয়েন্ট ব্যবহার করুন',
-  TKeys.rewardHistory:          'পুরস্কারের ইতিহাস',
-  TKeys.rwOrderBonus:           'অর্ডার সম্পন্ন বোনাস',
-  TKeys.rwReferral:             'রেফারেল পুরস্কার',
-  TKeys.rwFirstBooking:         'প্রথম বুকিং পুরস্কার',
-  TKeys.rwCampaign:             'বিশেষ ক্যাম্পেইন বোনাস',
+  TKeys.availableRewards:       'উপলভ্য পুরস্কার',
+  TKeys.rewardUnlocked:         'আনলক করা হয়েছে',
+  TKeys.rewardPointsToUnlock:   'পয়েন্ট প্রয়োজন',
+  TKeys.noRewardsAvailable:     'এখনো কোনো পুরস্কার নেই',
 };

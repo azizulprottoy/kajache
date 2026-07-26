@@ -101,7 +101,7 @@ class RegisterPage extends GetView<RegisterController> {
                 const SizedBox(height: 20),
                 TextFormField(
                   controller: fullNameController,
-                  keyboardType: TextInputType.none,
+                  keyboardType: TextInputType.name,
                   textInputAction: TextInputAction.next,
                   decoration: InputDecoration(
                     labelText: TKeys.fullname.tr,

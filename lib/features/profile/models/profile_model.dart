@@ -6,6 +6,7 @@ class ProfileModel {
   final String username;
   final String roleModelName;
   final Map<String, dynamic> detail; // profileDetail
+  final int points;
 
   ProfileModel({
     required this.id,
@@ -13,6 +14,7 @@ class ProfileModel {
     required this.username,
     required this.roleModelName,
     required this.detail,
+    required this.points,
   });
 
   factory ProfileModel.fromJson(Map<String, dynamic> data) {
@@ -24,6 +26,7 @@ class ProfileModel {
       detail: data['profileDetail'] is Map
           ? Map<String, dynamic>.from(data['profileDetail'])
           : <String, dynamic>{},
+      points: (data['points'] as num?)?.toInt() ?? 0,
     );
   }
 

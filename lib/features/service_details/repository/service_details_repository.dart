@@ -5,6 +5,7 @@ import '../../../core/network/api_endpoints.dart';
 import '../../../core/network/network_info.dart';
 import '../../home/models/services_response_model.dart';
 import '../../home/models/available_booking_response_model.dart';
+import '../../reviews/models/review_model.dart';
 import '../model/comment_model.dart';
 import '../model/service_details_response_model.dart';
 
@@ -50,6 +51,24 @@ class ServiceDetailsRepository {
         .toList();
   }
 
+  Future<List<ReviewModel>> getReviewsByServiceId(String serviceId) async {
+    final isConnected = await _networkInfo.isConnected;
+    if (!isConnected) {
+      throw Exception('No internet connection.');
+    }
+
+    final response = await _dio.get(
+      ApiEndpoints.reviews,
+      queryParameters: {'serviceId': serviceId},
+    );
+
+    final payload = Map<String, dynamic>.from(response.data);
+    final List listData = payload['data'] as List? ?? [];
+    return listData
+        .map((item) => ReviewModel.fromJson(Map<String, dynamic>.from(item)))
+        .toList();
+  }
+
   Future<CommentModel> addComment({
     required String serviceId,
     required String name,
@@ -69,6 +88,53 @@ class ServiceDetailsRepository {
         'comment': comment,
         if (propic != null && propic.isNotEmpty) 'propic': propic,
       },
+    );
+
+    final payload = Map<String, dynamic>.from(response.data);
+    return CommentModel.fromJson(
+      Map<String, dynamic>.from(payload['data']),
+    );
+  }
+
+  /// Add a reply to a comment. Returns the full updated comment (with replies).
+  Future<CommentModel> replyToComment({
+    required String commentId,
+    required String reply,
+    String? name,
+    String? propic,
+  }) async {
+    final isConnected = await _networkInfo.isConnected;
+    if (!isConnected) {
+      throw Exception('No internet connection.');
+    }
+
+    final response = await _dio.post(
+      ApiEndpoints.commentReply(commentId),
+      data: {
+        'reply': reply,
+        if (name != null && name.isNotEmpty) 'name': name,
+        if (propic != null && propic.isNotEmpty) 'propic': propic,
+      },
+    );
+
+    final payload = Map<String, dynamic>.from(response.data);
+    return CommentModel.fromJson(
+      Map<String, dynamic>.from(payload['data']),
+    );
+  }
+
+  /// Delete a reply from a comment. Returns the full updated comment.
+  Future<CommentModel> deleteReply({
+    required String commentId,
+    required String replyId,
+  }) async {
+    final isConnected = await _networkInfo.isConnected;
+    if (!isConnected) {
+      throw Exception('No internet connection.');
+    }
+
+    final response = await _dio.delete(
+      ApiEndpoints.commentReplyById(commentId, replyId),
     );
 
     final payload = Map<String, dynamic>.from(response.data);

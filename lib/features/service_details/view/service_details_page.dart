@@ -10,6 +10,7 @@ import 'package:flutter_html/flutter_html.dart';
 import '../../booking/arguments/service_booking_arguments.dart';
 import '../../home/models/available_booking_response_model.dart';
 import 'package:intl/intl.dart';
+import '../../reviews/models/review_model.dart';
 import '../controller/service_details_controller.dart';
 import '../model/comment_model.dart';
 
@@ -246,6 +247,10 @@ class ServiceDetailsPage extends GetView<ServiceDetailsController> {
                 ],
               ),
 
+              const SizedBox(height: 24),
+              const Divider(),
+              const SizedBox(height: 16),
+              _RatingSection(controller: controller),
               const SizedBox(height: 24),
               const Divider(),
               const SizedBox(height: 16),
@@ -949,6 +954,322 @@ class _BiddingBottomSheetState extends State<BiddingBottomSheet> {
   }
 }
 
+// ── Ratings & reviews summary (tap to expand the review list) ────────────────
+class _RatingSection extends StatelessWidget {
+  final ServiceDetailsController controller;
+
+  const _RatingSection({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Obx(() {
+      if (controller.isReviewsLoading.value && controller.reviews.isEmpty) {
+        return const Center(
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 24),
+            child: CircularProgressIndicator(),
+          ),
+        );
+      }
+
+      final summary = controller.ratingSummary;
+      final expanded = controller.showReviews.value;
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            TKeys.ratingsAndReviews.tr,
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: colorScheme.onSurface,
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // Tappable summary card
+          InkWell(
+            onTap: summary.total == 0 ? null : controller.toggleReviews,
+            borderRadius: BorderRadius.circular(16),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: colorScheme.surface,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: colorScheme.outlineVariant.withOpacity(0.5),
+                ),
+              ),
+              child: summary.total == 0
+                  ? Row(
+                      children: [
+                        Icon(Icons.star_border_rounded,
+                            color: colorScheme.onSurfaceVariant),
+                        const SizedBox(width: 8),
+                        Text(
+                          TKeys.noReviewsYet.tr,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    )
+                  : Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        // Left: average + stars + total
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.baseline,
+                              textBaseline: TextBaseline.alphabetic,
+                              children: [
+                                Text(
+                                  summary.average.toStringAsFixed(1),
+                                  style: theme.textTheme.displaySmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: colorScheme.onSurface,
+                                  ),
+                                ),
+                                Text(
+                                  '/5',
+                                  style: theme.textTheme.titleMedium?.copyWith(
+                                    color: colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            _StarRow(rating: summary.average),
+                            const SizedBox(height: 6),
+                            Text(
+                              '${summary.total} ${TKeys.ratings.tr}',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(width: 20),
+                        // Right: per-star distribution bars
+                        Expanded(
+                          child: Column(
+                            children: [
+                              for (int star = 5; star >= 1; star--)
+                                _RatingBar(
+                                  star: star,
+                                  fraction: summary.fractionFor(star),
+                                  count: summary.distribution[star] ?? 0,
+                                ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Icon(
+                          expanded
+                              ? Icons.keyboard_arrow_up_rounded
+                              : Icons.keyboard_arrow_down_rounded,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ],
+                    ),
+            ),
+          ),
+
+          // Expanded review list
+          if (expanded) ...[
+            const SizedBox(height: 16),
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: controller.reviews.length,
+              separatorBuilder: (_, __) => const SizedBox(height: 12),
+              itemBuilder: (context, index) =>
+                  _ReviewCard(review: controller.reviews[index]),
+            ),
+          ],
+        ],
+      );
+    });
+  }
+}
+
+/// A row of 5 stars filled to represent [rating] (supports half stars).
+class _StarRow extends StatelessWidget {
+  final double rating;
+
+  const _StarRow({required this.rating});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: List.generate(5, (i) {
+        final position = i + 1;
+        IconData icon;
+        if (rating >= position) {
+          icon = Icons.star_rounded;
+        } else if (rating >= position - 0.5) {
+          icon = Icons.star_half_rounded;
+        } else {
+          icon = Icons.star_border_rounded;
+        }
+        return Icon(icon, size: 20, color: Colors.amber.shade600);
+      }),
+    );
+  }
+}
+
+/// A single "N ★ ▓▓▓░ count" row in the distribution histogram.
+class _RatingBar extends StatelessWidget {
+  final int star;
+  final double fraction;
+  final int count;
+
+  const _RatingBar({
+    required this.star,
+    required this.fraction,
+    required this.count,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        children: [
+          Text(
+            '$star',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(width: 2),
+          Icon(Icons.star_rounded, size: 12, color: Colors.amber.shade600),
+          const SizedBox(width: 8),
+          Expanded(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: LinearProgressIndicator(
+                value: fraction,
+                minHeight: 8,
+                backgroundColor: colorScheme.surfaceVariant.withOpacity(0.5),
+                valueColor:
+                    AlwaysStoppedAnimation<Color>(Colors.amber.shade600),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          SizedBox(
+            width: 34,
+            child: Text(
+              '$count',
+              textAlign: TextAlign.end,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ReviewCard extends StatelessWidget {
+  final ReviewModel review;
+
+  const _ReviewCard({required this.review});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    String dateStr = '';
+    if (review.createdAt != null) {
+      dateStr = DateFormat('MMM dd, yyyy').format(review.createdAt!);
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: colorScheme.outlineVariant.withOpacity(0.5),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              CircleAvatar(
+                radius: 16,
+                backgroundColor: colorScheme.primaryContainer,
+                child: Text(
+                  review.employerName.isNotEmpty
+                      ? review.employerName[0].toUpperCase()
+                      : 'U',
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: colorScheme.onPrimaryContainer,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      review.employerName.isNotEmpty
+                          ? review.employerName
+                          : 'Anonymous',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                    if (dateStr.isNotEmpty)
+                      Text(
+                        dateStr,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                          fontSize: 11,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              _StarRow(rating: review.rating),
+            ],
+          ),
+          if (review.review.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Text(
+              review.review,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurface,
+                height: 1.4,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
 class _CommentsSection extends StatelessWidget {
   final ServiceDetailsController controller;
 
@@ -1079,7 +1400,7 @@ class _CommentsSection extends StatelessWidget {
             separatorBuilder: (_, __) => const SizedBox(height: 12),
             itemBuilder: (context, index) {
               final comment = controller.comments[index];
-              return _CommentCard(comment: comment);
+              return _CommentCard(comment: comment, controller: controller);
             },
           );
         }),
@@ -1090,8 +1411,9 @@ class _CommentsSection extends StatelessWidget {
 
 class _CommentCard extends StatelessWidget {
   final CommentModel comment;
+  final ServiceDetailsController controller;
 
-  const _CommentCard({required this.comment});
+  const _CommentCard({required this.comment, required this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -1164,6 +1486,182 @@ class _CommentCard extends StatelessWidget {
           Text(
             comment.comment,
             style: theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurface,
+              height: 1.4,
+            ),
+          ),
+
+          // Reply toggle
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+              onPressed: () => controller.toggleReplyField(comment.id),
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                minimumSize: const Size(0, 32),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                foregroundColor: colorScheme.primary,
+              ),
+              icon: const Icon(Icons.reply_rounded, size: 16),
+              label: Text(TKeys.reply.tr,
+                  style: theme.textTheme.labelMedium),
+            ),
+          ),
+
+          // Replies list
+          if (comment.replies.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(left: 12, top: 4),
+              child: Column(
+                children: [
+                  for (final reply in comment.replies)
+                    _ReplyCard(reply: reply),
+                ],
+              ),
+            ),
+
+          // Reply input (only for the open comment)
+          Obx(() {
+            if (controller.openReplyId.value != comment.id) {
+              return const SizedBox.shrink();
+            }
+            return Padding(
+              padding: const EdgeInsets.only(top: 8, left: 12),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                decoration: BoxDecoration(
+                  color: colorScheme.surfaceVariant.withOpacity(0.4),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: colorScheme.outline.withOpacity(0.2)),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: controller.replyInputController,
+                        autofocus: true,
+                        maxLines: null,
+                        textInputAction: TextInputAction.send,
+                        onSubmitted: (_) =>
+                            controller.submitReply(commentId: comment.id),
+                        decoration: InputDecoration(
+                          hintText: TKeys.writeReply.tr,
+                          hintStyle: theme.textTheme.bodySmall?.copyWith(
+                            color:
+                                colorScheme.onSurfaceVariant.withOpacity(0.6),
+                          ),
+                          border: InputBorder.none,
+                          isDense: true,
+                          contentPadding:
+                              const EdgeInsets.symmetric(vertical: 8),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Obx(() {
+                      if (controller.replySubmittingId.value == comment.id) {
+                        return const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        );
+                      }
+                      return IconButton(
+                        visualDensity: VisualDensity.compact,
+                        icon: Icon(Icons.send_rounded,
+                            size: 20, color: colorScheme.primary),
+                        onPressed: () =>
+                            controller.submitReply(commentId: comment.id),
+                      );
+                    }),
+                  ],
+                ),
+              ),
+            );
+          }),
+        ],
+      ),
+    );
+  }
+}
+
+class _ReplyCard extends StatelessWidget {
+  final ReplyModel reply;
+
+  const _ReplyCard({required this.reply});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    String dateStr = '';
+    if (reply.createdAt != null) {
+      dateStr = DateFormat('MMM dd, yyyy • hh:mm a').format(reply.createdAt!);
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(top: 8),
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceVariant.withOpacity(0.35),
+        borderRadius: BorderRadius.circular(10),
+        border: Border(
+          left: BorderSide(color: colorScheme.primary.withOpacity(0.4), width: 2),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              CircleAvatar(
+                radius: 12,
+                backgroundColor: colorScheme.primaryContainer,
+                backgroundImage:
+                    reply.propic.isNotEmpty ? NetworkImage(reply.propic) : null,
+                child: reply.propic.isEmpty
+                    ? Text(
+                        reply.name.isNotEmpty
+                            ? reply.name[0].toUpperCase()
+                            : 'U',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: colorScheme.onPrimaryContainer,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      )
+                    : null,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      reply.name.isNotEmpty ? reply.name : 'Anonymous',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                    if (dateStr.isNotEmpty)
+                      Text(
+                        dateStr,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                          fontSize: 10,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            reply.reply,
+            style: theme.textTheme.bodySmall?.copyWith(
               color: colorScheme.onSurface,
               height: 1.4,
             ),

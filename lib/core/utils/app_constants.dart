@@ -3,6 +3,7 @@ class AppConstants {
 
   // ── API ─────────────────────────────────────────────────────────────────────
   static const String baseUrl = 'http://10.0.2.2:3000/api/v1';
+  // static const String baseUrl = 'https://kpi.kajache.com/api/v1';
 
   // ── User Roles ──────────────────────────────────────────────────────────────
   static const String roleCustomer = 'customer';

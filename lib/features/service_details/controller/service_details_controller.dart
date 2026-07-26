@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 
 import '../../home/models/services_response_model.dart';
 import '../../home/models/available_booking_response_model.dart';
+import '../../reviews/models/review_model.dart';
 import '../arguments/service_details_arguments.dart';
 import '../model/comment_model.dart';
 import '../repository/service_details_repository.dart';
@@ -32,9 +33,30 @@ class ServiceDetailsController extends GetxController {
   final RxBool isSubmittingComment = false.obs;
   final TextEditingController commentInputController = TextEditingController();
 
+  // Reply state
+  /// Id of the comment whose reply field is currently open (null = none).
+  final RxnString openReplyId = RxnString();
+
+  /// Id of the comment whose reply is being submitted (for a per-card spinner).
+  final RxnString replySubmittingId = RxnString();
+  final TextEditingController replyInputController = TextEditingController();
+
+  // Reviews / ratings state
+  final RxList<ReviewModel> reviews = <ReviewModel>[].obs;
+  final RxBool isReviewsLoading = false.obs;
+
+  /// Whether the reviews list is expanded (toggled by tapping the rating card).
+  final RxBool showReviews = false.obs;
+
+  /// Aggregated rating stats derived from [reviews].
+  RatingSummary get ratingSummary => RatingSummary.fromReviews(reviews);
+
+  void toggleReviews() => showReviews.toggle();
+
   @override
   void onClose() {
     commentInputController.dispose();
+    replyInputController.dispose();
     super.onClose();
   }
 
@@ -147,6 +169,7 @@ class ServiceDetailsController extends GetxController {
       service.value = data;
       if (data != null && data.id.isNotEmpty) {
         fetchComments(data.id);
+        fetchReviews(data.id);
       }
     })
         .catchError((error) {
@@ -176,6 +199,18 @@ class ServiceDetailsController extends GetxController {
       debugPrint('[fetchComments] error: $e');
     } finally {
       if (!isClosed) isCommentsLoading.value = false;
+    }
+  }
+
+  Future<void> fetchReviews(String serviceId) async {
+    isReviewsLoading.value = true;
+    try {
+      final result = await _repository.getReviewsByServiceId(serviceId);
+      reviews.assignAll(result);
+    } catch (e) {
+      debugPrint('[fetchReviews] error: $e');
+    } finally {
+      if (!isClosed) isReviewsLoading.value = false;
     }
   }
 
@@ -224,6 +259,89 @@ class ServiceDetailsController extends GetxController {
       );
     } finally {
       if (!isClosed) isSubmittingComment.value = false;
+    }
+  }
+
+  /// Open/close the reply text field for a given comment.
+  void toggleReplyField(String commentId) {
+    if (openReplyId.value == commentId) {
+      openReplyId.value = null;
+    } else {
+      openReplyId.value = commentId;
+      replyInputController.clear();
+    }
+  }
+
+  /// Post the text in [replyInputController] as a reply to [commentId].
+  Future<void> submitReply({
+    required String commentId,
+    String? userName,
+    String? userPropic,
+  }) async {
+    final text = replyInputController.text.trim();
+
+    if (text.isEmpty) {
+      Get.snackbar(
+        'Warning',
+        'Please enter a reply before submitting.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    replySubmittingId.value = commentId;
+    try {
+      final updated = await _repository.replyToComment(
+        commentId: commentId,
+        reply: text,
+        name: userName,
+        propic: userPropic,
+      );
+
+      final index = comments.indexWhere((c) => c.id == commentId);
+      if (index != -1) {
+        comments[index] = updated;
+      }
+
+      replyInputController.clear();
+      openReplyId.value = null;
+      Get.snackbar(
+        'Success',
+        'Reply posted successfully!',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        e.toString().replaceFirst('Exception: ', ''),
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } finally {
+      if (!isClosed) replySubmittingId.value = null;
+    }
+  }
+
+  /// Delete a reply, then refresh the affected comment from the response.
+  Future<void> deleteReply({
+    required String commentId,
+    required String replyId,
+  }) async {
+    try {
+      final updated = await _repository.deleteReply(
+        commentId: commentId,
+        replyId: replyId,
+      );
+
+      final index = comments.indexWhere((c) => c.id == commentId);
+      if (index != -1) {
+        comments[index] = updated;
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        e.toString().replaceFirst('Exception: ', ''),
+        snackPosition: SnackPosition.BOTTOM,
+      );
     }
   }
 }

@@ -255,6 +255,11 @@ class TKeys {
   static const note                     = 'note';
   static const noteHint                 = 'note_hint';
   static const submitBid                = 'submit_bid';
+  static const ratings                  = 'ratings';
+  static const noReviewsYet             = 'no_reviews_yet';
+  static const ratingsAndReviews        = 'ratings_and_reviews';
+  static const reply                    = 'reply';
+  static const writeReply               = 'write_reply';
 
   // ── Category Details ──────────────────────────────────────────────────────────────
   static const categoryDetails          = 'category_details';
@@ -299,9 +304,8 @@ class TKeys {
   // ── Rewards ─────────────────────────────────────────────────────────────────────────────
   static const totalRewardPoints        = 'total_reward_points';
   static const rewardPointsSubtitle     = 'reward_points_subtitle';
-  static const rewardHistory            = 'reward_history';
-  static const rwOrderBonus             = 'rw_order_bonus';
-  static const rwReferral               = 'rw_referral';
-  static const rwFirstBooking           = 'rw_first_booking';
-  static const rwCampaign               = 'rw_campaign';
+  static const availableRewards         = 'available_rewards';
+  static const rewardUnlocked           = 'reward_unlocked';
+  static const rewardPointsToUnlock     = 'reward_points_to_unlock';
+  static const noRewardsAvailable       = 'no_rewards_available';
 }

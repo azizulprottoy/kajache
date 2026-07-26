@@ -73,6 +73,9 @@ class ApiEndpoints {
   // Comment
   static const String comments = '/comment';
   static const String comment = '/comment';
+  static String commentReply(String commentId) => '/comment/$commentId/reply';
+  static String commentReplyById(String commentId, String replyId) =>
+      '/comment/$commentId/reply/$replyId';
 
   // Favorite
   static const String favorites = '/favorite';
@@ -104,4 +107,9 @@ class ApiEndpoints {
   // Order Coupon
   static const String orderCoupons = '/orderCoupon';
   static const String orderCoupon = '/orderCoupon';
+
+  // Reward
+  static const String rewards = '/reward';
+  static const String reward = '/reward';
+  static String rewardById(String id) => '/reward/$id';
 }
