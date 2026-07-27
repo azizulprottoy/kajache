@@ -5,6 +5,7 @@ import '../../../app/routes/app_routes.dart';
 import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/common_app_bar.dart';
 import '../../../shared/widgets/custom_button.dart'; // CustomButton, ButtonVariant, ButtonSize
+import '../../../shared/shimmers/category_details_shimmer.dart';
 import '../../service_details/arguments/service_details_arguments.dart';
 import '../controller/category_details_controller.dart';
 import '../model/category_services_response_model.dart';
@@ -25,7 +26,7 @@ class CategoryDetailsPage extends GetView<CategoryDetailsController> {
       ),
       body: Obx(() {
         if (controller.isLoading.value && controller.category.value == null) {
-          return const Center(child: CircularProgressIndicator());
+          return const CategoryDetailsShimmer();
         }
 
         final category = controller.category.value;
@@ -124,10 +125,7 @@ class CategoryDetailsPage extends GetView<CategoryDetailsController> {
 
               // Services list (reactive)
               if (controller.isServicesLoading.value)
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 20),
-                  child: Center(child: CircularProgressIndicator()),
-                )
+                const CategoryServicesShimmer()
               else if (controller.services.isEmpty)
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 12),

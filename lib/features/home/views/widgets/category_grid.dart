@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../models/category_response_model.dart';
+import '../../../../shared/shimmers/category_shimmer.dart';
 
 class CategoryGrid extends StatelessWidget {
   final List<CategoryModel> categories;
@@ -20,7 +21,7 @@ class CategoryGrid extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     if (isLoading && categories.isEmpty) {
-      return const Center(child: CircularProgressIndicator());
+      return const CategoryShimmer();
     }
 
     if (categories.isEmpty) {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../app/routes/app_routes.dart';
+import '../../../shared/shimmers/popular_services_shimmer.dart';
 import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/common_app_bar.dart';
 import '../../../shared/widgets/custom_button.dart';
@@ -27,9 +28,7 @@ class AllServices extends GetView<AllServicesController> {
         onRefresh: controller.fetchAllServices,
         child: Obx(() {
           if (controller.isLoading.value && controller.allServices.isEmpty) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
+            return const AllServicesShimmer();
           }
 
           if (controller.allServices.isEmpty) {

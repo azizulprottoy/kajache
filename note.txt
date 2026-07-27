@@ -1,6 +1,6 @@
 tasks remaining ,
 1. add coupons
-2. add shimmers in all pages,
+2. add shimmers in all pages, -done
 3. fix dark theme colors,
 4. advertisement
 5. payment gateway,

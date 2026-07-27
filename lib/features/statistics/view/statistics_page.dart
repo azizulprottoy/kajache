@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../core/utils/translation_keys.dart';
+import '../../../shared/shimmers/statistics_shimmer.dart';
 import '../../../shared/widgets/common_app_bar.dart';
 import '../../home/models/available_booking_response_model.dart';
 import '../controller/statistics_controller.dart';
@@ -22,7 +23,7 @@ class StatisticsPage extends GetView<StatisticsController> {
       body: Obx(() {
         if (controller.isLoading.value &&
             controller.acceptedBookings.isEmpty) {
-          return const Center(child: CircularProgressIndicator());
+          return const StatisticsShimmer();
         }
 
         if (controller.errorMessage.value.isNotEmpty &&

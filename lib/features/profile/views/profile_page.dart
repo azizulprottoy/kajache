@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 
 import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/common_app_bar.dart';
+import '../../../shared/shimmers/profile_shimmer.dart';
 import '../controllers/profile_controller.dart';
 import 'edit_profile_page.dart';
 
@@ -23,7 +24,7 @@ class MyProfilePage extends GetView<ProfileController> {
       ),
       body: Obx(() {
         if (controller.isLoading.value && controller.profile.value == null) {
-          return const Center(child: CircularProgressIndicator());
+          return const ProfileShimmer();
         }
 
         final avatar = controller.profile.value?.avatar ?? '';

@@ -5,6 +5,7 @@ import 'package:kaj_ache/app/routes/app_routes.dart';
 import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/booking_status_helper.dart';
 import '../../../shared/widgets/common_app_bar.dart';
+import '../../../shared/shimmers/my_bookings_shimmer.dart';
 import '../controller/my_booking_controller.dart';
 import 'my_booking_details_page.dart';
 
@@ -25,7 +26,7 @@ class MyBookingPage extends GetView<MyBookingController> {
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
+          return const MyBookingsShimmer();
         }
 
         if (controller.bookings.isEmpty) {

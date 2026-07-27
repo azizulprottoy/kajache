@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../core/utils/media_url_helper.dart';
+import '../../shared/shimmers/booking_details_shimmer.dart';
 import '../../shared/widgets/common_app_bar.dart';
 import '../../shared/widgets/custom_button.dart';
 import '../../core/utils/translation_keys.dart';
@@ -25,7 +26,7 @@ class BookingDetailsPage extends GetView<BookingDetailsController> {
       body: Obx(() {
         final booking = controller.booking.value;
         if (controller.isLoading.value && booking == null) {
-          return const Center(child: CircularProgressIndicator());
+          return const BookingDetailsShimmer();
         }
         if (booking == null) {
           return _ErrorState(onRetry: controller.fetchBooking);

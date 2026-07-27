@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kaj_ache/features/service_details/arguments/service_details_arguments.dart';
 
+import '../../../shared/shimmers/popular_services_shimmer.dart';
+
 import '../../../app/routes/app_routes.dart';
 import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/custom_button.dart';
@@ -24,9 +26,7 @@ class PopularServicesList extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     if (isLoading && services.isEmpty) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+      return const PopularServicesShimmer();
     }
 
     if (services.isEmpty) {

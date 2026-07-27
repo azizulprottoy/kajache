@@ -11,6 +11,7 @@ import '../../booking/arguments/service_booking_arguments.dart';
 import '../../home/models/available_booking_response_model.dart';
 import 'package:intl/intl.dart';
 import '../../reviews/models/review_model.dart';
+import '../../../shared/shimmers/service_details_shimmer.dart';
 import '../controller/service_details_controller.dart';
 import '../model/comment_model.dart';
 
@@ -70,7 +71,7 @@ class ServiceDetailsPage extends GetView<ServiceDetailsController> {
       ),
       body: Obx(() {
         if (controller.isLoading.value && controller.service.value == null) {
-          return const Center(child: CircularProgressIndicator());
+          return const ServiceDetailsShimmer();
         }
 
         final service = controller.service.value;
@@ -959,12 +960,7 @@ class _RatingSection extends StatelessWidget {
 
     return Obx(() {
       if (controller.isReviewsLoading.value && controller.reviews.isEmpty) {
-        return const Center(
-          child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 24),
-            child: CircularProgressIndicator(),
-          ),
-        );
+        return const SizedBox.shrink();
       }
 
       final summary = controller.ratingSummary;
@@ -1354,12 +1350,7 @@ class _CommentsSection extends StatelessWidget {
         Obx(() {
           if (controller.isCommentsLoading.value &&
               controller.comments.isEmpty) {
-            return const Center(
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 24),
-                child: CircularProgressIndicator(),
-              ),
-            );
+            return const SizedBox.shrink();
           }
 
           if (controller.comments.isEmpty) {

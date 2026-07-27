@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 
 import '../../../core/controller/local_controller.dart';
 import '../../../core/utils/translation_keys.dart';
+import '../../../shared/shimmers/rewards_shimmer.dart';
 import '../../../shared/widgets/common_app_bar.dart';
 import '../../../shared/widgets/error_widget.dart';
 import '../controllers/reword_controller.dart';
@@ -33,7 +34,7 @@ class RewardsPage extends GetView<RewardsController> {
       ),
       body: Obx(() {
         if (controller.isLoading.value && controller.rewards.isEmpty) {
-          return const Center(child: CircularProgressIndicator());
+          return const RewardsShimmer();
         }
 
         if (controller.errorMessage.value.isNotEmpty &&

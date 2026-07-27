@@ -5,6 +5,7 @@ import '../../../app/routes/app_routes.dart';
 import '../../../core/controller/local_controller.dart';
 import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/common_app_bar.dart';
+import '../../main/controller/main_controller.dart';
 
 class MenuPage extends StatelessWidget {
   const MenuPage({super.key});
@@ -15,10 +16,12 @@ class MenuPage extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final localeController = Get.find<LocaleController>();
 
+    final mainController = Get.find<MainController>();
+
     return Scaffold(
       backgroundColor: colorScheme.surface,
-      appBar: const CommonAppBar(
-        title: 'Menu',
+      appBar: CommonAppBar(
+        title: TKeys.menuTitle.tr,
         showLanguageToggle: true,
       ),
       body: SafeArea(
@@ -42,13 +45,15 @@ class MenuPage extends StatelessWidget {
                     Get.toNamed(AppRoutes.myBookings);
                   },
                 ),
-                _MenuTile(
-                  icon: Icons.work_outline,
-                  title: TKeys.portfolio.tr,
-                  onTap: () {
-                    Get.toNamed(AppRoutes.portfolioPage);
-                  },
-                ),
+                if (mainController.isServiceProvider) ...[
+                  _MenuTile(
+                    icon: Icons.work_history_outlined,
+                    title: TKeys.portfolio.tr,
+                    onTap: () {
+                      Get.toNamed(AppRoutes.portfolioPage);
+                    },
+                  ),
+                ],
                 _MenuDivider(),
                 _MenuTile(
                   icon: Icons.fire_extinguisher_sharp,

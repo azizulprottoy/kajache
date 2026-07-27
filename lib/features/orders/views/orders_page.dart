@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../core/utils/translation_keys.dart';
+import '../../../shared/shimmers/orders_shimmer.dart';
 import '../../../shared/widgets/common_app_bar.dart';
 import '../controllers/order_controller.dart';
 
@@ -22,7 +23,7 @@ class PreviousOrdersPage extends GetView<PreviousOrdersController> {
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
+          return const OrdersShimmer();
         }
 
         if (controller.previousOrders.isEmpty) {

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../core/utils/translation_keys.dart';
+import '../../../shared/shimmers/portfolio_shimmer.dart';
 import '../../../shared/widgets/common_app_bar.dart';
 import '../controller/portfolio_controller.dart';
 import '../model/portfolio_model.dart';
@@ -33,7 +34,7 @@ class PortfolioPage extends GetView<PortfolioController> {
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
+          return const PortfolioShimmer();
         }
 
         if (controller.errorMessage.value.isNotEmpty &&

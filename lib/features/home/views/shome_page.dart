@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../../../app/routes/app_routes.dart';
 import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/common_app_bar.dart';
+import '../../../shared/shimmers/shome_shimmer.dart';
 import '../../sbooking/booking_details_arguments.dart';
 import '../controllers/shome_controller.dart';
 import '../models/available_booking_response_model.dart';
@@ -23,7 +24,7 @@ class SHomePage extends GetView<SHomeController> {
       ),
       body: Obx(() {
         if (controller.isLoading.value && controller.availableBookings.isEmpty) {
-          return const Center(child: CircularProgressIndicator());
+          return const ShomeShimmer();
         }
 
         return RefreshIndicator(
