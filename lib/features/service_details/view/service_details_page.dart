@@ -782,124 +782,117 @@ class _BiddingBottomSheetState extends State<BiddingBottomSheet> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return SafeArea(
-      top: false,
-      child: DraggableScrollableSheet(
-        expand: false,
-        initialChildSize: 0.72,
-        minChildSize: 0.55,
-        maxChildSize: 0.92,
-        builder: (context, scrollController) {
-          return Container(
-            decoration: BoxDecoration(
-              color: colorScheme.surface,
-              borderRadius:
-              const BorderRadius.vertical(top: Radius.circular(24)),
-            ),
-            child: SingleChildScrollView(
-              controller: scrollController,
-              padding: EdgeInsets.fromLTRB(
-                16,
-                12,
-                16,
-                MediaQuery.of(context).viewInsets.bottom + 16,
-              ),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Drag handle
-                    Container(
-                      width: 42,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: colorScheme.outlineVariant,
-                        borderRadius: BorderRadius.circular(99),
-                      ),
+    return AnimatedPadding(
+      duration: const Duration(milliseconds: 150),
+      curve: Curves.easeOut,
+      padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom),
+      child: Container(
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
+          borderRadius:
+          const BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: SafeArea(
+          top: false,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Drag handle
+                  Container(
+                    width: 42,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: colorScheme.outlineVariant,
+                      borderRadius: BorderRadius.circular(99),
                     ),
-                    const SizedBox(height: 16),
+                  ),
+                  const SizedBox(height: 16),
 
-                    Text(
-                      widget.isEditMode
-                          ? TKeys.editYourBid.tr
-                          : TKeys.placeYourBid.tr,
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: colorScheme.onSurface,
-                      ),
+                  Text(
+                    widget.isEditMode
+                        ? TKeys.editYourBid.tr
+                        : TKeys.placeYourBid.tr,
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.onSurface,
                     ),
-                    const SizedBox(height: 6),
-                    Text(
-                      TKeys.placeBidSubtitle.tr,
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    TKeys.placeBidSubtitle.tr,
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
                     ),
-                    const SizedBox(height: 20),
+                  ),
+                  const SizedBox(height: 20),
 
-                    // Bid price field
-                    TextFormField(
-                      controller: _priceController,
-                      keyboardType: TextInputType.number,
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return TKeys.enterBidPriceError.tr;
-                        }
-                        return null;
-                      },
-                      decoration: InputDecoration(
-                        labelText: TKeys.bidPrice.tr,
-                        hintText: TKeys.enterPrice.tr,
-                        prefixIcon: const Icon(Icons.currency_exchange),
-                        prefixText: '৳ ',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
+                  // Bid price field
+                  TextFormField(
+                    controller: _priceController,
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return TKeys.enterBidPriceError.tr;
+                      }
+                      return null;
+                    },
+                    decoration: InputDecoration(
+                      labelText: TKeys.bidPrice.tr,
+                      hintText: TKeys.enterPrice.tr,
+                      prefixIcon: const Icon(Icons.currency_exchange),
+                      prefixText: '৳ ',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
                       ),
                     ),
-                    const SizedBox(height: 14),
+                  ),
+                  const SizedBox(height: 14),
 
-                    // ETA field
-                    TextFormField(
-                      controller: _etaController,
-                      readOnly: true,
-                      onTap: _pickTime,
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return TKeys.selectEstimatedTimeError.tr;
-                        }
-                        return null;
-                      },
-                      decoration: InputDecoration(
-                        labelText: TKeys.estimatedArrival.tr,
-                        hintText: TKeys.selectTime.tr,
-                        prefixIcon: const Icon(Icons.access_time_outlined),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
+                  // ETA field
+                  TextFormField(
+                    controller: _etaController,
+                    readOnly: true,
+                    onTap: _pickTime,
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return TKeys.selectEstimatedTimeError.tr;
+                      }
+                      return null;
+                    },
+                    decoration: InputDecoration(
+                      labelText: TKeys.estimatedArrival.tr,
+                      hintText: TKeys.selectTime.tr,
+                      prefixIcon: const Icon(Icons.access_time_outlined),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
                       ),
                     ),
-                    const SizedBox(height: 14),
+                  ),
+                  const SizedBox(height: 14),
 
-                    // Note field
-                    TextFormField(
-                      controller: _noteController,
-                      maxLines: 4,
-                      decoration: InputDecoration(
-                        labelText: TKeys.note.tr,
-                        hintText: TKeys.noteHint.tr,
-                        alignLabelWithHint: true,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
+                  // Note field
+                  TextFormField(
+                    controller: _noteController,
+                    maxLines: 3,
+                    decoration: InputDecoration(
+                      labelText: TKeys.note.tr,
+                      hintText: TKeys.noteHint.tr,
+                      alignLabelWithHint: true,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
                       ),
                     ),
-                    const SizedBox(height: 20),
+                  ),
+                  const SizedBox(height: 20),
 
-                    // Cancel / Submit buttons
-                    Row(
+                  // Cancel / Submit buttons
+                  Row(
                       children: [
                         Expanded(
                           child: OutlinedButton(
@@ -947,9 +940,8 @@ class _BiddingBottomSheetState extends State<BiddingBottomSheet> {
                 ),
               ),
             ),
-          );
-        },
-      ),
+          ),
+        ),
     );
   }
 }

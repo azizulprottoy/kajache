@@ -309,4 +309,14 @@ class TKeys {
   static const rewardUnlocked           = 'reward_unlocked';
   static const rewardPointsToUnlock     = 'reward_points_to_unlock';
   static const noRewardsAvailable       = 'no_rewards_available';
+  static const howToEarnPoints          = 'how_to_earn_points';
+  static const rewardMilestones         = 'reward_milestones';
+  static const nextMilestone            = 'next_milestone';
+  static const earnByProfile            = 'earn_by_profile';
+  static const earnByBooking            = 'earn_by_booking';
+  static const earnByComment            = 'earn_by_comment';
+  static const earnByReply              = 'earn_by_reply';
+  static const earnByReview             = 'earn_by_review';
+  static const earnByRating             = 'earn_by_rating';
+  static const pts                      = 'pts';
 }
