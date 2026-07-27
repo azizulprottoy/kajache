@@ -18,6 +18,16 @@ class TKeys {
   static const submit         = 'submit';
   static const search         = 'search';
   static const seeAll         = 'see_all';
+  static const tryAgain       = 'try_again';
+  static const change         = 'change';
+  static const close          = 'close';
+  static const thankYou       = 'thank_you';
+  static const starRating     = 'star_rating';
+  static const warning        = 'warning';
+  static const enterCommentFirst = 'enter_comment_first';
+  static const commentPosted  = 'comment_posted';
+  static const enterReplyFirst = 'enter_reply_first';
+  static const replyPosted    = 'reply_posted';
   static const district            = 'district';
   static const area                = 'area';
   static const selectDistrict      = 'select_district';
@@ -218,6 +228,19 @@ class TKeys {
   static const refundableInfo           = 'refundable_info';
   static const processing               = 'processing';
   static const confirmPay500            = 'confirm_pay_500';
+  static const markTaskComplete         = 'mark_task_complete';
+  static const startBookingConfirm      = 'start_booking_confirm';
+  static const makeInProgress           = 'make_in_progress';
+  static const taskCompleted            = 'task_completed';
+  static const taskCompletedMsg         = 'task_completed_msg';
+  static const technicianBooked         = 'technician_booked';
+  static const bookingIdMissing         = 'booking_id_missing';
+  static const reviewService            = 'review_service';
+  static const rateTechnician           = 'rate_technician';
+  static const serviceReviewSubmitted   = 'service_review_submitted';
+  static const techRatingSubmitted      = 'tech_rating_submitted';
+  static const deletePortfolioConfirm   = 'delete_portfolio_confirm';
+  static const tapToSelectImage         = 'tap_to_select_image';
   static const next                     = 'next';
   static const bdt                      = 'bdt';
 

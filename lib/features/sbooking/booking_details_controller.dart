@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 
 import '../home/models/available_booking_response_model.dart';
 import 'booking_details_arguments.dart';
+import '../../core/utils/translation_keys.dart';
 import 'booking_details_repository.dart';
 
 
@@ -30,7 +31,7 @@ class BookingDetailsController extends GetxController {
     super.onReady();
     if (bookingId.isEmpty) {
       Get.back();
-      Get.snackbar('Error', 'Booking ID is missing.');
+      Get.snackbar(TKeys.error.tr, TKeys.bookingIdMissing.tr);
       return;
     }
     fetchBooking();
@@ -44,7 +45,7 @@ class BookingDetailsController extends GetxController {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!isClosed) {
           Get.snackbar(
-            'Error',
+            TKeys.error.tr,
             error.toString().replaceFirst('Exception: ', ''),
             snackPosition: SnackPosition.BOTTOM,
           );
@@ -91,7 +92,7 @@ class BookingDetailsController extends GetxController {
       return true;
     } catch (error) {
       Get.snackbar(
-        'Error',
+        TKeys.error.tr,
         error.toString().replaceFirst('Exception: ', ''),
         snackPosition: SnackPosition.BOTTOM,
       );

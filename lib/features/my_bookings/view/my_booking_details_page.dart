@@ -57,8 +57,8 @@ class MyBookingDetailsPage extends GetView<MyBookingDetailsController> {
                               if (!success) return;
 
                               Get.snackbar(
-                                'Task completed',
-                                'The booking has been marked as completed',
+                                TKeys.taskCompleted.tr,
+                                TKeys.taskCompletedMsg.tr,
                                 snackPosition: SnackPosition.BOTTOM,
                               );
                             },
@@ -128,18 +128,18 @@ class MyBookingDetailsPage extends GetView<MyBookingDetailsController> {
     final result = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Mark task as completed?'),
+        title: Text(TKeys.markTaskComplete.tr),
         content: const Text(
           'Confirm that the technician has finished this job.',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('Cancel'),
+            child: Text(TKeys.cancel.tr),
           ),
           FilledButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text('Confirm'),
+            child: Text(TKeys.confirm.tr),
           ),
         ],
       ),
@@ -203,7 +203,7 @@ class _FeedbackSection extends StatelessWidget {
               child: OutlinedButton.icon(
                 onPressed: () => _openForm(isServiceReview: true),
                 icon: const Icon(Icons.rate_review_outlined),
-                label: const Text('Review Service'),
+                label: Text(TKeys.reviewService.tr),
               ),
             ),
           ],
@@ -214,7 +214,7 @@ class _FeedbackSection extends StatelessWidget {
               child: FilledButton.icon(
                 onPressed: () => _openForm(isServiceReview: false),
                 icon: const Icon(Icons.star_outline_rounded),
-                label: const Text('Rate Technician'),
+                label: Text(TKeys.rateTechnician.tr),
               ),
             ),
           ],
@@ -266,10 +266,10 @@ class _RatingAndReviewSheetState extends State<_RatingAndReviewSheet> {
 
     Navigator.of(context).pop();
     Get.snackbar(
-      'Thank you',
+      TKeys.thankYou.tr,
       widget.isServiceReview
-          ? 'Your service review was submitted.'
-          : 'Your technician rating was submitted.',
+          ? TKeys.serviceReviewSubmitted.tr
+          : TKeys.techRatingSubmitted.tr,
       snackPosition: SnackPosition.BOTTOM,
     );
   }
@@ -322,7 +322,7 @@ class _RatingAndReviewSheetState extends State<_RatingAndReviewSheet> {
                     children: List.generate(5, (index) {
                       final value = index + 1;
                       return IconButton(
-                        tooltip: '$value star',
+                        tooltip: '$value ${TKeys.starRating.tr}',
                         onPressed: () => setState(() => _rating = value),
                         icon: Icon(
                           value <= _rating
@@ -375,7 +375,7 @@ class _RatingAndReviewSheetState extends State<_RatingAndReviewSheet> {
                                   strokeWidth: 2,
                                 ),
                               )
-                            : const Text('Submit'),
+                            : Text(TKeys.submit.tr),
                       ),
                     );
                   }),
@@ -433,7 +433,7 @@ class _BidderProfileSheet extends StatelessWidget {
                   Align(
                     alignment: Alignment.topRight,
                     child: IconButton(
-                      tooltip: 'Close',
+                      tooltip: TKeys.close.tr,
                       onPressed: Get.back,
                       icon: const Icon(Icons.close_rounded),
                     ),
@@ -549,8 +549,8 @@ class _BidderProfileSheet extends StatelessWidget {
                             Get.back();
                           }
                           Get.snackbar(
-                            'Success',
-                            'Technician booked successfully',
+                            TKeys.success.tr,
+                            TKeys.technicianBooked.tr,
                             snackPosition: SnackPosition.BOTTOM,
                           );
                         },
@@ -1228,7 +1228,7 @@ class _ErrorState extends StatelessWidget {
           const SizedBox(height: 12),
           FilledButton(
             onPressed: onRetry,
-            child: const Text('Retry'),
+            child: Text(TKeys.retry.tr),
           ),
         ],
       ),

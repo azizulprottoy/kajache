@@ -348,7 +348,7 @@ class _ErrorState extends StatelessWidget {
             const SizedBox(height: 16),
             FilledButton(
               onPressed: onRetry,
-              child: const Text('Try Again'),
+              child: Text(TKeys.tryAgain.tr),
             ),
           ],
         ),

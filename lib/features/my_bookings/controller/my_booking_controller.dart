@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../model/my_booking_model.dart';
+import '../../../core/utils/translation_keys.dart';
 import '../repository/my_booking_repository.dart';
 
 class MyBookingController extends GetxController {
@@ -26,7 +27,7 @@ class MyBookingController extends GetxController {
 
       bookings.assignAll(result);
     } catch (e) {
-      Get.snackbar('Error', e.toString(), snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(TKeys.error.tr, e.toString(), snackPosition: SnackPosition.BOTTOM);
     } finally {
       isLoading.value = false;
     }

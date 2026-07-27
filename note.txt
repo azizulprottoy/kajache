@@ -1,0 +1,15 @@
+tasks remaining ,
+1. add coupons
+2. add shimmers in all pages,
+3. fix dark theme colors,
+4. advertisement
+5. payment gateway,
+6. complain
+7. chat with technitian
+8. in app call
+9. reting review in one bottom sheet,
+10.location tracing with map
+11. payment gateway integration
+
+
+

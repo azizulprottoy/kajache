@@ -760,7 +760,7 @@ class _ErrorState extends StatelessWidget {
           const SizedBox(height: 12),
           FilledButton(
             onPressed: onRetry,
-            child: const Text('Retry'),
+            child: Text(TKeys.retry.tr),
           ),
         ],
       ),

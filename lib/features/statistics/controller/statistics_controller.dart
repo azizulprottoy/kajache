@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../core/utils/translation_keys.dart';
 import '../../home/models/available_booking_response_model.dart';
 import '../repository/statistics_repository.dart';
 
@@ -54,18 +55,18 @@ class StatisticsController extends GetxController {
 
     final confirmed = await Get.dialog<bool>(
       AlertDialog(
-        title: const Text('Start this booking?'),
+        title: Text(TKeys.startBookingConfirm.tr),
         content: const Text(
           'The booking status will be changed to in progress.',
         ),
         actions: [
           TextButton(
             onPressed: () => Get.back(result: false),
-            child: const Text('Cancel'),
+            child: Text(TKeys.cancel.tr),
           ),
           FilledButton(
             onPressed: () => Get.back(result: true),
-            child: const Text('Make In Progress'),
+            child: Text(TKeys.makeInProgress.tr),
           ),
         ],
       ),
@@ -96,7 +97,7 @@ class StatisticsController extends GetxController {
       );
     } catch (error) {
       Get.snackbar(
-        'Error',
+        TKeys.error.tr,
         error.toString().replaceFirst('Exception: ', ''),
         snackPosition: SnackPosition.BOTTOM,
       );

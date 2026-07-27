@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../home/models/available_booking_response_model.dart';
+import '../../../core/utils/translation_keys.dart';
 import '../repository/my_booking_repository.dart';
 
 class MyBookingDetailsController extends GetxController {
@@ -32,7 +33,7 @@ class MyBookingDetailsController extends GetxController {
     if (bookingId.isEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Get.snackbar(
-          'Error',
+          TKeys.error.tr,
           'Booking ID is missing',
           snackPosition: SnackPosition.BOTTOM,
         );
@@ -53,7 +54,7 @@ class MyBookingDetailsController extends GetxController {
       booking.value = result;
     } catch (e) {
       Get.snackbar(
-        'Error',
+        TKeys.error.tr,
         e.toString().replaceFirst('Exception: ', ''),
         snackPosition: SnackPosition.BOTTOM,
       );
@@ -73,7 +74,7 @@ class MyBookingDetailsController extends GetxController {
   Future<bool> bookTechnician(BookingBidModel bid) async {
     if (bookingId.isEmpty || bid.id.isEmpty) {
       Get.snackbar(
-        'Error',
+        TKeys.error.tr,
         'Booking or bid ID is missing',
         snackPosition: SnackPosition.BOTTOM,
       );
@@ -94,7 +95,7 @@ class MyBookingDetailsController extends GetxController {
       return true;
     } catch (e) {
       Get.snackbar(
-        'Error',
+        TKeys.error.tr,
         e.toString().replaceFirst('Exception: ', ''),
         snackPosition: SnackPosition.BOTTOM,
       );
@@ -107,7 +108,7 @@ class MyBookingDetailsController extends GetxController {
   Future<bool> completeTask() async {
     if (bookingId.isEmpty) {
       Get.snackbar(
-        'Error',
+        TKeys.error.tr,
         'Booking ID is missing',
         snackPosition: SnackPosition.BOTTOM,
       );
@@ -134,7 +135,7 @@ class MyBookingDetailsController extends GetxController {
       return true;
     } catch (e) {
       Get.snackbar(
-        'Error',
+        TKeys.error.tr,
         e.toString().replaceFirst('Exception: ', ''),
         snackPosition: SnackPosition.BOTTOM,
       );
@@ -167,7 +168,7 @@ class MyBookingDetailsController extends GetxController {
       return true;
     } catch (e) {
       Get.snackbar(
-        'Error',
+        TKeys.error.tr,
         e.toString().replaceFirst('Exception: ', ''),
         snackPosition: SnackPosition.BOTTOM,
       );
@@ -200,7 +201,7 @@ class MyBookingDetailsController extends GetxController {
       return true;
     } catch (e) {
       Get.snackbar(
-        'Error',
+        TKeys.error.tr,
         e.toString().replaceFirst('Exception: ', ''),
         snackPosition: SnackPosition.BOTTOM,
       );

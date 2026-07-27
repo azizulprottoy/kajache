@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../models/profile_model.dart';
 import '../models/worker_profile_model.dart';
+import '../../../core/utils/translation_keys.dart';
 import '../repository/profile_repository.dart';
 
 class ProfileController extends GetxController {
@@ -105,7 +106,7 @@ class ProfileController extends GetxController {
       isCategoriesLoading.value = true;
       categories.assignAll(await _repository.getCategoryNames());
     } catch (e) {
-      Get.snackbar('Error', e.toString(),
+      Get.snackbar(TKeys.error.tr, e.toString(),
           snackPosition: SnackPosition.BOTTOM);
     } finally {
       isCategoriesLoading.value = false;
@@ -141,7 +142,7 @@ class ProfileController extends GetxController {
       if (p.district.isNotEmpty) selectedDistrict.value = p.district;
       if (p.area.isNotEmpty) selectedArea.value = p.area;
     } catch (e) {
-      Get.snackbar('Error', e.toString(),
+      Get.snackbar(TKeys.error.tr, e.toString(),
           snackPosition: SnackPosition.BOTTOM);
     } finally {
       isLoading.value = false;
@@ -200,7 +201,7 @@ class ProfileController extends GetxController {
 
       await fetchMyProfile(); // refresh with saved values
     } catch (e) {
-      Get.snackbar('Error', e.toString(),
+      Get.snackbar(TKeys.error.tr, e.toString(),
           snackPosition: SnackPosition.BOTTOM);
     } finally {
       isLoading.value = false;

@@ -540,11 +540,11 @@ class _Step3Body extends GetView<BookingController> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 20),
-        Text('Review & Pay',
+        Text(TKeys.reviewPay.tr,
             style: theme.textTheme.headlineSmall
                 ?.copyWith(fontWeight: FontWeight.bold)),
         const SizedBox(height: 4),
-        Text('A small booking fee opens your request for bidding.',
+        Text(TKeys.bookingFeeInfo.tr,
             style: theme.textTheme.bodySmall
                 ?.copyWith(color: colorScheme.onSurfaceVariant)),
         const SizedBox(height: 20),
@@ -570,7 +570,7 @@ class _Step3Body extends GetView<BookingController> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Service',
+                        Text(TKeys.service.tr,
                             style: theme.textTheme.labelSmall?.copyWith(
                               fontWeight: FontWeight.bold,
                               color: colorScheme.onSurfaceVariant,
@@ -597,7 +597,7 @@ class _Step3Body extends GetView<BookingController> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Text('Max Budget',
+                      Text(TKeys.maxBudgetShort.tr,
                           style: theme.textTheme.labelSmall?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: colorScheme.onSurfaceVariant,
@@ -662,12 +662,12 @@ class _Step3Body extends GetView<BookingController> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Booking Fee',
+                    Text(TKeys.bookingFee.tr,
                         style: theme.textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.bold,
                         )),
                     const SizedBox(height: 2),
-                    Text('Refundable if no provider is found',
+                    Text(TKeys.refundableInfo.tr,
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: colorScheme.onSurfaceVariant,
                         )),
@@ -703,7 +703,7 @@ class _Step3Body extends GetView<BookingController> {
                   Icon(Icons.credit_card_outlined,
                       color: colorScheme.primary, size: 20),
                   const SizedBox(width: 8),
-                  Text('Payment Method',
+                  Text(TKeys.paymentMethod.tr,
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.bold,
                       )),
@@ -820,7 +820,7 @@ class _BottomNavBar extends StatelessWidget {
                 child: OutlinedButton.icon(
                   onPressed: isLoading ? null : onBack,
                   icon: const Icon(Icons.arrow_back, size: 18),
-                  label: const Text('Back'),
+                  label: Text(TKeys.back.tr),
                   style: OutlinedButton.styleFrom(
                     minimumSize: const Size.fromHeight(52),
                     shape: RoundedRectangleBorder(

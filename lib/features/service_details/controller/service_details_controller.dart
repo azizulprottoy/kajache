@@ -6,6 +6,7 @@ import '../../home/models/available_booking_response_model.dart';
 import '../../reviews/models/review_model.dart';
 import '../arguments/service_details_arguments.dart';
 import '../model/comment_model.dart';
+import '../../../core/utils/translation_keys.dart';
 import '../repository/service_details_repository.dart';
 
 class ServiceDetailsController extends GetxController {
@@ -90,7 +91,7 @@ class ServiceDetailsController extends GetxController {
       Get.back();
 
       Get.snackbar(
-        'Error',
+        TKeys.error.tr,
         'Service ID not found',
         snackPosition: SnackPosition.BOTTOM,
       );
@@ -108,7 +109,7 @@ class ServiceDetailsController extends GetxController {
   }) async {
     debugPrint('[submitBid] bookingId=$bookingId price=$price eta=$estimatedArrival');
     if (bookingId.isEmpty) {
-      Get.snackbar('Error', 'Booking ID missing — cannot place bid.',
+      Get.snackbar(TKeys.error.tr, TKeys.bookingIdMissing.tr,
           snackPosition: SnackPosition.BOTTOM);
       return false;
     }
@@ -142,7 +143,7 @@ class ServiceDetailsController extends GetxController {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!isClosed) {
           Get.snackbar(
-            'Error',
+            TKeys.error.tr,
             e.toString().replaceFirst('Exception: ', ''),
             snackPosition: SnackPosition.BOTTOM,
           );
@@ -176,7 +177,7 @@ class ServiceDetailsController extends GetxController {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!isClosed) {
           Get.snackbar(
-            'Error',
+            TKeys.error.tr,
             error.toString().replaceFirst('Exception: ', ''),
             snackPosition: SnackPosition.BOTTOM,
           );
@@ -220,8 +221,8 @@ class ServiceDetailsController extends GetxController {
 
     if (text.isEmpty) {
       Get.snackbar(
-        'Warning',
-        'Please enter a comment before submitting.',
+        TKeys.warning.tr,
+        TKeys.enterCommentFirst.tr,
         snackPosition: SnackPosition.BOTTOM,
       );
       return;
@@ -229,8 +230,8 @@ class ServiceDetailsController extends GetxController {
 
     if (serviceId == null || serviceId.isEmpty) {
       Get.snackbar(
-        'Error',
-        'Service details not found.',
+        TKeys.error.tr,
+        TKeys.serviceNotFound.tr,
         snackPosition: SnackPosition.BOTTOM,
       );
       return;
@@ -247,13 +248,13 @@ class ServiceDetailsController extends GetxController {
       comments.insert(0, newComment);
       commentInputController.clear();
       Get.snackbar(
-        'Success',
-        'Comment posted successfully!',
+        TKeys.success.tr,
+        TKeys.commentPosted.tr,
         snackPosition: SnackPosition.BOTTOM,
       );
     } catch (e) {
       Get.snackbar(
-        'Error',
+        TKeys.error.tr,
         e.toString().replaceFirst('Exception: ', ''),
         snackPosition: SnackPosition.BOTTOM,
       );
@@ -282,8 +283,8 @@ class ServiceDetailsController extends GetxController {
 
     if (text.isEmpty) {
       Get.snackbar(
-        'Warning',
-        'Please enter a reply before submitting.',
+        TKeys.warning.tr,
+        TKeys.enterReplyFirst.tr,
         snackPosition: SnackPosition.BOTTOM,
       );
       return;
@@ -306,13 +307,13 @@ class ServiceDetailsController extends GetxController {
       replyInputController.clear();
       openReplyId.value = null;
       Get.snackbar(
-        'Success',
-        'Reply posted successfully!',
+        TKeys.success.tr,
+        TKeys.replyPosted.tr,
         snackPosition: SnackPosition.BOTTOM,
       );
     } catch (e) {
       Get.snackbar(
-        'Error',
+        TKeys.error.tr,
         e.toString().replaceFirst('Exception: ', ''),
         snackPosition: SnackPosition.BOTTOM,
       );
@@ -338,7 +339,7 @@ class ServiceDetailsController extends GetxController {
       }
     } catch (e) {
       Get.snackbar(
-        'Error',
+        TKeys.error.tr,
         e.toString().replaceFirst('Exception: ', ''),
         snackPosition: SnackPosition.BOTTOM,
       );

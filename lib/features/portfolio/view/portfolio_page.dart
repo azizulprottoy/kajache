@@ -234,21 +234,21 @@ class PortfolioPage extends GetView<PortfolioController> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Delete portfolio work?'),
+        title: Text(TKeys.deletePortfolioConfirm.tr),
         content: const Text(
           'This portfolio item will be permanently deleted.',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('Cancel'),
+            child: Text(TKeys.cancel.tr),
           ),
           FilledButton(
             style: FilledButton.styleFrom(
               backgroundColor: Theme.of(dialogContext).colorScheme.error,
             ),
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text('Delete'),
+            child: Text(TKeys.delete.tr),
           ),
         ],
       ),
@@ -347,13 +347,13 @@ class _PortfolioCard extends StatelessWidget {
                       if (value == 'delete') onDelete();
                     },
                     itemBuilder: (context) => [
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: 'edit',
                         child: ListTile(
                           dense: true,
                           contentPadding: EdgeInsets.zero,
-                          leading: Icon(Icons.edit_outlined),
-                          title: Text('Edit'),
+                          leading: const Icon(Icons.edit_outlined),
+                          title: Text(TKeys.edit.tr),
                         ),
                       ),
                       PopupMenuItem(
@@ -426,7 +426,7 @@ class _PortfolioImagePicker extends StatelessWidget {
                     color: colorScheme.primary,
                   ),
                   const SizedBox(height: 10),
-                  const Text('Tap to select an image'),
+                  Text(TKeys.tapToSelectImage.tr),
                 ],
               ),
             if (selectedImage != null || existingImage.isNotEmpty)
@@ -442,12 +442,12 @@ class _PortfolioImagePicker extends StatelessWidget {
                     color: colorScheme.surface.withOpacity(0.9),
                     borderRadius: BorderRadius.circular(99),
                   ),
-                  child: const Row(
+                  child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.edit_outlined, size: 18),
-                      SizedBox(width: 6),
-                      Text('Change'),
+                      const Icon(Icons.edit_outlined, size: 18),
+                      const SizedBox(width: 6),
+                      Text(TKeys.change.tr),
                     ],
                   ),
                 ),
@@ -564,7 +564,7 @@ class _ErrorState extends StatelessWidget {
             OutlinedButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh),
-              label: const Text('Retry'),
+              label: Text(TKeys.retry.tr),
             ),
           ],
         ),
