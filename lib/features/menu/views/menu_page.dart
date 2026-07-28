@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../app/theme/context_extension.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../app/routes/app_routes.dart';
@@ -211,7 +213,7 @@ class _MenuSectionCard extends StatelessWidget {
           ),
         ],
         border: Border.all(
-          color: Theme.of(context).colorScheme.outlineVariant.withOpacity(0.08),
+          color: Theme.of(context).colorScheme.borderColor,
         ),
       ),
       child: Column(
@@ -314,8 +316,10 @@ class _SwitchMenuTile extends StatelessWidget {
       trailing: Switch(
         value: value,
         onChanged: onChanged,
-        inactiveThumbColor: colorScheme.primary,
-        activeThumbColor: colorScheme.secondary,
+        activeColor: colorScheme.onPrimary,
+        activeTrackColor: colorScheme.primary,
+        inactiveThumbColor: colorScheme.outline,
+        inactiveTrackColor: colorScheme.surfaceContainerHighest,
       ),
     );
   }
@@ -329,7 +333,7 @@ class _MenuDivider extends StatelessWidget {
       thickness: 1,
       indent: 16,
       endIndent: 16,
-      color: Theme.of(context).colorScheme.outlineVariant.withOpacity(0.08),
+      color: Theme.of(context).colorScheme.borderColor,
     );
   }
 }

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../app/theme/context_extension.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../shared/widgets/common_app_bar.dart';
 import '../controller/booking_controller.dart';
@@ -115,7 +117,7 @@ class _StepperHeader extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: isCompleted
                       ? colorScheme.primary
-                      : colorScheme.outlineVariant.withOpacity(0.4),
+                      : colorScheme.borderColor,
                   borderRadius: BorderRadius.circular(99),
                 ),
               ),
@@ -210,7 +212,7 @@ class _ServiceContextBar extends StatelessWidget {
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: colorScheme.outlineVariant.withOpacity(0.35),
+          color: colorScheme.borderColor,
         ),
       ),
       child: Row(
@@ -306,7 +308,7 @@ class _Step1Body extends GetView<BookingController> {
                   border: Border.all(
                     color: isSelected
                         ? colorScheme.primary
-                        : colorScheme.outlineVariant.withOpacity(0.5),
+                        : colorScheme.borderColor,
                     width: isSelected ? 1.5 : 1,
                   ),
                 ),

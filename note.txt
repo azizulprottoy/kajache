@@ -1,9 +1,9 @@
 tasks remaining ,
 1. add coupons
 2. add shimmers in all pages,             -done
-3. fix dark theme colors,
+3. fix dark theme colors,                 -done
 4. advertisement
-5. payment gateway,
+5. payment gateway,                       -done
 6. complain                               -done
 7. chat with technician
 8. in app call

@@ -225,18 +225,16 @@ class BookingController extends GetxController {
             Get.back();
 
             /// REDIRECT TO BOOKING LIST
-            Get.offAllNamed(
-              AppRoutes.myBookings,
-            );
+            Get.until((r) => r.settings.name == AppRoutes.main);
+            Get.toNamed(AppRoutes.myBookings);
           },
 
           onClose: () {
             Get.back();
 
             /// REDIRECT TO BOOKING LIST
-            Get.offAllNamed(
-              AppRoutes.myBookings,
-            );
+            Get.until((r) => r.settings.name == AppRoutes.main);
+            Get.toNamed(AppRoutes.myBookings);
           },
         ),
 

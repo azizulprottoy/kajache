@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../app/theme/context_extension.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../app/routes/app_routes.dart';
@@ -173,7 +175,7 @@ class _ServiceCard extends StatelessWidget {
           color: colorScheme.surface,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: colorScheme.outlineVariant.withValues(alpha: 0.1),
+            color: colorScheme.borderColor,
           ),
         ),
         padding: const EdgeInsets.all(12),
@@ -242,31 +244,11 @@ class _ServiceCard extends StatelessWidget {
 
             const SizedBox(width: 8),
 
-            // Price + Book Now
-            SizedBox(
-              width: 90,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    '৳${service.basePrice ?? 0}',
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: colorScheme.primary,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  CustomButton(
-                    label: TKeys.bookNow.tr,
-                    variant: ButtonVariant.primary,
-                    size: ButtonSize.sm,
-                    isFullWidth: true,
-                    onPressed: () => Get.toNamed(
-                      AppRoutes.bookingPage,
-                      arguments: service,
-                    ),
-                  ),
-                ],
+            Text(
+              '৳${service.basePrice ?? 0}',
+              style: theme.textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: colorScheme.primary,
               ),
             ),
           ],

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../app/theme/context_extension.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
@@ -161,7 +163,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
           focusedErrorBorder: border,
           disabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide:   BorderSide(color: cs.outlineVariant.withOpacity(0.5)),
+            borderSide:   BorderSide(color: cs.borderColor),
           ),
           labelStyle: theme.textTheme.bodyMedium?.copyWith(
             color: _isFocused ? cs.primary : cs.onSurfaceVariant,

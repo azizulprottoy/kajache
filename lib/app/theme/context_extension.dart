@@ -7,3 +7,10 @@ extension ThemeContext on BuildContext {
   AppCustomColors get customColors =>
       Theme.of(this).extension<AppCustomColors>()!;
 }
+
+extension AdaptiveBorder on ColorScheme {
+  /// Visible border color in both light and dark themes.
+  Color get borderColor => brightness == Brightness.dark
+      ? outlineVariant
+      : outlineVariant.withValues(alpha: 0.25);
+}

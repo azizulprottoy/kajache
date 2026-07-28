@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../app/theme/context_extension.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../core/utils/media_url_helper.dart';
@@ -247,13 +249,12 @@ class _FeedbackSection extends StatelessWidget {
     required this.controller,
   });
 
-  void _openForm({
-    required bool isServiceReview,
-  }) {
+  void _openCombinedSheet() {
     Get.bottomSheet(
-      _RatingAndReviewSheet(
+      _CombinedFeedbackSheet(
         controller: controller,
-        isServiceReview: isServiceReview,
+        needsServiceReview: !booking.serviceRated,
+        needsTechRating: !booking.providerRated,
       ),
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -285,81 +286,93 @@ class _FeedbackSection extends StatelessWidget {
               color: colors.onSurfaceVariant,
             ),
           ),
-          if (!booking.serviceRated) ...[
-            const SizedBox(height: 14),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: () => _openForm(isServiceReview: true),
-                icon: const Icon(Icons.rate_review_outlined),
-                label: Text(TKeys.reviewService.tr),
-              ),
+          const SizedBox(height: 14),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton.icon(
+              onPressed: _openCombinedSheet,
+              icon: const Icon(Icons.rate_review_outlined),
+              label: Text('Rate & Review'),
             ),
-          ],
-          if (!booking.providerRated) ...[
-            const SizedBox(height: 10),
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton.icon(
-                onPressed: () => _openForm(isServiceReview: false),
-                icon: const Icon(Icons.star_outline_rounded),
-                label: Text(TKeys.rateTechnician.tr),
-              ),
-            ),
-          ],
+          ),
         ],
       ),
     );
   }
 }
 
-class _RatingAndReviewSheet extends StatefulWidget {
+class _CombinedFeedbackSheet extends StatefulWidget {
   final MyBookingDetailsController controller;
-  final bool isServiceReview;
+  final bool needsServiceReview;
+  final bool needsTechRating;
 
-  const _RatingAndReviewSheet({
+  const _CombinedFeedbackSheet({
     required this.controller,
-    required this.isServiceReview,
+    required this.needsServiceReview,
+    required this.needsTechRating,
   });
 
   @override
-  State<_RatingAndReviewSheet> createState() =>
-      _RatingAndReviewSheetState();
+  State<_CombinedFeedbackSheet> createState() => _CombinedFeedbackSheetState();
 }
 
-class _RatingAndReviewSheetState extends State<_RatingAndReviewSheet> {
+class _CombinedFeedbackSheetState extends State<_CombinedFeedbackSheet> {
   final _formKey = GlobalKey<FormState>();
-  final _commentController = TextEditingController();
-  int _rating = 5;
+  final _serviceReviewController = TextEditingController();
+  final _techCommentController = TextEditingController();
+  int _serviceRating = 5;
+  int _techRating = 5;
 
   @override
   void dispose() {
-    _commentController.dispose();
+    _serviceReviewController.dispose();
+    _techCommentController.dispose();
     super.dispose();
   }
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final success = widget.isServiceReview
-        ? await widget.controller.submitServiceReview(
-            rating: _rating,
-            review: _commentController.text,
-          )
-        : await widget.controller.submitProviderRating(
-            rating: _rating,
-            comment: _commentController.text,
-          );
+    bool success = true;
+
+    if (widget.needsServiceReview) {
+      success = await widget.controller.submitServiceReview(
+        rating: _serviceRating,
+        review: _serviceReviewController.text,
+      );
+    }
+
+    if (success && widget.needsTechRating) {
+      success = await widget.controller.submitProviderRating(
+        rating: _techRating,
+        comment: _techCommentController.text,
+      );
+    }
 
     if (!success || !mounted) return;
-
     Navigator.of(context).pop();
     Get.snackbar(
       TKeys.thankYou.tr,
-      widget.isServiceReview
-          ? TKeys.serviceReviewSubmitted.tr
-          : TKeys.techRatingSubmitted.tr,
+      TKeys.serviceReviewSubmitted.tr,
       snackPosition: SnackPosition.BOTTOM,
+    );
+  }
+
+  Widget _starRow(int current, void Function(int) onSelect) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(5, (i) {
+        final v = i + 1;
+        return IconButton(
+          tooltip: '$v ${TKeys.starRating.tr}',
+          onPressed: () => onSelect(v),
+          icon: Icon(
+            v <= current ? Icons.star_rounded : Icons.star_border_rounded,
+            color: Colors.amber.shade700,
+            size: 32,
+          ),
+        );
+      }),
     );
   }
 
@@ -370,17 +383,14 @@ class _RatingAndReviewSheetState extends State<_RatingAndReviewSheet> {
 
     return SafeArea(
       top: false,
-      child: Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-        ),
+      child: AnimatedPadding(
+        duration: const Duration(milliseconds: 150),
+        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
         child: Container(
           padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
           decoration: BoxDecoration(
             color: colors.surface,
-            borderRadius: const BorderRadius.vertical(
-              top: Radius.circular(26),
-            ),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(26)),
           ),
           child: Form(
             key: _formKey,
@@ -389,8 +399,7 @@ class _RatingAndReviewSheetState extends State<_RatingAndReviewSheet> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
-                    width: 44,
-                    height: 4,
+                    width: 44, height: 4,
                     decoration: BoxDecoration(
                       color: colors.outlineVariant,
                       borderRadius: BorderRadius.circular(20),
@@ -398,72 +407,74 @@ class _RatingAndReviewSheetState extends State<_RatingAndReviewSheet> {
                   ),
                   const SizedBox(height: 18),
                   Text(
-                    widget.isServiceReview
-                        ? 'Review Service'
-                        : 'Rate Technician',
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
+                    'Rate your experience',
+                    style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
                   ),
-                  const SizedBox(height: 14),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(5, (index) {
-                      final value = index + 1;
-                      return IconButton(
-                        tooltip: '$value ${TKeys.starRating.tr}',
-                        onPressed: () => setState(() => _rating = value),
-                        icon: Icon(
-                          value <= _rating
-                              ? Icons.star_rounded
-                              : Icons.star_border_rounded,
-                          color: Colors.amber.shade700,
-                          size: 34,
-                        ),
-                      );
-                    }),
-                  ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    controller: _commentController,
-                    minLines: 3,
-                    maxLines: 5,
-                    validator: (value) {
-                      if (widget.isServiceReview &&
-                          (value == null || value.trim().isEmpty)) {
-                        return 'Please write a service review';
-                      }
-                      return null;
-                    },
-                    decoration: InputDecoration(
-                      labelText: widget.isServiceReview
-                          ? 'Service review'
-                          : 'Comment (optional)',
-                      hintText: widget.isServiceReview
-                          ? 'Tell us about the service'
-                          : 'Add a comment about the technician',
-                      alignLabelWithHint: true,
-                      border: const OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 18),
-                  Obx(() {
-                    final submitting = widget.isServiceReview
-                        ? widget.controller.isSubmittingServiceReview.value
-                        : widget.controller.isSubmittingProviderRating.value;
+                  const SizedBox(height: 20),
 
+                  // ── Service review ─────────────────────────────────────
+                  if (widget.needsServiceReview) ...[
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(TKeys.reviewService.tr,
+                          style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
+                    ),
+                    const SizedBox(height: 8),
+                    _starRow(_serviceRating, (v) => setState(() => _serviceRating = v)),
+                    const SizedBox(height: 10),
+                    TextFormField(
+                      controller: _serviceReviewController,
+                      minLines: 2, maxLines: 4,
+                      validator: (v) => (v == null || v.trim().isEmpty)
+                          ? 'Please write a service review'
+                          : null,
+                      decoration: InputDecoration(
+                        labelText: TKeys.reviewService.tr,
+                        hintText: 'Tell us about the service',
+                        alignLabelWithHint: true,
+                        border: const OutlineInputBorder(),
+                      ),
+                    ),
+                  ],
+
+                  // ── Technician rating ──────────────────────────────────
+                  if (widget.needsTechRating) ...[
+                    SizedBox(height: widget.needsServiceReview ? 20 : 0),
+                    if (widget.needsServiceReview)
+                      const Divider(height: 1),
+                    const SizedBox(height: 16),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(TKeys.rateTechnician.tr,
+                          style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
+                    ),
+                    const SizedBox(height: 8),
+                    _starRow(_techRating, (v) => setState(() => _techRating = v)),
+                    const SizedBox(height: 10),
+                    TextFormField(
+                      controller: _techCommentController,
+                      minLines: 2, maxLines: 4,
+                      decoration: InputDecoration(
+                        labelText: '${TKeys.rateTechnician.tr} (optional)',
+                        hintText: 'Add a comment about the technician',
+                        alignLabelWithHint: true,
+                        border: const OutlineInputBorder(),
+                      ),
+                    ),
+                  ],
+
+                  const SizedBox(height: 20),
+                  Obx(() {
+                    final submitting =
+                        widget.controller.isSubmittingServiceReview.value ||
+                        widget.controller.isSubmittingProviderRating.value;
                     return SizedBox(
                       width: double.infinity,
                       child: FilledButton(
                         onPressed: submitting ? null : _submit,
                         child: submitting
-                            ? const SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              )
+                            ? const SizedBox(width: 20, height: 20,
+                                child: CircularProgressIndicator(strokeWidth: 2))
                             : Text(TKeys.submit.tr),
                       ),
                     );
@@ -666,6 +677,10 @@ class _BookingPaymentSheetState extends State<_BookingPaymentSheet> {
     final colors = theme.colorScheme;
     final controller = widget.controller;
     final bookingFee = controller.booking.value?.bookingFee ?? 500;
+    final selectedBid = controller.booking.value?.bids.cast<BookingBidModel?>()
+        .firstWhere((b) => b?.status.toLowerCase() == 'selected', orElse: () => null);
+    final bidPrice = selectedBid?.price ?? 0;
+    final total = bookingFee + bidPrice;
 
     return SafeArea(
       top: false,
@@ -704,7 +719,7 @@ class _BookingPaymentSheetState extends State<_BookingPaymentSheet> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'A technician has been selected. Pay the booking fee so they can start the job.',
+                    'A technician has been selected. Pay the platform fee + bid amount to confirm.',
                     textAlign: TextAlign.center,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: colors.onSurfaceVariant,
@@ -723,25 +738,61 @@ class _BookingPaymentSheetState extends State<_BookingPaymentSheet> {
                       color: colors.surfaceContainerLowest,
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: colors.outlineVariant.withOpacity(0.35),
+                        color: colors.borderColor,
                       ),
                     ),
-                    child: Row(
+                    child: Column(
                       children: [
-                        Expanded(
-                          child: Text(
-                            TKeys.bookingFee.tr,
-                            style: theme.textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                TKeys.platformFee.tr,
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: colors.onSurfaceVariant,
+                                ),
+                              ),
                             ),
-                          ),
+                            Text('৳$bookingFee',
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                    fontWeight: FontWeight.w600)),
+                          ],
                         ),
-                        Text(
-                          '$bookingFee BDT',
-                          style: theme.textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: colors.primary,
-                          ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                TKeys.jobBudget.tr,
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: colors.onSurfaceVariant,
+                                ),
+                              ),
+                            ),
+                            Text('৳$bidPrice',
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                    fontWeight: FontWeight.w600)),
+                          ],
+                        ),
+                        const Divider(height: 20),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                TKeys.totalAmount.tr,
+                                style: theme.textTheme.titleSmall?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            Text(
+                              '৳$total',
+                              style: theme.textTheme.titleLarge?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: colors.primary,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -793,7 +844,7 @@ class _BookingPaymentSheetState extends State<_BookingPaymentSheet> {
                               border: Border.all(
                                 color: isSelected
                                     ? colors.primary
-                                    : colors.outlineVariant.withOpacity(0.5),
+                                    : colors.borderColor,
                               ),
                             ),
                             child: Text(
@@ -841,7 +892,7 @@ class _BookingPaymentSheetState extends State<_BookingPaymentSheet> {
                                   strokeWidth: 2,
                                 ),
                               )
-                            : Text(TKeys.confirmPay500.tr),
+                            : Text('${TKeys.payNow.tr} ৳$total'),
                       ),
                     );
                   }),
@@ -1311,7 +1362,7 @@ class _BidCard extends StatelessWidget {
             border: Border.all(
               color: isMine
                   ? Colors.green.shade300
-                  : colors.outlineVariant.withOpacity(0.45),
+                  : colors.borderColor,
             ),
           ),
           child: Column(

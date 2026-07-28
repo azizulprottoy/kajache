@@ -31,8 +31,18 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: colorScheme.surface,
       elevation: 0,
       automaticallyImplyLeading: false,
-      leading: showBack
-          ? BackButton(color: colorScheme.onSurface)
+      titleSpacing: (showBack || Navigator.canPop(context)) ? 0 : NavigationToolbar.kMiddleSpacing,
+      leadingWidth: showBack ? 32 : null,
+      leading: (showBack || Navigator.canPop(context))
+          ? Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 1),
+              child: BackButton(
+                color: colorScheme.onSurface,
+                style: ButtonStyle(
+                  iconSize: WidgetStateProperty.all(18),
+                ),
+              ),
+            )
           : null,
 
       title: title != null

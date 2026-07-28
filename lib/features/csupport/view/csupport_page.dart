@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../app/theme/context_extension.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../core/controller/local_controller.dart';
@@ -156,7 +158,7 @@ class _FaqTile extends StatelessWidget {
         color: colorScheme.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: colorScheme.outlineVariant.withValues(alpha: 0.4),
+          color: colorScheme.borderColor,
         ),
       ),
       child: ExpansionTile(
@@ -211,7 +213,7 @@ class _FaqShimmer extends StatelessWidget {
             color: colorScheme.surfaceContainerLowest,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: colorScheme.outlineVariant.withValues(alpha: 0.4),
+              color: colorScheme.borderColor,
             ),
           ),
         ),

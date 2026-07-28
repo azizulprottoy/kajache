@@ -27,7 +27,7 @@ class CommonBottomNavBar extends StatelessWidget {
               color: context.colors.surface,
               border: Border(
                 top: BorderSide(
-                  color: context.colors.outlineVariant.withOpacity(0.2),
+                  color: context.colors.borderColor,
                 ),
               ),
             ),
@@ -70,8 +70,8 @@ class CommonBottomNavBar extends StatelessWidget {
                       ? context.colors.primary
                       : context.colors.surface,
                   border: Border.all(
-                    color: context.colors.surface,
-                    width: 1,
+                    color: context.colors.borderColor,
+                    width: 1.5,
                   ),
                   boxShadow: [
                     BoxShadow(

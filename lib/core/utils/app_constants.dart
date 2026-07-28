@@ -1,8 +1,12 @@
+import 'dart:io';
+
 class AppConstants {
   AppConstants._();
 
   // ── API ─────────────────────────────────────────────────────────────────────
-  static const String baseUrl = 'http://10.0.2.2:3000/api/v1';
+  static String get baseUrl => Platform.isAndroid
+      ? 'http://10.0.2.2:3000/api/v1'
+      : 'http://localhost:3000/api/v1';
   // static const String baseUrl = 'https://kpi.kajache.com/api/v1';
 
   // ── Web pages ───────────────────────────────────────────────────────────────

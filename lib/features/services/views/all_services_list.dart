@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../app/theme/context_extension.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../app/routes/app_routes.dart';
@@ -74,7 +76,7 @@ class AllServices extends GetView<AllServicesController> {
                     color: colorScheme.surface,
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
-                      color: colorScheme.outlineVariant.withOpacity(0.1),
+                      color: colorScheme.borderColor,
                     ),
                   ),
                   padding: const EdgeInsets.all(12),

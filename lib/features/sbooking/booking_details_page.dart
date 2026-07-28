@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../app/theme/context_extension.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../core/utils/media_url_helper.dart';
@@ -344,7 +346,7 @@ class _BidCard extends StatelessWidget {
         border: Border.all(
           color: isMine
               ? Colors.green.shade300
-              : colors.outlineVariant.withOpacity(.45),
+              : colors.borderColor,
         ),
       ),
       child: Column(

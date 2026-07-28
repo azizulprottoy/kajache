@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../app/theme/context_extension.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kaj_ache/features/service_details/arguments/service_details_arguments.dart';
 
@@ -61,7 +63,7 @@ class PopularServicesList extends StatelessWidget {
               color: colorScheme.surface,
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
-                color: colorScheme.outlineVariant.withOpacity(0.1),
+                color: colorScheme.borderColor,
               ),
             ),
             padding: const EdgeInsets.all(12),

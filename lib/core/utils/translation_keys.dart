@@ -118,6 +118,9 @@ class TKeys {
   static const payment        = 'payment';
   static const paymentMethod  = 'payment_method';
   static const totalAmount    = 'total_amount';
+  static const platformFee    = 'platform_fee';
+  static const jobBudget      = 'job_budget';
+  static const payNow         = 'pay_now';
   static const transactions   = 'transactions';
   static const cash           = 'cash';
   static const bkash          = 'bkash';

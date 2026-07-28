@@ -1,6 +1,9 @@
+import 'package:flutter/material.dart';
+import '../../../app/theme/context_extension.dart';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import '../../../app/theme/context_extension.dart';
 import 'package:get/get.dart';
 
 import '../../../core/controller/local_controller.dart';
@@ -302,7 +305,7 @@ class _ChecklistItem extends StatelessWidget {
                     border: Border.all(
                       color: isUnlocked
                           ? colorScheme.primary.withValues(alpha: 0.3)
-                          : colorScheme.outlineVariant.withValues(alpha: 0.4),
+                          : colorScheme.borderColor,
                     ),
                   ),
                   child: Row(
@@ -549,7 +552,7 @@ class _EarnActionTile extends StatelessWidget {
         color: colorScheme.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: colorScheme.outlineVariant.withValues(alpha: 0.35),
+          color: colorScheme.borderColor,
         ),
       ),
       child: Row(

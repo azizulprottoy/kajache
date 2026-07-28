@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../app/theme/context_extension.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../core/utils/translation_keys.dart';
@@ -100,7 +102,7 @@ class _AcceptedBookingCard extends StatelessWidget {
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: colorScheme.outlineVariant.withValues(alpha: 0.55),
+          color: colorScheme.borderColor,
         ),
         boxShadow: [
           BoxShadow(

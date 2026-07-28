@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../app/theme/context_extension.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../app/routes/app_routes.dart';
 import '../../../core/utils/translation_keys.dart';
@@ -362,7 +364,7 @@ class ServiceDetailsPage extends GetView<ServiceDetailsController> {
                 //           color: colorScheme.surface,
                 //           borderRadius: BorderRadius.circular(18),
                 //           border: Border.all(
-                //             color: colorScheme.outlineVariant.withOpacity(0.25),
+                //             color: colorScheme.borderColor,
                 //           ),
                 //         ),
                 //         child: Column(
@@ -504,7 +506,7 @@ class _PosterDetailsCard extends StatelessWidget {
         color: colorScheme.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: colorScheme.outlineVariant.withOpacity(0.45),
+          color: colorScheme.borderColor,
         ),
       ),
       child: Column(
@@ -988,7 +990,7 @@ class _RatingSection extends StatelessWidget {
                 color: colorScheme.surface,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: colorScheme.outlineVariant.withOpacity(0.5),
+                  color: colorScheme.borderColor,
                 ),
               ),
               child: summary.total == 0
@@ -1193,7 +1195,7 @@ class _ReviewCard extends StatelessWidget {
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: colorScheme.outlineVariant.withOpacity(0.5),
+          color: colorScheme.borderColor,
         ),
       ),
       child: Column(
@@ -1414,7 +1416,7 @@ class _CommentCard extends StatelessWidget {
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: colorScheme.outlineVariant.withOpacity(0.5),
+          color: colorScheme.borderColor,
         ),
       ),
       child: Column(
