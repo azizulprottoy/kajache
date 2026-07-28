@@ -21,6 +21,8 @@ class ApiEndpoints {
 
   // Banner
   static const String banner = '/banner';
+  static const String advertisements = '/advertisement';
+  static String adClick(String id) => '/advertisement/$id/click';
 
   // Category
   static const String categories = '/category';

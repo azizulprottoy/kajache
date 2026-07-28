@@ -647,10 +647,12 @@ class _BookingPaymentSheet extends StatefulWidget {
 class _BookingPaymentSheetState extends State<_BookingPaymentSheet> {
   final _formKey = GlobalKey<FormState>();
   final _transactionIdController = TextEditingController();
+  final _couponController = TextEditingController();
 
   @override
   void dispose() {
     _transactionIdController.dispose();
+    _couponController.dispose();
     super.dispose();
   }
 
@@ -774,29 +776,152 @@ class _BookingPaymentSheetState extends State<_BookingPaymentSheet> {
                                     fontWeight: FontWeight.w600)),
                           ],
                         ),
+                        // Discount row (shown when coupon applied)
+                        Obx(() {
+                          final discount = controller.discountAmount;
+                          if (discount <= 0) return const SizedBox.shrink();
+                          return Column(
+                            children: [
+                              const SizedBox(height: 8),
+                              Row(children: [
+                                Expanded(child: Text(TKeys.discount.tr,
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                        color: Colors.green.shade600))),
+                                Text('-৳$discount',
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.green.shade600)),
+                              ]),
+                            ],
+                          );
+                        }),
                         const Divider(height: 20),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                TKeys.totalAmount.tr,
-                                style: theme.textTheme.titleSmall?.copyWith(
-                                  fontWeight: FontWeight.bold,
+                        Obx(() {
+                          final finalAmt = controller.finalPaymentAmount;
+                          return Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  TKeys.totalAmount.tr,
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
-                            ),
-                            Text(
-                              '৳$total',
-                              style: theme.textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: colors.primary,
+                              Text(
+                                '৳$finalAmt',
+                                style: theme.textTheme.titleLarge?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: colors.primary,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
+                            ],
+                          );
+                        }),
                       ],
                     ),
                   ),
+
+                  const SizedBox(height: 16),
+
+                  // ── Coupon section ─────────────────────────────────────────
+                  Obx(() {
+                    final appliedCoupon = controller.appliedCoupon.value;
+                    if (appliedCoupon != null) {
+                      // Show applied coupon chip with remove
+                      return Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: Colors.green.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.green.shade300),
+                        ),
+                        child: Row(children: [
+                          Icon(Icons.local_offer_outlined,
+                              size: 18, color: Colors.green.shade700),
+                          const SizedBox(width: 8),
+                          Expanded(child: Text(
+                            '${appliedCoupon.code}  —  ${TKeys.couponApplied.tr}',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: Colors.green.shade700,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          )),
+                          TextButton(
+                            onPressed: () {
+                              controller.removeCoupon();
+                              _couponController.clear();
+                            },
+                            style: TextButton.styleFrom(
+                                foregroundColor: Colors.red.shade400,
+                                padding: EdgeInsets.zero,
+                                minimumSize: const Size(40, 30)),
+                            child: Text(TKeys.removeCoupon.tr),
+                          ),
+                        ]),
+                      );
+                    }
+
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Available coupons chips
+                        if (controller.coupons.isNotEmpty) ...[
+                          Text(TKeys.availableCoupons.tr,
+                              style: theme.textTheme.labelLarge?.copyWith(
+                                  fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 8),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 6,
+                            children: controller.coupons.map((c) {
+                              return ActionChip(
+                                label: Text(c.code),
+                                avatar: const Icon(Icons.local_offer_outlined,
+                                    size: 16),
+                                onPressed: () {
+                                  _couponController.text = c.code;
+                                  controller.applyCoupon(c.code);
+                                },
+                              );
+                            }).toList(),
+                          ),
+                          const SizedBox(height: 12),
+                        ],
+
+                        // Manual coupon input
+                        Row(children: [
+                          Expanded(
+                            child: TextFormField(
+                              controller: _couponController,
+                              textCapitalization: TextCapitalization.characters,
+                              decoration: InputDecoration(
+                                labelText: TKeys.couponCode.tr,
+                                prefixIcon: const Icon(Icons.discount_outlined),
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12)),
+                                errorText: controller.couponError.value.isEmpty
+                                    ? null
+                                    : controller.couponError.value,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          FilledButton(
+                            onPressed: () =>
+                                controller.applyCoupon(_couponController.text),
+                            style: FilledButton.styleFrom(
+                              minimumSize: const Size(70, 52),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12)),
+                            ),
+                            child: Text(TKeys.applyCoupon.tr),
+                          ),
+                        ]),
+                      ],
+                    );
+                  }),
 
                   const SizedBox(height: 16),
 
@@ -892,7 +1017,8 @@ class _BookingPaymentSheetState extends State<_BookingPaymentSheet> {
                                   strokeWidth: 2,
                                 ),
                               )
-                            : Text('${TKeys.payNow.tr} ৳$total'),
+                            : Obx(() => Text(
+                                '${TKeys.payNow.tr} ৳${controller.finalPaymentAmount}')),
                       ),
                     );
                   }),

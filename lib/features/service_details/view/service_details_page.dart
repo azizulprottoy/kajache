@@ -14,6 +14,7 @@ import '../../home/models/available_booking_response_model.dart';
 import 'package:intl/intl.dart';
 import '../../reviews/models/review_model.dart';
 import '../../../shared/shimmers/service_details_shimmer.dart';
+import '../../advertisements/widget/ad_banner.dart';
 import '../controller/service_details_controller.dart';
 import '../model/comment_model.dart';
 
@@ -107,6 +108,8 @@ class ServiceDetailsPage extends GetView<ServiceDetailsController> {
               ),
 
               const SizedBox(height: 20),
+
+              AdBanner(position: 'service_top', height: 100, padding: EdgeInsets.only(bottom: 16)),
 
               Text(
                 service.localizedTitle,
@@ -208,6 +211,8 @@ class ServiceDetailsPage extends GetView<ServiceDetailsController> {
               ],
 
               const SizedBox(height: 16),
+
+              AdBanner(position: 'service_middle', height: 100, padding: EdgeInsets.symmetric(vertical: 12)),
 
               service.localizedDescription.isNotEmpty
                   ? Html(

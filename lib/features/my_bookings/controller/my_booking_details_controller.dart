@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 
 import '../../home/models/available_booking_response_model.dart';
 import '../../../core/utils/translation_keys.dart';
+import '../../payments/models/coupon_model.dart';
 import '../../payments/models/payment_method_model.dart';
 import '../../payments/repository/payment_repository.dart';
 import '../repository/my_booking_repository.dart';
@@ -24,6 +25,49 @@ class MyBookingDetailsController extends GetxController {
   final selectedPaymentMethod = Rxn<PaymentMethodModel>();
   final paymentMethodsList = <PaymentMethodModel>[].obs;
   final isLoadingPaymentMethods = false.obs;
+
+  // ── Coupon ──────────────────────────────────────────────────────────────────
+  final coupons = <CouponModel>[].obs;
+  final appliedCoupon = Rxn<CouponModel>();
+  final couponError = ''.obs;
+  final isLoadingCoupons = false.obs;
+
+  int get discountAmount {
+    final coupon = appliedCoupon.value;
+    if (coupon == null) return 0;
+    final base = _basePaymentAmount;
+    return coupon.discountFor(base).clamp(0, base);
+  }
+
+  int get _basePaymentAmount {
+    final b = booking.value;
+    if (b == null) return 500;
+    final selectedBid = b.bids.cast<BookingBidModel?>()
+        .firstWhere((bid) => bid?.status.toLowerCase() == 'selected', orElse: () => null);
+    return (b.bookingFee ?? 500) + (selectedBid?.price ?? 0);
+  }
+
+  int get finalPaymentAmount => _basePaymentAmount - discountAmount;
+
+  void applyCoupon(String code) {
+    final trimmed = code.trim().toUpperCase();
+    final match = coupons.cast<CouponModel?>().firstWhere(
+      (c) => c?.code.toUpperCase() == trimmed,
+      orElse: () => null,
+    );
+    if (match == null || !match.isValid) {
+      couponError.value = TKeys.invalidCoupon.tr;
+      appliedCoupon.value = null;
+    } else {
+      appliedCoupon.value = match;
+      couponError.value = '';
+    }
+  }
+
+  void removeCoupon() {
+    appliedCoupon.value = null;
+    couponError.value = '';
+  }
 
   String bookingId = '';
 
@@ -66,6 +110,18 @@ class MyBookingDetailsController extends GetxController {
 
     fetchBooking();
     _fetchPaymentMethods();
+    _fetchCoupons();
+  }
+
+  Future<void> _fetchCoupons() async {
+    isLoadingCoupons.value = true;
+    try {
+      final list = await _paymentRepository.getCoupons();
+      coupons.assignAll(list);
+    } catch (_) {
+    } finally {
+      if (!isClosed) isLoadingCoupons.value = false;
+    }
   }
 
   Future<void> _fetchPaymentMethods() async {

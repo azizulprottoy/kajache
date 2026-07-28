@@ -1,5 +1,5 @@
 tasks remaining ,
-1. add coupons
+1. add coupons                           -done
 2. add shimmers in all pages,             -done
 3. fix dark theme colors,                 -done
 4. advertisement

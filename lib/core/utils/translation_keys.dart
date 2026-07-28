@@ -120,7 +120,14 @@ class TKeys {
   static const totalAmount    = 'total_amount';
   static const platformFee    = 'platform_fee';
   static const jobBudget      = 'job_budget';
-  static const payNow         = 'pay_now';
+  static const payNow           = 'pay_now';
+  static const couponCode       = 'coupon_code';
+  static const applyCoupon      = 'apply_coupon';
+  static const invalidCoupon    = 'invalid_coupon';
+  static const couponApplied    = 'coupon_applied';
+  static const discount         = 'discount';
+  static const removeCoupon     = 'remove_coupon';
+  static const availableCoupons = 'available_coupons';
   static const transactions   = 'transactions';
   static const cash           = 'cash';
   static const bkash          = 'bkash';

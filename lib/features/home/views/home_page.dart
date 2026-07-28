@@ -5,6 +5,7 @@ import 'package:kaj_ache/features/home/views/widgets/category_grid.dart';
 
 import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/common_app_bar.dart';
+import '../../advertisements/widget/ad_banner.dart';
 import '../../services/views/popular_services_list.dart';
 import '../controllers/home_controller.dart';
 
@@ -32,6 +33,8 @@ class HomePage extends GetView<HomeController> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 12),
+
+                  AdBanner(position: 'home_top'),
 
                   // TextField(
                   //   readOnly: true,
@@ -88,6 +91,8 @@ class HomePage extends GetView<HomeController> {
                     onCategoryTap: controller.onCategoryTap,
                   ),
 
+                  AdBanner(position: 'home_middle'),
+
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -112,6 +117,8 @@ class HomePage extends GetView<HomeController> {
                     services: controller.popularServices,
                     isLoading: controller.isLoading.value,
                   ),
+
+                  AdBanner(position: 'home_bottom'),
 
                   const SizedBox(height: 24),
                 ],

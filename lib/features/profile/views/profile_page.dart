@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/common_app_bar.dart';
 import '../../../shared/shimmers/profile_shimmer.dart';
+import '../../advertisements/widget/ad_banner.dart';
 import '../controllers/profile_controller.dart';
 import 'edit_profile_page.dart';
 
@@ -99,6 +100,8 @@ class MyProfilePage extends GetView<ProfileController> {
                     ],
                   ),
                 ),
+                AdBanner(position: 'profile_middle', height: 100, padding: EdgeInsets.symmetric(vertical: 12)),
+
                 const SizedBox(height: 16),
                 _ProfileSection(
                   title: TKeys.basicInformation.tr,
