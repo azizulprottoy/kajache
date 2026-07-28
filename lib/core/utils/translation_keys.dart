@@ -218,6 +218,9 @@ class TKeys {
   static const pickTime                 = 'pick_time';
   static const timeSlot                 = 'time_slot';
   static const minBudgetError           = 'min_budget_error';
+  static const transactionId            = 'transaction_id';
+  static const transactionIdHint        = 'transaction_id_hint';
+  static const transactionIdRequired    = 'transaction_id_required';
   static const maxBudgetLabel           = 'max_budget_label';
   static const budgetHint               = 'budget_hint';
   static const maxBudgetInfo            = 'max_budget_info';

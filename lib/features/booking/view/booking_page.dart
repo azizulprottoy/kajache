@@ -78,8 +78,6 @@ SizedBox(height: 100,),
         return _Step1Body(theme: theme, colorScheme: colorScheme);
       case 2:
         return _Step2Body(context: context, theme: theme, colorScheme: colorScheme);
-      case 3:
-        return _Step3Body(theme: theme, colorScheme: colorScheme);
       default:
         return const SizedBox();
     }
@@ -98,7 +96,7 @@ class _StepperHeader extends StatelessWidget {
     required this.theme,
   });
 
-  static final _steps = [TKeys.serviceScope.tr, TKeys.logistics.tr, TKeys.payConfirm.tr];
+  static final _steps = [TKeys.serviceScope.tr, TKeys.logistics.tr];
 
   @override
   Widget build(BuildContext context) {
@@ -528,268 +526,6 @@ class _Step2Body extends GetView<BookingController> {
     );
   }
 }
-class _Step3Body extends GetView<BookingController> {
-  final ThemeData theme;
-  final ColorScheme colorScheme;
-
-  const _Step3Body({required this.theme, required this.colorScheme});
-
-  @override
-  Widget build(BuildContext context) {
-    return Obx(() => Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: 20),
-        Text(TKeys.reviewPay.tr,
-            style: theme.textTheme.headlineSmall
-                ?.copyWith(fontWeight: FontWeight.bold)),
-        const SizedBox(height: 4),
-        Text(TKeys.bookingFeeInfo.tr,
-            style: theme.textTheme.bodySmall
-                ?.copyWith(color: colorScheme.onSurfaceVariant)),
-        const SizedBox(height: 20),
-
-        // Summary card
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: colorScheme.surfaceContainerLowest,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: colorScheme.outlineVariant.withOpacity(0.3),
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(TKeys.service.tr,
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: colorScheme.onSurfaceVariant,
-                              letterSpacing: 1,
-                            )),
-                        const SizedBox(height: 4),
-                        Text(controller.serviceTitle.value,
-                            style: theme.textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            )),
-                        if (controller.selectedSubServices.isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 4),
-                            child: Text(
-                              controller.selectedSubServices.join(' · '),
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(TKeys.maxBudgetShort.tr,
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: colorScheme.onSurfaceVariant,
-                            letterSpacing: 1,
-                          )),
-                      const SizedBox(height: 4),
-                      Text(
-                        '${controller.budgetController.text} BDT',
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: colorScheme.onSurface,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              const Divider(height: 24),
-              Wrap(
-                spacing: 16,
-                runSpacing: 8,
-                children: [
-                  _SummaryChip(
-                    icon: Icons.location_on_outlined,
-                    label: '${controller.addressController.text}, ${controller.selectedCity.value}',
-                    colorScheme: colorScheme,
-                    theme: theme,
-                  ),
-                  _SummaryChip(
-                    icon: Icons.calendar_today_outlined,
-                    label: controller.dateController.text,
-                    colorScheme: colorScheme,
-                    theme: theme,
-                  ),
-                  _SummaryChip(
-                    icon: Icons.access_time_outlined,
-                    label: controller.selectedTime.string,
-                    colorScheme: colorScheme,
-                    theme: theme,
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-
-        const SizedBox(height: 16),
-
-        // Booking fee row
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          decoration: BoxDecoration(
-            color: colorScheme.surface,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: colorScheme.outlineVariant.withOpacity(0.35),
-            ),
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(TKeys.bookingFee.tr,
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        )),
-                    const SizedBox(height: 2),
-                    Text(TKeys.refundableInfo.tr,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        )),
-                  ],
-                ),
-              ),
-              Text('500 BDT',
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: colorScheme.primary,
-                  )),
-            ],
-          ),
-        ),
-
-        const SizedBox(height: 16),
-
-        // Payment method
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: colorScheme.primary.withOpacity(0.05),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: colorScheme.primary.withOpacity(0.15),
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(Icons.credit_card_outlined,
-                      color: colorScheme.primary, size: 20),
-                  const SizedBox(width: 8),
-                  Text(TKeys.paymentMethod.tr,
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      )),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: controller.paymentMethods.map((m) {
-                  final isSelected =
-                      controller.selectedPaymentMethod.value == m;
-                  return Expanded(
-                    child: Padding(
-                      padding: EdgeInsets.only(
-                          right: m != controller.paymentMethods.last ? 10 : 0),
-                      child: GestureDetector(
-                        onTap: () =>
-                        controller.selectedPaymentMethod.value = m,
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? colorScheme.primary
-                                : colorScheme.surface,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: isSelected
-                                  ? colorScheme.primary
-                                  : colorScheme.outlineVariant.withOpacity(0.5),
-                            ),
-                          ),
-                          child: Center(
-                            child: Text(
-                              m.toUpperCase(),
-                              style: theme.textTheme.labelMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: isSelected
-                                    ? colorScheme.onPrimary
-                                    : colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
-            ],
-          ),
-        ),
-      ],
-    ));
-  }
-}
-
-class _SummaryChip extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final ColorScheme colorScheme;
-  final ThemeData theme;
-
-  const _SummaryChip({
-    required this.icon,
-    required this.label,
-    required this.colorScheme,
-    required this.theme,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, size: 14, color: colorScheme.primary),
-        const SizedBox(width: 4),
-        Text(label,
-            style: theme.textTheme.bodySmall?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: colorScheme.onSurfaceVariant,
-            )),
-      ],
-    );
-  }
-}
-
 class _BottomNavBar extends StatelessWidget {
   final int currentStep;
   final bool isLoading;
@@ -836,7 +572,7 @@ class _BottomNavBar extends StatelessWidget {
               child: FilledButton.icon(
                 onPressed: isLoading
                     ? null
-                    : currentStep == 3
+                    : currentStep == BookingController.lastStep
                     ? onConfirm
                     : onNext,
                 icon: isLoading
@@ -848,15 +584,15 @@ class _BottomNavBar extends StatelessWidget {
                     color: colorScheme.onPrimary,
                   ),
                 )
-                    : currentStep == 3
+                    : currentStep == BookingController.lastStep
                     ? const Icon(Icons.check, size: 18)
                     : const Icon(Icons.arrow_forward, size: 18),
                 label: Text(
                   isLoading
-                      ? 'Processing...'
-                      : currentStep == 3
-                      ? 'Confirm & Pay 500 BDT'
-                      : 'Next',
+                      ? TKeys.loading.tr
+                      : currentStep == BookingController.lastStep
+                      ? TKeys.bookingConfirm.tr
+                      : TKeys.next.tr,
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 style: FilledButton.styleFrom(

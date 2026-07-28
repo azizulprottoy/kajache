@@ -1,15 +1,17 @@
 tasks remaining ,
 1. add coupons
-2. add shimmers in all pages, -done
+2. add shimmers in all pages,             -done
 3. fix dark theme colors,
 4. advertisement
 5. payment gateway,
-6. complain
-7. chat with technitian
+6. complain                               -done
+7. chat with technician
 8. in app call
 9. reting review in one bottom sheet,
 10.location tracing with map
-11. payment gateway integration
+11.payment gateway integration
+12. show portfolio items in the details page
+
 
 
 

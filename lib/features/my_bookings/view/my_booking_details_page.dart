@@ -39,6 +39,11 @@ class MyBookingDetailsPage extends GetView<MyBookingDetailsController> {
 
               _BookingCard(booking: booking),
 
+              if (controller.isPaymentDue) ...[
+                const SizedBox(height: 14),
+                _PaymentDueBanner(controller: controller),
+              ],
+
               if (booking.status.trim().toLowerCase() == 'in_progress') ...[
                 const SizedBox(height: 14),
                 Obx(
@@ -169,6 +174,67 @@ class MyBookingDetailsPage extends GetView<MyBookingDetailsController> {
     );
 
     return result ?? false;
+  }
+}
+
+class _PaymentDueBanner extends StatelessWidget {
+  final MyBookingDetailsController controller;
+
+  const _PaymentDueBanner({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: colors.primary.withOpacity(0.06),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: colors.primary.withOpacity(0.25)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.payments_outlined, color: colors.primary, size: 20),
+              const SizedBox(width: 8),
+              Text(
+                'Payment required',
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'You selected a technician for this booking. Pay the booking fee to let them start.',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: colors.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton.icon(
+              onPressed: () => Get.bottomSheet(
+                _BookingPaymentSheet(controller: controller),
+                isScrollControlled: true,
+                isDismissible: false,
+                enableDrag: false,
+                backgroundColor: Colors.transparent,
+              ),
+              icon: const Icon(Icons.payment_outlined),
+              label: const Text('Pay Now'),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -558,6 +624,237 @@ class _ComplaintSheetState extends State<_ComplaintSheet> {
   }
 }
 
+class _BookingPaymentSheet extends StatefulWidget {
+  final MyBookingDetailsController controller;
+
+  const _BookingPaymentSheet({required this.controller});
+
+  @override
+  State<_BookingPaymentSheet> createState() => _BookingPaymentSheetState();
+}
+
+class _BookingPaymentSheetState extends State<_BookingPaymentSheet> {
+  final _formKey = GlobalKey<FormState>();
+  final _transactionIdController = TextEditingController();
+
+  @override
+  void dispose() {
+    _transactionIdController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    final success = await widget.controller.confirmBookingPayment(
+      transactionId: _transactionIdController.text,
+    );
+
+    if (!success || !mounted) return;
+
+    Navigator.of(context).pop();
+    Get.snackbar(
+      TKeys.success.tr,
+      'Payment confirmed. The technician can now start the job.',
+      snackPosition: SnackPosition.BOTTOM,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final controller = widget.controller;
+    final bookingFee = controller.booking.value?.bookingFee ?? 500;
+
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+          decoration: BoxDecoration(
+            color: colors.surface,
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(26),
+            ),
+          ),
+          child: Form(
+            key: _formKey,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 44,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: colors.outlineVariant,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  Text(
+                    TKeys.payConfirm.tr,
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'A technician has been selected. Pay the booking fee so they can start the job.',
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: colors.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Booking fee row
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
+                    decoration: BoxDecoration(
+                      color: colors.surfaceContainerLowest,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: colors.outlineVariant.withOpacity(0.35),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            TKeys.bookingFee.tr,
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          '$bookingFee BDT',
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: colors.primary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      TKeys.paymentMethod.tr,
+                      style: theme.textTheme.labelLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Obx(() {
+                    if (controller.isLoadingPaymentMethods.value) {
+                      return const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 12),
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      );
+                    }
+                    if (controller.paymentMethodsList.isEmpty) {
+                      return Text(TKeys.noData.tr);
+                    }
+                    return Wrap(
+                      spacing: 10,
+                      runSpacing: 10,
+                      children: controller.paymentMethodsList.map((m) {
+                        final isSelected =
+                            controller.selectedPaymentMethod.value?.id ==
+                                m.id;
+                        return GestureDetector(
+                          onTap: () =>
+                              controller.selectedPaymentMethod.value = m,
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? colors.primary
+                                  : colors.surface,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: isSelected
+                                    ? colors.primary
+                                    : colors.outlineVariant.withOpacity(0.5),
+                              ),
+                            ),
+                            child: Text(
+                              m.name.toUpperCase(),
+                              style: theme.textTheme.labelMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: isSelected
+                                    ? colors.onPrimary
+                                    : colors.onSurfaceVariant,
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    );
+                  }),
+
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _transactionIdController,
+                    decoration: InputDecoration(
+                      labelText: TKeys.transactionId.tr,
+                      hintText: TKeys.transactionIdHint.tr,
+                      prefixIcon: const Icon(Icons.receipt_long_outlined),
+                      border: const OutlineInputBorder(),
+                    ),
+                    validator: (v) => v == null || v.trim().isEmpty
+                        ? TKeys.transactionIdRequired.tr
+                        : null,
+                  ),
+
+                  const SizedBox(height: 18),
+                  Obx(() {
+                    final submitting = controller.isSubmittingPayment.value;
+
+                    return SizedBox(
+                      width: double.infinity,
+                      child: FilledButton(
+                        onPressed: submitting ? null : _submit,
+                        child: submitting
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : Text(TKeys.confirmPay500.tr),
+                      ),
+                    );
+                  }),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _BidderProfileSheet extends StatelessWidget {
   final BookingBidModel bid;
   final MyBookingDetailsController controller;
@@ -721,6 +1018,14 @@ class _BidderProfileSheet extends StatelessWidget {
                             TKeys.success.tr,
                             TKeys.technicianBooked.tr,
                             snackPosition: SnackPosition.BOTTOM,
+                          );
+
+                          Get.bottomSheet(
+                            _BookingPaymentSheet(controller: controller),
+                            isScrollControlled: true,
+                            isDismissible: false,
+                            enableDrag: false,
+                            backgroundColor: Colors.transparent,
                           );
                         },
                   icon: controller.isBookingTechnician.value

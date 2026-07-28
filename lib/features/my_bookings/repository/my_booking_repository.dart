@@ -78,6 +78,28 @@ class MyBookingRepository {
     );
   }
 
+  /// Pays the booking fee once a bid has been selected. Backend only
+  /// accepts this once the booking is in 'bid_selected' state.
+  Future<void> confirmPayment(
+    String bookingId, {
+    required String paymentMethod,
+    required String transactionId,
+  }) async {
+    final isConnected = await _networkInfo.isConnected;
+
+    if (!isConnected) {
+      throw Exception('No internet connection');
+    }
+
+    await _dio.post(
+      ApiEndpoints.payment(bookingId),
+      data: {
+        'paymentMethod': paymentMethod,
+        'transactionId': transactionId,
+      },
+    );
+  }
+
   Future<void> completeBooking(String bookingId) async {
     final isConnected = await _networkInfo.isConnected;
 

@@ -21,6 +21,9 @@ class BookingController extends GetxController {
   late final String serviceId;
 
   /// Step
+  /// Booking creation is now 2 steps — payment moved to after a bid is
+  /// selected (see MyBookingDetailsController.confirmBookingPayment).
+  static const int lastStep = 2;
   final currentStep = 1.obs;
   final isLoading = false.obs;
 
@@ -35,9 +38,6 @@ class BookingController extends GetxController {
 
   RxnString selectedCity = RxnString();
   RxnString selectedTime = RxnString();
-
-  /// Step 3
-  final selectedPaymentMethod = 'bkash'.obs;
 
   final cities = [
     'Dhaka',
@@ -57,11 +57,6 @@ class BookingController extends GetxController {
     '07:00 PM',
   ];
 
-  final paymentMethods = [
-    'bkash',
-    'nagad',
-    'card',
-  ];
 
   late final List<String> subServiceOptions;
 
@@ -88,7 +83,6 @@ class BookingController extends GetxController {
     }
 
     selectedCity.value = 'Dhaka';
-
     subServiceOptions = _defaultSubs;
   }
 
@@ -176,7 +170,7 @@ class BookingController extends GetxController {
       return;
     }
 
-    if (currentStep.value < 3) {
+    if (currentStep.value < lastStep) {
       currentStep.value++;
     }
   }
@@ -191,7 +185,8 @@ class BookingController extends GetxController {
     try {
       isLoading.value = true;
 
-      /// 1. CREATE BOOKING
+      /// 1. CREATE BOOKING (no payment yet — bidding opens right away;
+      /// payment happens after the client selects a winning bid)
       final request = BookingRequestModel(
         service: serviceId,
         details: problemDetailsController.text.trim(),
@@ -217,16 +212,7 @@ class BookingController extends GetxController {
         throw Exception('Failed to create booking');
       }
 
-      /// 2. GET BOOKING ID
-      final bookingId =
-      createRes['data']['_id'].toString();
-
-      /// 3. CONFIRM PAYMENT
-      await bookingRepository.confirmPayment(
-        bookingId,
-      );
-
-      /// 4. SHOW SUCCESS MODAL
+      /// 2. SHOW SUCCESS MODAL
       await Get.dialog(
         SuccessModal(
           title: TKeys.bookingSuccessful.tr,

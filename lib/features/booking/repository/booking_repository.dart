@@ -33,16 +33,4 @@ class BookingRepository {
 
     return Map<String, dynamic>.from(response.data);
   }
-
-  Future<Map<String, dynamic>> confirmPayment(String bookingId) async {
-    final isConnected = await _networkInfo.isConnected;
-
-    if (!isConnected) {
-      throw Exception('No internet connection');
-    }
-
-    final response = await _dio.post(ApiEndpoints.payment(bookingId));
-
-    return Map<String, dynamic>.from(response.data);
-  }
 }

@@ -3,10 +3,13 @@ import 'package:get/get.dart';
 
 import '../../home/models/available_booking_response_model.dart';
 import '../../../core/utils/translation_keys.dart';
+import '../../payments/models/payment_method_model.dart';
+import '../../payments/repository/payment_repository.dart';
 import '../repository/my_booking_repository.dart';
 
 class MyBookingDetailsController extends GetxController {
   final MyBookingRepository repository = MyBookingRepository();
+  final PaymentRepository _paymentRepository = PaymentRepository();
 
   final isLoading = false.obs;
   final isBookingTechnician = false.obs;
@@ -14,10 +17,19 @@ class MyBookingDetailsController extends GetxController {
   final isSubmittingServiceReview = false.obs;
   final isSubmittingProviderRating = false.obs;
   final isSubmittingComplaint = false.obs;
+  final isSubmittingPayment = false.obs;
   final booking = Rxn<AvailableBookingModel>();
   final selectedBidder = Rxn<BookingBidModel>();
 
+  final selectedPaymentMethod = Rxn<PaymentMethodModel>();
+  final paymentMethodsList = <PaymentMethodModel>[].obs;
+  final isLoadingPaymentMethods = false.obs;
+
   String bookingId = '';
+
+  bool get isPaymentDue =>
+      booking.value?.status.trim().toLowerCase() == 'bid_selected' &&
+      booking.value?.paymentStatus.trim().toLowerCase() != 'paid';
 
   String? get assignedTechnicianId {
     final bids = booking.value?.bids ?? [];
@@ -53,6 +65,19 @@ class MyBookingDetailsController extends GetxController {
     }
 
     fetchBooking();
+    _fetchPaymentMethods();
+  }
+
+  Future<void> _fetchPaymentMethods() async {
+    isLoadingPaymentMethods.value = true;
+    try {
+      final methods = await _paymentRepository.getPaymentMethods();
+      paymentMethodsList.assignAll(methods);
+      if (methods.isNotEmpty) selectedPaymentMethod.value = methods.first;
+    } catch (_) {
+    } finally {
+      if (!isClosed) isLoadingPaymentMethods.value = false;
+    }
   }
 
   Future<void> fetchBooking() async {
@@ -113,6 +138,39 @@ class MyBookingDetailsController extends GetxController {
       return false;
     } finally {
       isBookingTechnician.value = false;
+    }
+  }
+
+  Future<bool> confirmBookingPayment({required String transactionId}) async {
+    if (!isPaymentDue) {
+      Get.snackbar(
+        TKeys.error.tr,
+        'Payment is not due for this booking',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return false;
+    }
+
+    if (isSubmittingPayment.value) return false;
+
+    try {
+      isSubmittingPayment.value = true;
+      await repository.confirmPayment(
+        bookingId,
+        paymentMethod: selectedPaymentMethod.value?.name ?? '',
+        transactionId: transactionId.trim(),
+      );
+      await fetchBooking();
+      return true;
+    } catch (e) {
+      Get.snackbar(
+        TKeys.error.tr,
+        e.toString().replaceFirst('Exception: ', ''),
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return false;
+    } finally {
+      isSubmittingPayment.value = false;
     }
   }
 
