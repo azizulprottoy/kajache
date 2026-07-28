@@ -70,6 +70,12 @@ class ApiEndpoints {
   static const String review = '/review';
   static const String employeeRating = '/employeeRating';
 
+  // Complain / Support
+  static const String complain = '/complain';
+
+  // FAQ
+  static const String faqs = '/faq';
+
   // Comment
   static const String comments = '/comment';
   static const String comment = '/comment';

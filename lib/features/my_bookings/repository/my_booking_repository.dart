@@ -132,4 +132,25 @@ class MyBookingRepository {
       },
     );
   }
+
+  Future<void> submitComplaint({
+    required String complainAgainst,
+    required String title,
+    required String reason,
+  }) async {
+    final isConnected = await _networkInfo.isConnected;
+
+    if (!isConnected) {
+      throw Exception('No internet connection');
+    }
+
+    await _dio.post(
+      ApiEndpoints.complain,
+      data: {
+        'complainAgainst': complainAgainst,
+        'title': title.trim(),
+        'reason': reason.trim(),
+      },
+    );
+  }
 }

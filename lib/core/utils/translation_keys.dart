@@ -239,6 +239,11 @@ class TKeys {
   static const rateTechnician           = 'rate_technician';
   static const serviceReviewSubmitted   = 'service_review_submitted';
   static const techRatingSubmitted      = 'tech_rating_submitted';
+  static const reportTechnician         = 'report_technician';
+  static const complaintTitle           = 'complaint_title';
+  static const complaintReason          = 'complaint_reason';
+  static const complaintSubmitted       = 'complaint_submitted';
+  static const complaintSubmittedMsg    = 'complaint_submitted_msg';
   static const deletePortfolioConfirm   = 'delete_portfolio_confirm';
   static const tapToSelectImage         = 'tap_to_select_image';
   static const next                     = 'next';
@@ -307,6 +312,12 @@ class TKeys {
   static const subjectRequired          = 'subject_required';
   static const messageLabel             = 'message_label';
   static const messageRequired          = 'message_required';
+  static const faq                      = 'faq';
+  static const frequentlyAskedQuestions = 'frequently_asked_questions';
+  static const noFaqsAvailable          = 'no_faqs_available';
+  static const supportSubmitted         = 'support_submitted';
+  static const supportSubmittedMsg      = 'support_submitted_msg';
+  static const supportTicket            = 'support_ticket';
 
   // ── Statistics ──────────────────────────────────────────────────────────────────────
   static const statistics               = 'statistics';

@@ -13,10 +13,21 @@ class MyBookingDetailsController extends GetxController {
   final isCompletingTask = false.obs;
   final isSubmittingServiceReview = false.obs;
   final isSubmittingProviderRating = false.obs;
+  final isSubmittingComplaint = false.obs;
   final booking = Rxn<AvailableBookingModel>();
   final selectedBidder = Rxn<BookingBidModel>();
 
   String bookingId = '';
+
+  String? get assignedTechnicianId {
+    final bids = booking.value?.bids ?? [];
+    for (final bid in bids) {
+      if (bid.status.trim().toLowerCase() == 'selected') {
+        return bid.providerId;
+      }
+    }
+    return null;
+  }
 
   @override
   void onInit() {
@@ -208,6 +219,43 @@ class MyBookingDetailsController extends GetxController {
       return false;
     } finally {
       isSubmittingProviderRating.value = false;
+    }
+  }
+
+  Future<bool> submitComplaint({
+    required String title,
+    required String reason,
+  }) async {
+    final technicianId = assignedTechnicianId;
+
+    if (technicianId == null || technicianId.isEmpty) {
+      Get.snackbar(
+        TKeys.error.tr,
+        'No technician found for this booking',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return false;
+    }
+
+    if (isSubmittingComplaint.value) return false;
+
+    try {
+      isSubmittingComplaint.value = true;
+      await repository.submitComplaint(
+        complainAgainst: technicianId,
+        title: title.trim(),
+        reason: reason.trim(),
+      );
+      return true;
+    } catch (e) {
+      Get.snackbar(
+        TKeys.error.tr,
+        e.toString().replaceFirst('Exception: ', ''),
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return false;
+    } finally {
+      isSubmittingComplaint.value = false;
     }
   }
 }

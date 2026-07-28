@@ -90,6 +90,29 @@ class MyBookingDetailsPage extends GetView<MyBookingDetailsController> {
                 ),
               ],
 
+              if (booking.status.trim().toLowerCase() == 'completed' &&
+                  controller.assignedTechnicianId != null) ...[
+                const SizedBox(height: 14),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () => Get.bottomSheet(
+                      _ComplaintSheet(controller: controller),
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Theme.of(context).colorScheme.error,
+                      side: BorderSide(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                    ),
+                    icon: const Icon(Icons.report_outlined),
+                    label: Text(TKeys.reportTechnician.tr),
+                  ),
+                ),
+              ],
+
               _SectionTitle(
                 icon: Icons.gavel_outlined,
                 title: "Submitted bids",
@@ -366,6 +389,152 @@ class _RatingAndReviewSheetState extends State<_RatingAndReviewSheet> {
                     return SizedBox(
                       width: double.infinity,
                       child: FilledButton(
+                        onPressed: submitting ? null : _submit,
+                        child: submitting
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : Text(TKeys.submit.tr),
+                      ),
+                    );
+                  }),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ComplaintSheet extends StatefulWidget {
+  final MyBookingDetailsController controller;
+
+  const _ComplaintSheet({required this.controller});
+
+  @override
+  State<_ComplaintSheet> createState() => _ComplaintSheetState();
+}
+
+class _ComplaintSheetState extends State<_ComplaintSheet> {
+  final _formKey = GlobalKey<FormState>();
+  final _titleController = TextEditingController();
+  final _reasonController = TextEditingController();
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _reasonController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    final success = await widget.controller.submitComplaint(
+      title: _titleController.text,
+      reason: _reasonController.text,
+    );
+
+    if (!success || !mounted) return;
+
+    Navigator.of(context).pop();
+    Get.snackbar(
+      TKeys.complaintSubmitted.tr,
+      TKeys.complaintSubmittedMsg.tr,
+      snackPosition: SnackPosition.BOTTOM,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+          decoration: BoxDecoration(
+            color: colors.surface,
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(26),
+            ),
+          ),
+          child: Form(
+            key: _formKey,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 44,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: colors.outlineVariant,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  Text(
+                    TKeys.reportTechnician.tr,
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  TextFormField(
+                    controller: _titleController,
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'Please enter a title';
+                      }
+                      return null;
+                    },
+                    decoration: InputDecoration(
+                      labelText: TKeys.complaintTitle.tr,
+                      hintText: 'e.g. Rude behavior, late arrival',
+                      border: const OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: _reasonController,
+                    minLines: 3,
+                    maxLines: 5,
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'Please describe the issue';
+                      }
+                      return null;
+                    },
+                    decoration: InputDecoration(
+                      labelText: TKeys.complaintReason.tr,
+                      hintText: 'Tell us what went wrong',
+                      alignLabelWithHint: true,
+                      border: const OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  Obx(() {
+                    final submitting =
+                        widget.controller.isSubmittingComplaint.value;
+
+                    return SizedBox(
+                      width: double.infinity,
+                      child: FilledButton(
+                        style: FilledButton.styleFrom(
+                          backgroundColor: colors.error,
+                        ),
                         onPressed: submitting ? null : _submit,
                         child: submitting
                             ? const SizedBox(
