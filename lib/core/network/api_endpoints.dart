@@ -79,6 +79,8 @@ class ApiEndpoints {
 
   // FAQ
   static const String faqs = '/faq';
+  static const String districts = '/district';
+  static String areasByDistrict(String districtId) => '/area?district=$districtId';
 
   // Comment
   static const String comments = '/comment';

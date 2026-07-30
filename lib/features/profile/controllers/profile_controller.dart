@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import '../models/profile_model.dart';
 import '../models/worker_profile_model.dart';
 import '../../../core/utils/translation_keys.dart';
+import '../../../core/network/geo_repository.dart';
 import '../repository/profile_repository.dart';
 
 class ProfileController extends GetxController {
@@ -38,38 +39,48 @@ class ProfileController extends GetxController {
   bool get isServiceProvider =>
       profileType.value == ProfileType.serviceProvider;
 
+  final _geoRepo = GeoRepository();
+
+  final selectedDistrictId = RxnString();
   final selectedDistrict = RxnString();
   final selectedArea = RxnString();
 
-  final districts = <String>[
-    'Bagerhat', 'Bandarban', 'Barguna', 'Barishal', 'Bhola', 'Bogura',
-    'Brahmanbaria', 'Chandpur', 'Chattogram', 'Chuadanga', "Cox's Bazar",
-    'Cumilla', 'Dhaka', 'Dinajpur', 'Faridpur', 'Feni', 'Gaibandha',
-    'Gazipur', 'Gopalganj', 'Habiganj', 'Jamalpur', 'Jashore', 'Jhalokati',
-    'Jhenaidah', 'Joypurhat', 'Khagrachhari', 'Khulna', 'Kishoreganj',
-    'Kurigram', 'Kushtia', 'Lakshmipur', 'Lalmonirhat', 'Madaripur', 'Magura',
-    'Manikganj', 'Meherpur', 'Moulvibazar', 'Munshiganj', 'Mymensingh',
-    'Naogaon', 'Narail', 'Narayanganj', 'Narsingdi', 'Natore',
-    'Chapainawabganj', 'Netrokona', 'Nilphamari', 'Noakhali', 'Pabna',
-    'Panchagarh', 'Patuakhali', 'Pirojpur', 'Rajbari', 'Rajshahi',
-    'Rangamati', 'Rangpur', 'Satkhira', 'Shariatpur', 'Sherpur', 'Sirajganj',
-    'Sunamganj', 'Sylhet', 'Tangail', 'Thakurgaon',
-  ].obs;
+  final RxList<GeoModel> districtList = <GeoModel>[].obs;
+  final RxList<GeoModel> areaList = <GeoModel>[].obs;
+  final RxBool isDistrictsLoading = false.obs;
+  final RxBool isAreasLoading = false.obs;
 
-  final Map<String, List<String>> areasByDistrict = {
-    'Dhaka': ['Dhanmondi', 'Gulshan', 'Mirpur', 'Uttara', 'Mohammadpur', 'Banani', 'Motijheel'],
-    'Chattogram': ['Agrabad', 'Pahartali', 'Halishahar', 'Nasirabad', 'Khulshi'],
-    'Sylhet': ['Zindabazar', 'Ambarkhana', 'Subid Bazar', 'Tilagor'],
-    // ...populate the rest, or fetch from backend
-  };
+  // Keep string list for backward compatibility with dropdowns
+  List<String> get districts => districtList.map((d) => d.name).toList();
+  List<String> get currentAreas => areaList.map((a) => a.name).toList();
 
-  List<String> get currentAreas => selectedDistrict.value == null
-      ? <String>[]
-      : (areasByDistrict[selectedDistrict.value] ?? <String>[]);
+  Future<void> fetchDistricts() async {
+    isDistrictsLoading.value = true;
+    try {
+      districtList.assignAll(await _geoRepo.getDistricts());
+    } catch (_) {
+    } finally {
+      if (!isClosed) isDistrictsLoading.value = false;
+    }
+  }
 
-  void onDistrictSelected(String district) {
-    selectedDistrict.value = district;
+  Future<void> onDistrictSelected(String districtName) async {
+    selectedDistrict.value = districtName;
     selectedArea.value = null;
+    areaList.clear();
+    final district = districtList.firstWhere(
+      (d) => d.name == districtName,
+      orElse: () => GeoModel(id: '', name: '', nameBn: ''),
+    );
+    if (district.id.isEmpty) return;
+    selectedDistrictId.value = district.id;
+    isAreasLoading.value = true;
+    try {
+      areaList.assignAll(await _geoRepo.getAreas(district.id));
+    } catch (_) {
+    } finally {
+      if (!isClosed) isAreasLoading.value = false;
+    }
   }
 
   void onAreaSelected(String area) => selectedArea.value = area;
@@ -94,6 +105,7 @@ class ProfileController extends GetxController {
     if (args is ProfileType) profileType.value = args;
 
     _loadProfileData();
+    fetchDistricts();
   }
 
   Future<void> _loadProfileData() async {
@@ -139,7 +151,18 @@ class ProfileController extends GetxController {
       experienceController.text = p.experience;
       serviceAreaController.text = p.serviceArea;
 
-      if (p.district.isNotEmpty) selectedDistrict.value = p.district;
+      if (p.district.isNotEmpty) {
+        selectedDistrict.value = p.district;
+        // Load areas for the saved district
+        final match = districtList.firstWhere(
+          (d) => d.name == p.district,
+          orElse: () => GeoModel(id: '', name: '', nameBn: ''),
+        );
+        if (match.id.isNotEmpty) {
+          selectedDistrictId.value = match.id;
+          areaList.assignAll(await _geoRepo.getAreas(match.id));
+        }
+      }
       if (p.area.isNotEmpty) selectedArea.value = p.area;
     } catch (e) {
       Get.snackbar(TKeys.error.tr, e.toString(),
