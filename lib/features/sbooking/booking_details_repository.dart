@@ -70,4 +70,9 @@ class BookingDetailsRepository {
       Map<String, dynamic>.from(payload['data']),
     );
   }
+
+  Future<void> markCashReceived(String bookingId) async {
+    await _requireConnection();
+    await _dio.post(ApiEndpoints.markCashReceived(bookingId));
+  }
 }

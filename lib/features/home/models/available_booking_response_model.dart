@@ -126,6 +126,8 @@ class AvailableBookingModel {
   final String? myBidEstimatedArrival;
   final String? myBidMessage;
   final String? myBidStatus;
+  final String paymentMethod;
+  final bool cashReceived;
 
   AvailableBookingModel({
     required this.id,
@@ -157,6 +159,8 @@ class AvailableBookingModel {
     this.myBidEstimatedArrival,
     this.myBidMessage,
     this.myBidStatus,
+    this.paymentMethod = '',
+    this.cashReceived = false,
   });
 
   factory AvailableBookingModel.fromJson(Map<String, dynamic> json) {
@@ -254,6 +258,8 @@ class AvailableBookingModel {
       myBidEstimatedArrival: myBid?['estimatedArrival']?.toString(),
       myBidMessage: myBid?['message']?.toString(),
       myBidStatus: myBid?['status']?.toString(),
+      paymentMethod: json['paymentMethod']?.toString() ?? '',
+      cashReceived: json['cashReceived'] == true,
     );
   }
 

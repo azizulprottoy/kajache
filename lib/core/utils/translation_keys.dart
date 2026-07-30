@@ -123,6 +123,7 @@ class TKeys {
   static const payNow           = 'pay_now';
   static const couponCode       = 'coupon_code';
   static const applyCoupon      = 'apply_coupon';
+  static const tapToApply       = 'tap_to_apply';
   static const invalidCoupon    = 'invalid_coupon';
   static const couponApplied    = 'coupon_applied';
   static const discount         = 'discount';
@@ -245,6 +246,10 @@ class TKeys {
   static const startBookingConfirm      = 'start_booking_confirm';
   static const makeInProgress           = 'make_in_progress';
   static const taskCompleted            = 'task_completed';
+  static const cashAfterService         = 'cash_after_service';
+  static const markCashReceived         = 'mark_cash_received';
+  static const cashReceivedConfirmed    = 'cash_received_confirmed';
+  static const cashPending              = 'cash_pending';
   static const taskCompletedMsg         = 'task_completed_msg';
   static const technicianBooked         = 'technician_booked';
   static const bookingIdMissing         = 'booking_id_missing';

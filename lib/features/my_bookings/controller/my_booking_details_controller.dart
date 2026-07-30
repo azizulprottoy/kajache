@@ -35,19 +35,19 @@ class MyBookingDetailsController extends GetxController {
   int get discountAmount {
     final coupon = appliedCoupon.value;
     if (coupon == null) return 0;
-    final base = _basePaymentAmount;
+    final base = basePaymentAmount;
     return coupon.discountFor(base).clamp(0, base);
   }
 
-  int get _basePaymentAmount {
+  int get basePaymentAmount {
     final b = booking.value;
-    if (b == null) return 500;
+    if (b == null) return 0;
     final selectedBid = b.bids.cast<BookingBidModel?>()
         .firstWhere((bid) => bid?.status.toLowerCase() == 'selected', orElse: () => null);
-    return (b.bookingFee ?? 500) + (selectedBid?.price ?? 0);
+    return b.bookingFee + (selectedBid?.price ?? 0);
   }
 
-  int get finalPaymentAmount => _basePaymentAmount - discountAmount;
+  int get finalPaymentAmount => basePaymentAmount - discountAmount;
 
   void applyCoupon(String code) {
     final trimmed = code.trim().toUpperCase();
@@ -197,7 +197,7 @@ class MyBookingDetailsController extends GetxController {
     }
   }
 
-  Future<bool> confirmBookingPayment({required String transactionId}) async {
+  Future<bool> confirmBookingPayment({required String transactionId, bool isCash = false}) async {
     if (!isPaymentDue) {
       Get.snackbar(
         TKeys.error.tr,
@@ -213,7 +213,7 @@ class MyBookingDetailsController extends GetxController {
       isSubmittingPayment.value = true;
       await repository.confirmPayment(
         bookingId,
-        paymentMethod: selectedPaymentMethod.value?.name ?? '',
+        paymentMethod: isCash ? 'cash' : (selectedPaymentMethod.value?.name ?? ''),
         transactionId: transactionId.trim(),
       );
       await fetchBooking();

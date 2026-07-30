@@ -489,6 +489,236 @@ class _CombinedFeedbackSheetState extends State<_CombinedFeedbackSheet> {
   }
 }
 
+// ── Coupon ticket card ────────────────────────────────────────────────────────
+class _CouponTicket extends StatelessWidget {
+  final dynamic coupon; // CouponModel
+  final int basePrice;
+  final VoidCallback onRedeem;
+
+  const _CouponTicket({
+    required this.coupon,
+    required this.basePrice,
+    required this.onRedeem,
+  });
+
+  String get _discountLabel {
+    if (coupon.type == 'percentage') {
+      return '${coupon.percentage.toInt()}% OFF';
+    }
+    return '৳${coupon.amount.toInt()} OFF';
+  }
+
+  String? get _daysLeft {
+    final end = coupon.endDate as DateTime?;
+    if (end == null) return null;
+    final diff = end.difference(DateTime.now()).inDays;
+    if (diff < 0) return null;
+    if (diff == 0) return 'Last day';
+    return '$diff days left';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final daysLeft = _daysLeft;
+
+    return GestureDetector(
+      onTap: onRedeem,
+      child: CustomPaint(
+      painter: _TicketPainter(
+        color: colors.surface,
+        borderColor: colors.primary.withValues(alpha: 0.4),
+        notchRadius: 10,
+        dashColor: colors.primary.withValues(alpha: 0.3),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 0),
+        child: Row(
+          children: [
+            // Left panel — icon
+            SizedBox(
+              width: 56,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 30,
+                    height: 30,
+                    decoration: BoxDecoration(
+                      color: colors.primaryContainer,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.local_offer_rounded,
+                        color: colors.onPrimaryContainer, size: 15),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    coupon.code,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: colors.primary,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 9,
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+
+            // Middle content
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      _discountLabel,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w900,
+                        color: colors.primary,
+                      ),
+                    ),
+                    if (coupon.type == 'percentage')
+                      Text(
+                        'Save ৳${coupon.discountFor(basePrice)}',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: colors.onSurfaceVariant,
+                        ),
+                      ),
+                    const SizedBox(height: 4),
+                    Text(
+                      TKeys.tapToApply.tr,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: colors.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // Right panel — days left (rotated)
+            if (daysLeft != null)
+              SizedBox(
+                width: 22,
+                child: RotatedBox(
+                  quarterTurns: 1,
+                  child: Text(
+                    daysLeft.toUpperCase(),
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: colors.onSurfaceVariant,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 8,
+                      letterSpacing: 0.5,
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                  ),
+                ),
+              )
+            else
+              const SizedBox(width: 12),
+          ],
+        ),
+      ),
+    ),
+    );
+  }
+}
+
+class _PaymentIcon extends StatelessWidget {
+  final ColorScheme colors;
+  const _PaymentIcon({required this.colors});
+  @override
+  Widget build(BuildContext context) => Container(
+        width: 36,
+        height: 36,
+        decoration: BoxDecoration(
+          color: colors.primaryContainer,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Icon(Icons.payment_outlined,
+            color: colors.onPrimaryContainer, size: 20),
+      );
+}
+
+class _TicketPainter extends CustomPainter {
+  final Color color;
+  final Color borderColor;
+  final Color dashColor;
+  final double notchRadius;
+
+  const _TicketPainter({
+    required this.color,
+    required this.borderColor,
+    required this.notchRadius,
+    required this.dashColor,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+
+    final borderPaint = Paint()
+      ..color = borderColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.2;
+
+    const r = 12.0; // corner radius
+    final nr = notchRadius;
+    final midX = 56.0; // divider position
+
+    // Build path with notches at midX
+    final path = Path()
+      ..moveTo(r, 0)
+      ..lineTo(midX - nr, 0)
+      ..arcToPoint(Offset(midX + nr, 0),
+          radius: Radius.circular(nr), clockwise: false)
+      ..lineTo(size.width - r, 0)
+      ..arcToPoint(Offset(size.width, r), radius: const Radius.circular(r))
+      ..lineTo(size.width, size.height - r)
+      ..arcToPoint(Offset(size.width - r, size.height),
+          radius: const Radius.circular(r))
+      ..lineTo(midX + nr, size.height)
+      ..arcToPoint(Offset(midX - nr, size.height),
+          radius: Radius.circular(nr), clockwise: false)
+      ..lineTo(r, size.height)
+      ..arcToPoint(Offset(0, size.height - r), radius: const Radius.circular(r))
+      ..lineTo(0, r)
+      ..arcToPoint(const Offset(r, 0), radius: const Radius.circular(r))
+      ..close();
+
+    canvas.drawPath(path, paint);
+    canvas.drawPath(path, borderPaint);
+
+    // Dashed divider
+    final dashPaint = Paint()
+      ..color = dashColor
+      ..strokeWidth = 1.5
+      ..style = PaintingStyle.stroke;
+
+    const dashH = 5.0;
+    const gap = 4.0;
+    double y = nr * 2;
+    while (y < size.height - nr * 2) {
+      canvas.drawLine(Offset(midX, y), Offset(midX, y + dashH), dashPaint);
+      y += dashH + gap;
+    }
+  }
+
+  @override
+  bool shouldRepaint(_TicketPainter old) =>
+      old.color != color || old.borderColor != borderColor;
+}
+
 class _ComplaintSheet extends StatefulWidget {
   final MyBookingDetailsController controller;
 
@@ -648,6 +878,7 @@ class _BookingPaymentSheetState extends State<_BookingPaymentSheet> {
   final _formKey = GlobalKey<FormState>();
   final _transactionIdController = TextEditingController();
   final _couponController = TextEditingController();
+  bool _isCash = false;
 
   @override
   void dispose() {
@@ -657,10 +888,17 @@ class _BookingPaymentSheetState extends State<_BookingPaymentSheet> {
   }
 
   Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_isCash && !_formKey.currentState!.validate()) return;
+    if (_isCash) {
+      widget.controller.selectedPaymentMethod.value =
+          widget.controller.paymentMethodsList
+              .cast<dynamic>()
+              .firstWhere((m) => m.name.toLowerCase() == 'cash', orElse: () => null);
+    }
 
     final success = await widget.controller.confirmBookingPayment(
-      transactionId: _transactionIdController.text,
+      transactionId: _isCash ? '' : _transactionIdController.text,
+      isCash: _isCash,
     );
 
     if (!success || !mounted) return;
@@ -678,7 +916,7 @@ class _BookingPaymentSheetState extends State<_BookingPaymentSheet> {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     final controller = widget.controller;
-    final bookingFee = controller.booking.value?.bookingFee ?? 500;
+    final bookingFee = controller.booking.value?.bookingFee ?? 0;
     final selectedBid = controller.booking.value?.bids.cast<BookingBidModel?>()
         .firstWhere((b) => b?.status.toLowerCase() == 'selected', orElse: () => null);
     final bidPrice = selectedBid?.price ?? 0;
@@ -824,70 +1062,130 @@ class _BookingPaymentSheetState extends State<_BookingPaymentSheet> {
 
                   const SizedBox(height: 16),
 
+                  // ── Cash after service toggle ──────────────────────────────
+                  StatefulBuilder(builder: (_, setState) => GestureDetector(
+                    onTap: () => setState(() => _isCash = !_isCash),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: _isCash
+                            ? Colors.orange.withValues(alpha: 0.08)
+                            : colors.surfaceContainerLowest,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: _isCash
+                              ? Colors.orange.shade400
+                              : colors.borderColor,
+                          width: _isCash ? 1.5 : 1,
+                        ),
+                      ),
+                      child: Row(children: [
+                        Icon(Icons.payments_outlined,
+                            color: _isCash
+                                ? Colors.orange.shade700
+                                : colors.onSurfaceVariant,
+                            size: 22),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(TKeys.cashAfterService.tr,
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                    color: _isCash
+                                        ? Colors.orange.shade700
+                                        : colors.onSurface,
+                                  )),
+                              Text('Pay the technician directly after service',
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                      color: colors.onSurfaceVariant)),
+                            ],
+                          ),
+                        ),
+                        Switch(
+                          value: _isCash,
+                          onChanged: (v) => setState(() => _isCash = v),
+                          activeColor: Colors.orange.shade600,
+                          activeTrackColor:
+                              Colors.orange.withValues(alpha: 0.2),
+                        ),
+                      ]),
+                    ),
+                  )),
+
+                  const SizedBox(height: 16),
+
                   // ── Coupon section ─────────────────────────────────────────
                   Obx(() {
                     final appliedCoupon = controller.appliedCoupon.value;
                     if (appliedCoupon != null) {
                       // Show applied coupon chip with remove
-                      return Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 10),
-                        decoration: BoxDecoration(
-                          color: Colors.green.withValues(alpha: 0.08),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.green.shade300),
-                        ),
-                        child: Row(children: [
-                          Icon(Icons.local_offer_outlined,
-                              size: 18, color: Colors.green.shade700),
-                          const SizedBox(width: 8),
-                          Expanded(child: Text(
-                            '${appliedCoupon.code}  —  ${TKeys.couponApplied.tr}',
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: Colors.green.shade700,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          )),
-                          TextButton(
-                            onPressed: () {
-                              controller.removeCoupon();
-                              _couponController.clear();
-                            },
-                            style: TextButton.styleFrom(
-                                foregroundColor: Colors.red.shade400,
-                                padding: EdgeInsets.zero,
-                                minimumSize: const Size(40, 30)),
-                            child: Text(TKeys.removeCoupon.tr),
+                      return GestureDetector(
+                        onTap: () {
+                          controller.removeCoupon();
+                          _couponController.clear();
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 10),
+                          decoration: BoxDecoration(
+                            color: Colors.green.withValues(alpha: 0.08),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.green.shade300),
                           ),
-                        ]),
+                          child: Row(children: [
+                            Icon(Icons.local_offer_outlined,
+                                size: 18, color: Colors.green.shade700),
+                            const SizedBox(width: 8),
+                            Expanded(child: Text(
+                              '${appliedCoupon.code}  —  ${TKeys.couponApplied.tr}',
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: Colors.green.shade700,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            )),
+                            Icon(Icons.close_rounded,
+                                size: 18, color: Colors.red.shade400),
+                          ]),
+                        ),
                       );
                     }
 
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Available coupons chips
+                        // Available coupon tickets
                         if (controller.coupons.isNotEmpty) ...[
                           Text(TKeys.availableCoupons.tr,
                               style: theme.textTheme.labelLarge?.copyWith(
                                   fontWeight: FontWeight.bold)),
                           const SizedBox(height: 8),
-                          Wrap(
-                            spacing: 8,
-                            runSpacing: 6,
-                            children: controller.coupons.map((c) {
-                              return ActionChip(
-                                label: Text(c.code),
-                                avatar: const Icon(Icons.local_offer_outlined,
-                                    size: 16),
-                                onPressed: () {
-                                  _couponController.text = c.code;
-                                  controller.applyCoupon(c.code);
-                                },
-                              );
-                            }).toList(),
+                          SizedBox(
+                            height: 80,
+                            child: ListView.separated(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: controller.coupons.length,
+                              separatorBuilder: (_, __) => const SizedBox(width: 10),
+                              itemBuilder: (_, i) {
+                                final c = controller.coupons[i];
+                                return SizedBox(
+                                  width: 220,
+                                  child: _CouponTicket(
+                                    coupon: c,
+                                    basePrice: controller.basePaymentAmount,
+                                    onRedeem: () {
+                                      _couponController.text = c.code;
+                                      controller.applyCoupon(c.code);
+                                    },
+                                  ),
+                                );
+                              },
+                            ),
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 10),
                         ],
 
                         // Manual coupon input
@@ -923,6 +1221,7 @@ class _BookingPaymentSheetState extends State<_BookingPaymentSheet> {
                     );
                   }),
 
+                  if (!_isCash) ...[
                   const SizedBox(height: 16),
 
                   Align(
@@ -945,42 +1244,82 @@ class _BookingPaymentSheetState extends State<_BookingPaymentSheet> {
                     if (controller.paymentMethodsList.isEmpty) {
                       return Text(TKeys.noData.tr);
                     }
-                    return Wrap(
-                      spacing: 10,
-                      runSpacing: 10,
+                    return Column(
                       children: controller.paymentMethodsList.map((m) {
                         final isSelected =
-                            controller.selectedPaymentMethod.value?.id ==
-                                m.id;
+                            controller.selectedPaymentMethod.value?.id == m.id;
+                        final desc = m.description.isNotEmpty
+                            ? m.description
+                            : m.account;
                         return GestureDetector(
                           onTap: () =>
                               controller.selectedPaymentMethod.value = m,
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 200),
+                            margin: const EdgeInsets.only(bottom: 10),
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
-                            ),
+                                horizontal: 14, vertical: 12),
                             decoration: BoxDecoration(
                               color: isSelected
-                                  ? colors.primary
+                                  ? colors.primary.withValues(alpha: 0.06)
                                   : colors.surface,
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(14),
                               border: Border.all(
                                 color: isSelected
                                     ? colors.primary
                                     : colors.borderColor,
+                                width: isSelected ? 1.5 : 1,
                               ),
                             ),
-                            child: Text(
-                              m.name.toUpperCase(),
-                              style: theme.textTheme.labelMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: isSelected
-                                    ? colors.onPrimary
-                                    : colors.onSurfaceVariant,
+                            child: Row(children: [
+                              // Icon/image
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: m.image.isNotEmpty
+                                    ? Image.network(
+                                        m.image,
+                                        width: 36,
+                                        height: 36,
+                                        fit: BoxFit.contain,
+                                        errorBuilder: (_, __, ___) =>
+                                            _PaymentIcon(colors: colors),
+                                      )
+                                    : _PaymentIcon(colors: colors),
                               ),
-                            ),
+                              const SizedBox(width: 12),
+                              // Name + description
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      m.name,
+                                      style: theme.textTheme.titleSmall?.copyWith(
+                                        fontWeight: FontWeight.w700,
+                                        color: isSelected
+                                            ? colors.primary
+                                            : colors.onSurface,
+                                      ),
+                                    ),
+                                    if (desc.isNotEmpty) ...[
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        desc,
+                                        style: theme.textTheme.bodySmall?.copyWith(
+                                          color: colors.onSurfaceVariant,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
+                                  ],
+                                ),
+                              ),
+                              // Selected indicator
+                              if (isSelected)
+                                Icon(Icons.check_circle_rounded,
+                                    color: colors.primary, size: 20),
+                            ]),
                           ),
                         );
                       }).toList(),
@@ -1000,6 +1339,7 @@ class _BookingPaymentSheetState extends State<_BookingPaymentSheet> {
                         ? TKeys.transactionIdRequired.tr
                         : null,
                   ),
+                  ], // end if (!_isCash)
 
                   const SizedBox(height: 18),
                   Obx(() {

@@ -60,6 +60,56 @@ class BookingDetailsPage extends GetView<BookingDetailsController> {
                     isMine: bid.id == booking.myBidId,
                   ),
                 ),
+
+              // Mark cash received button (technician)
+              if (booking.paymentMethod == 'cash' &&
+                  !booking.cashReceived &&
+                  (booking.status == 'completed' || booking.status == 'in_progress')) ...[
+                const SizedBox(height: 20),
+                Obx(() => SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: controller.isMarkingCash.value
+                        ? null
+                        : () => controller.markCashReceived(),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: Colors.orange.shade600,
+                      minimumSize: const Size.fromHeight(52),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14)),
+                    ),
+                    icon: controller.isMarkingCash.value
+                        ? const SizedBox(
+                            width: 18, height: 18,
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2, color: Colors.white))
+                        : const Icon(Icons.payments_outlined),
+                    label: Text(TKeys.markCashReceived.tr),
+                  ),
+                )),
+              ],
+
+              if (booking.paymentMethod == 'cash' && booking.cashReceived) ...[
+                const SizedBox(height: 20),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 14, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.green.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: Colors.green.shade300),
+                  ),
+                  child: Row(children: [
+                    Icon(Icons.check_circle_rounded,
+                        color: Colors.green.shade700),
+                    const SizedBox(width: 10),
+                    Text(TKeys.cashReceivedConfirmed.tr,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Colors.green.shade700,
+                            fontWeight: FontWeight.w600)),
+                  ]),
+                ),
+              ],
             ],
           ),
         );

@@ -13,6 +13,7 @@ class BookingDetailsController extends GetxController {
 
   final RxBool isLoading = true.obs;
   final RxBool isBidLoading = false.obs;
+  final RxBool isMarkingCash = false.obs;
   final Rxn<AvailableBookingModel> booking =
       Rxn<AvailableBookingModel>();
 
@@ -99,6 +100,24 @@ class BookingDetailsController extends GetxController {
       return false;
     } finally {
       if (!isClosed) isBidLoading.value = false;
+    }
+  }
+
+  Future<bool> markCashReceived() async {
+    isMarkingCash.value = true;
+    try {
+      await _repository.markCashReceived(bookingId);
+      await fetchBooking();
+      Get.snackbar(TKeys.success.tr, TKeys.cashReceivedConfirmed.tr,
+          snackPosition: SnackPosition.BOTTOM);
+      return true;
+    } catch (e) {
+      Get.snackbar(TKeys.error.tr,
+          e.toString().replaceFirst('Exception: ', ''),
+          snackPosition: SnackPosition.BOTTOM);
+      return false;
+    } finally {
+      if (!isClosed) isMarkingCash.value = false;
     }
   }
 }
