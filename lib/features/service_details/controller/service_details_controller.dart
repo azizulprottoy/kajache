@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:geolocator/geolocator.dart';
 
 import '../../home/models/services_response_model.dart';
 import '../../home/models/available_booking_response_model.dart';
@@ -114,6 +115,19 @@ class ServiceDetailsController extends GetxController {
       return false;
     }
     isBidLoading.value = true;
+
+    // Capture technician GPS silently before placing bid
+    double? providerLat, providerLng;
+    try {
+      final perm = await Geolocator.checkPermission();
+      if (perm == LocationPermission.whileInUse || perm == LocationPermission.always) {
+        final pos = await Geolocator.getCurrentPosition(
+            desiredAccuracy: LocationAccuracy.high);
+        providerLat = pos.latitude;
+        providerLng = pos.longitude;
+      }
+    } catch (_) {}
+
     try {
       if (hasBid) {
         final bidId = myBidId;
@@ -133,6 +147,8 @@ class ServiceDetailsController extends GetxController {
           price: price,
           estimatedArrival: estimatedArrival,
           message: message,
+          providerLat: providerLat,
+          providerLng: providerLng,
         );
       }
       myBidPrice = price.round();

@@ -10,6 +10,7 @@ import '../../shared/widgets/custom_button.dart';
 import '../../core/utils/translation_keys.dart';
 import '../home/models/available_booking_response_model.dart';
 import 'booking_details_controller.dart';
+import '../tracking/live_tracking_map.dart';
 
 
 class BookingDetailsPage extends GetView<BookingDetailsController> {
@@ -60,6 +61,35 @@ class BookingDetailsPage extends GetView<BookingDetailsController> {
                     isMine: bid.id == booking.myBidId,
                   ),
                 ),
+
+              // Navigate to customer location map
+              if (booking.locationLat != null &&
+                  (booking.status == 'bidding_open' ||
+                      booking.status == 'bid_selected' ||
+                      booking.status == 'in_progress')) ...[
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => TechnicianTrackingMap(
+                          bookingId: booking.id,
+                          customerLat: booking.locationLat!,
+                          customerLng: booking.locationLng!,
+                        ),
+                      ),
+                    ),
+                    style: FilledButton.styleFrom(
+                      minimumSize: const Size.fromHeight(52),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    ),
+                    icon: const Icon(Icons.map_outlined),
+                    label: const Text('Navigate to Customer'),
+                  ),
+                ),
+              ],
 
               // Mark cash received button (technician)
               if (booking.paymentMethod == 'cash' &&

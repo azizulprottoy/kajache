@@ -9,6 +9,7 @@ import '../../../shared/widgets/common_app_bar.dart';
 import '../../home/models/available_booking_response_model.dart';
 import '../../sbooking/booking_details_controller.dart';
 import '../controller/my_booking_details_controller.dart';
+import '../../tracking/live_tracking_map.dart';
 
 class MyBookingDetailsPage extends GetView<MyBookingDetailsController> {
   const MyBookingDetailsPage({super.key});
@@ -44,6 +45,34 @@ class MyBookingDetailsPage extends GetView<MyBookingDetailsController> {
               if (controller.isPaymentDue) ...[
                 const SizedBox(height: 14),
                 _PaymentDueBanner(controller: controller),
+              ],
+
+              // Track Technician button (shown when in_progress and booking has coordinates)
+              if ((booking.status.trim().toLowerCase() == 'in_progress' ||
+                  booking.status.trim().toLowerCase() == 'bid_selected') &&
+                  booking.locationLat != null) ...[
+                const SizedBox(height: 14),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => CustomerTrackingMap(
+                          bookingId: booking.id,
+                          customerLat: booking.locationLat!,
+                          customerLng: booking.locationLng!,
+                        ),
+                      ),
+                    ),
+                    icon: const Icon(Icons.map_outlined),
+                    label: const Text('Track Technician'),
+                    style: OutlinedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(48),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    ),
+                  ),
+                ),
               ],
 
               if (booking.status.trim().toLowerCase() == 'in_progress') ...[
@@ -125,6 +154,32 @@ class MyBookingDetailsPage extends GetView<MyBookingDetailsController> {
                 title: "Submitted bids",
                 count: booking.bids.length,
               ),
+              // View on map button — always shown if booking has coordinates
+              if (booking.locationLat != null) ...[
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: () => Navigator.push(context, MaterialPageRoute(
+                      builder: (_) => BiddersMapPage(
+                        bids: booking.bids,
+                        customerLat: booking.locationLat,
+                        customerLng: booking.locationLng,
+                      ),
+                    )),
+                    icon: const Icon(Icons.map_rounded, size: 18),
+                    label: Text(
+                      booking.bids.any((b) => b.providerLat != null)
+                          ? 'View My Location & Bidders on Map'
+                          : 'View My Location on Map',
+                    ),
+                    style: FilledButton.styleFrom(
+                      minimumSize: const Size.fromHeight(48),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    ),
+                  ),
+                ),
+              ],
               const SizedBox(height: 10),
               if (booking.bids.isEmpty)
                 const _EmptyBids()

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../../app/theme/context_extension.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../app/theme/context_extension.dart';
 import '../../../shared/widgets/common_app_bar.dart';
-import '../controller/booking_controller.dart';
 import '../../../core/utils/translation_keys.dart';
+import '../controller/booking_controller.dart';
+import 'widgets/map_location_picker.dart';
 
 class BookingPage extends GetView<BookingController> {
   const BookingPage({super.key});
@@ -32,12 +32,11 @@ class BookingPage extends GetView<BookingController> {
             theme: theme,
           )),
 
-          Obx(() => _StepperHeader(
-            currentStep: controller.currentStep.value,
-            colorScheme: colorScheme,
-            theme: theme,
-          )),
-          SizedBox(height: 20,),
+          // Obx(() => _StepperHeader(
+          //   currentStep: controller.currentStep.value,
+          //   colorScheme: colorScheme,
+          //   theme: theme,
+          // )),
           Obx(() => AnimatedSwitcher(
               duration: const Duration(milliseconds: 300),
               transitionBuilder: (child, animation) => SlideTransition(
@@ -60,7 +59,7 @@ class BookingPage extends GetView<BookingController> {
             )
             ),
 
-SizedBox(height: 100,),
+SizedBox(height: 50,),
           Obx(() => _BottomNavBar(
             currentStep: controller.currentStep.value,
             isLoading: controller.isLoading.value,
@@ -387,7 +386,64 @@ class _Step2Body extends GetView<BookingController> {
 
         const SizedBox(height: 20),
 
-        /// Address
+        /// Map location picker button
+        Obx(() {
+          final hasPin = controller.pickedLat.value != null;
+          return GestureDetector(
+            onTap: () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const MapLocationPicker(),
+                ),
+              );
+              if (result is PickedLocation) {
+                controller.pickedLat.value = result.lat;
+                controller.pickedLng.value = result.lng;
+                controller.pickedDistrict.value = result.district;
+                controller.pickedArea.value = result.area;
+                controller.addressController.text = result.address;
+              }
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+              decoration: BoxDecoration(
+                color: hasPin
+                    ? colorScheme.primaryContainer.withValues(alpha: 0.4)
+                    : colorScheme.surfaceContainerLowest,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: hasPin ? colorScheme.primary : colorScheme.borderColor,
+                ),
+              ),
+              child: Row(children: [
+                Icon(Icons.map_outlined,
+                    color: hasPin ? colorScheme.primary : colorScheme.onSurfaceVariant),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    hasPin
+                        ? controller.addressController.text.isNotEmpty
+                            ? controller.addressController.text
+                            : '${controller.pickedLat.value!.toStringAsFixed(5)}, ${controller.pickedLng.value!.toStringAsFixed(5)}'
+                        : 'Tap to set location on map',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: hasPin ? colorScheme.onSurface : colorScheme.onSurfaceVariant,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Icon(Icons.chevron_right_rounded,
+                    color: colorScheme.onSurfaceVariant, size: 20),
+              ]),
+            ),
+          );
+        }),
+
+        const SizedBox(height: 14),
+
+        /// Address (manual fallback)
         TextFormField(
           controller: controller.addressController,
           decoration: InputDecoration(

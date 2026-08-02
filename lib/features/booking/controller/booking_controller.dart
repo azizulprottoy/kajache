@@ -36,6 +36,12 @@ class BookingController extends GetxController {
   final addressController = TextEditingController();
   final budgetController = TextEditingController();
 
+  // Map-picked location
+  final RxnDouble pickedLat = RxnDouble();
+  final RxnDouble pickedLng = RxnDouble();
+  final RxnString pickedDistrict = RxnString();
+  final RxnString pickedArea = RxnString();
+
   RxnString selectedCity = RxnString();
   RxnString selectedTime = RxnString();
 
@@ -194,6 +200,9 @@ class BookingController extends GetxController {
         location: LocationModel(
           address: addressController.text.trim(),
           city: selectedCity.value ?? 'Dhaka',
+          lat: pickedLat.value,
+          lng: pickedLng.value,
+          district: pickedDistrict.value,
         ),
         schedule: ScheduleModel(
           date: dateController.text.trim(),

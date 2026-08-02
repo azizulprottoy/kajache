@@ -128,6 +128,8 @@ class AvailableBookingModel {
   final String? myBidStatus;
   final String paymentMethod;
   final bool cashReceived;
+  final double? locationLat;
+  final double? locationLng;
 
   AvailableBookingModel({
     required this.id,
@@ -161,6 +163,8 @@ class AvailableBookingModel {
     this.myBidStatus,
     this.paymentMethod = '',
     this.cashReceived = false,
+    this.locationLat,
+    this.locationLng,
   });
 
   factory AvailableBookingModel.fromJson(Map<String, dynamic> json) {
@@ -260,6 +264,12 @@ class AvailableBookingModel {
       myBidStatus: myBid?['status']?.toString(),
       paymentMethod: json['paymentMethod']?.toString() ?? '',
       cashReceived: json['cashReceived'] == true,
+      locationLat: (location['coordinates'] is Map)
+          ? (location['coordinates']['lat'] as num?)?.toDouble()
+          : null,
+      locationLng: (location['coordinates'] is Map)
+          ? (location['coordinates']['lng'] as num?)?.toDouble()
+          : null,
     );
   }
 
@@ -321,6 +331,8 @@ class BookingBidModel {
   final String estimatedArrival;
   final String message;
   final String status;
+  final double? providerLat;
+  final double? providerLng;
 
   const BookingBidModel({
     required this.id,
@@ -334,6 +346,8 @@ class BookingBidModel {
     required this.estimatedArrival,
     required this.message,
     required this.status,
+    this.providerLat,
+    this.providerLng,
   });
 
   factory BookingBidModel.fromJson(Map<String, dynamic> json) {
@@ -368,6 +382,12 @@ class BookingBidModel {
       estimatedArrival: json['estimatedArrival']?.toString() ?? '',
       message: json['message']?.toString() ?? '',
       status: json['status']?.toString() ?? '',
+      providerLat: (json['providerLocation'] is Map)
+          ? (json['providerLocation']['lat'] as num?)?.toDouble()
+          : null,
+      providerLng: (json['providerLocation'] is Map)
+          ? (json['providerLocation']['lng'] as num?)?.toDouble()
+          : null,
     );
   }
 }

@@ -30,16 +30,24 @@ class BookingRequestModel {
 class LocationModel {
   final String address;
   final String city;
+  final double? lat;
+  final double? lng;
+  final String? district;
 
   LocationModel({
     required this.address,
     required this.city,
+    this.lat,
+    this.lng,
+    this.district,
   });
 
   Map<String, dynamic> toJson() {
     return {
       "address": address,
       "city": city,
+      if (district != null) "district": district,
+      if (lat != null && lng != null) "coordinates": {"lat": lat, "lng": lng},
     };
   }
 }

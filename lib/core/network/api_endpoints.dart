@@ -63,6 +63,8 @@ class ApiEndpoints {
   // Payment
   static String payment(String bookingId) => '/booking/$bookingId/confirm-payment';
   static String markCashReceived(String bookingId) => '/booking/$bookingId/mark-cash-received';
+  static String updateTechnicianLocation(String bookingId) => '/booking/$bookingId/technician-location';
+  static String getTechnicianLocation(String bookingId) => '/booking/$bookingId/technician-location';
   static const String paymentMethods = '/paymentMethod';
 
   // Coupon

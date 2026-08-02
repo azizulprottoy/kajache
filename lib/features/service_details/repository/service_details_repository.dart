@@ -148,6 +148,8 @@ class ServiceDetailsRepository {
     required double price,
     required String estimatedArrival,
     String message = '',
+    double? providerLat,
+    double? providerLng,
   }) async {
     final isConnected = await _networkInfo.isConnected;
 
@@ -161,6 +163,8 @@ class ServiceDetailsRepository {
         'price': price,
         'estimatedArrival': estimatedArrival,
         if (message.isNotEmpty) 'message': message,
+        if (providerLat != null && providerLng != null)
+          'providerLocation': {'lat': providerLat, 'lng': providerLng},
       },
     );
 
