@@ -322,8 +322,14 @@ class TKeys {
   static const customerSupport          = 'customer_support';
   static const privacyPolicy            = 'privacy_policy';
   static const termsConditions          = 'terms_conditions';
+  static const aboutUs                  = 'about_us';
+  static const supportChat              = 'support_chat';
   static const logout                   = 'logout';
   static const logoutConfirm            = 'logout_confirm';
+
+  // ── About Us ──────────────────────────────────────────────────────────────────────
+  static const noSocialMediaAvailable   = 'no_social_media_available';
+  static const couldNotOpenLink         = 'could_not_open_link';
 
   // ── Customer Support ────────────────────────────────────────────────────────────────
   static const subject                  = 'subject';

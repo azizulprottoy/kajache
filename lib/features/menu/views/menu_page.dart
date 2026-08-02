@@ -64,14 +64,6 @@ class MenuPage extends StatelessWidget {
                     Get.toNamed(AppRoutes.rewordPage);
                   },
                 ),
-                _MenuDivider(),
-                _MenuTile(
-                  icon: Icons.chat_bubble_outline,
-                  title: TKeys.chat.tr,
-                  onTap: () {
-                    Get.toNamed(AppRoutes.chatPage);
-                  },
-                ),
               ],
             ),
 
@@ -88,6 +80,14 @@ class MenuPage extends StatelessWidget {
                 ),
                 _MenuDivider(),
                 _MenuTile(
+                  icon: Icons.chat_bubble_outline,
+                  title: TKeys.supportChat.tr,
+                  onTap: () {
+                    Get.toNamed(AppRoutes.supportChatPage);
+                  },
+                ),
+                _MenuDivider(),
+                _MenuTile(
                   icon: Icons.privacy_tip_outlined,
                   title: TKeys.privacyPolicy.tr,
                   onTap: () {
@@ -100,6 +100,14 @@ class MenuPage extends StatelessWidget {
                   title: TKeys.termsConditions.tr,
                   onTap: () {
                     Get.toNamed(AppRoutes.termsConditionPage);
+                  },
+                ),
+                _MenuDivider(),
+                _MenuTile(
+                  icon: Icons.info_outline_rounded,
+                  title: TKeys.aboutUs.tr,
+                  onTap: () {
+                    Get.toNamed(AppRoutes.aboutUsPage);
                   },
                 ),
               ],

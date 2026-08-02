@@ -322,8 +322,14 @@ const Map<String, String> enUS = {
   TKeys.customerSupport:        'Customer Support',
   TKeys.privacyPolicy:          'Privacy Policy',
   TKeys.termsConditions:        'Terms & Conditions',
+  TKeys.aboutUs:                'About Us',
+  TKeys.supportChat:            'Support Chat',
   TKeys.logout:                 'Log Out',
   TKeys.logoutConfirm:          'Are you sure you want to log out?',
+
+  // About Us
+  TKeys.noSocialMediaAvailable: 'No social media links available',
+  TKeys.couldNotOpenLink:       'Could not open link',
 
   // Customer Support
   TKeys.subject:                'Subject',

@@ -85,6 +85,16 @@ class MyBookingDetailsController extends GetxController {
     return null;
   }
 
+  String? get selectedBidId {
+    final bids = booking.value?.bids ?? [];
+    for (final bid in bids) {
+      if (bid.status.trim().toLowerCase() == 'selected') {
+        return bid.id;
+      }
+    }
+    return null;
+  }
+
   @override
   void onInit() {
     super.onInit();

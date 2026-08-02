@@ -1,4 +1,8 @@
 import 'package:get/get.dart';
+import 'package:kaj_ache/features/about_us/binding/about_us_binding.dart';
+import 'package:kaj_ache/features/about_us/view/about_us_page.dart';
+import 'package:kaj_ache/features/support_chat/binding/support_chat_binding.dart';
+import 'package:kaj_ache/features/support_chat/view/support_chat_page.dart';
 import 'package:kaj_ache/features/auth/views/forgot_password.dart';
 import 'package:kaj_ache/features/auth/views/otp_page.dart';
 import 'package:kaj_ache/features/category_details/binding/category_details_binding.dart';
@@ -192,6 +196,16 @@ class AppPages {
       name: AppRoutes.myBookingDetails ,
       page: () => const MyBookingDetailsPage(),
       binding: MyBookingDetailsBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.aboutUsPage,
+      page: () => const AboutUsPage(),
+      binding: AboutUsBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.supportChatPage,
+      page: () => const SupportChatPage(),
+      binding: SupportChatBinding(),
     ),
   ];
 }

@@ -25,10 +25,12 @@ class AppRoutes {
   static const customerSupportPage = '/customerSupport';
   static const privacyPolicyPage = '/privacyPolicy';
   static const termsConditionPage = '/termsCondition';
+  static const aboutUsPage = '/aboutUs';
   static const bookingPage = '/bookingPage';
   static const categoryDetails = '/categoryDetails';
   static const myBookings       = '/myBookings';
   static const myBookingDetails   ='/myBookingDetails';
+  static const supportChatPage = '/supportChat';
 }
 //   static const onboarding = '/onboarding';
 //   // Main

@@ -3,6 +3,7 @@ import '../../../app/theme/context_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../app/routes/app_routes.dart';
 import '../../core/utils/media_url_helper.dart';
 import '../../shared/shimmers/booking_details_shimmer.dart';
 import '../../shared/widgets/common_app_bar.dart';
@@ -87,6 +88,35 @@ class BookingDetailsPage extends GetView<BookingDetailsController> {
                     ),
                     icon: const Icon(Icons.map_outlined),
                     label: const Text('Navigate to Customer'),
+                  ),
+                ),
+              ],
+
+              // Chat with customer (only once this bid has been selected)
+              if (booking.myBidId != null &&
+                  booking.myBidStatus?.trim().toLowerCase() == 'selected' &&
+                  [
+                    'bid_selected',
+                    'in_progress',
+                    'completed',
+                  ].contains(booking.status.trim().toLowerCase())) ...[
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () => Get.toNamed(
+                      AppRoutes.chatPage,
+                      arguments: {
+                        'bidId': booking.myBidId,
+                        'bookingStatus': booking.status,
+                      },
+                    ),
+                    icon: const Icon(Icons.chat_bubble_outline),
+                    label: const Text('Chat with Customer'),
+                    style: OutlinedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(48),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    ),
                   ),
                 ),
               ],

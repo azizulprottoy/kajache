@@ -3,6 +3,7 @@ import '../../../app/theme/context_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../app/routes/app_routes.dart';
 import '../../../core/utils/media_url_helper.dart';
 import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/common_app_bar.dart';
@@ -67,6 +68,33 @@ class MyBookingDetailsPage extends GetView<MyBookingDetailsController> {
                     ),
                     icon: const Icon(Icons.map_outlined),
                     label: const Text('Track Technician'),
+                    style: OutlinedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(48),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    ),
+                  ),
+                ),
+              ],
+
+              if (controller.selectedBidId != null &&
+                  [
+                    'bid_selected',
+                    'in_progress',
+                    'completed',
+                  ].contains(booking.status.trim().toLowerCase())) ...[
+                const SizedBox(height: 14),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () => Get.toNamed(
+                      AppRoutes.chatPage,
+                      arguments: {
+                        'bidId': controller.selectedBidId,
+                        'bookingStatus': booking.status,
+                      },
+                    ),
+                    icon: const Icon(Icons.chat_bubble_outline),
+                    label: const Text('Chat with Technician'),
                     style: OutlinedButton.styleFrom(
                       minimumSize: const Size.fromHeight(48),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),

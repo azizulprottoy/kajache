@@ -324,8 +324,14 @@ const Map<String, String> bnBD = {
   TKeys.customerSupport:        'গ্রাহক সহায়তা',
   TKeys.privacyPolicy:          'গোপনীয়তা নীতি',
   TKeys.termsConditions:        'শর্তাবলী',
+  TKeys.aboutUs:                'আমাদের সম্পর্কে',
+  TKeys.supportChat:            'সহায়তা চ্যাট',
   TKeys.logout:                 'লগ আউট',
   TKeys.logoutConfirm:          'আপনি কি নিশ্চিত লগ আউট করতে চান?',
+
+  // About Us
+  TKeys.noSocialMediaAvailable: 'কোনো সোশ্যাল মিডিয়া লিংক পাওয়া যায়নি',
+  TKeys.couldNotOpenLink:       'লিংক খোলা যায়নি',
 
   // Customer Support
   TKeys.subject:                'বিষয়',

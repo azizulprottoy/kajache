@@ -20,17 +20,46 @@ class ChatPage extends GetView<ChatController> {
       ),
       body: Column(
         children: [
+          if (!controller.canSend)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              color: colorScheme.surfaceContainerHighest,
+              child: Row(
+                children: [
+                  Icon(Icons.lock_outline_rounded, size: 16, color: colorScheme.onSurfaceVariant),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'This chat is closed: the booking is already finished.',
+                      style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 12),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           Expanded(
-            child: Obx(
-                  () => ListView.builder(
+            child: Obx(() {
+              if (controller.isLoading.value) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (controller.messages.isEmpty) {
+                return Center(
+                  child: Text(
+                    'No messages yet. Say hello!',
+                    style: TextStyle(color: colorScheme.onSurfaceVariant),
+                  ),
+                );
+              }
+              return ListView.builder(
                 padding: const EdgeInsets.all(16),
                 itemCount: controller.messages.length,
                 itemBuilder: (context, index) {
                   final msg = controller.messages[index];
+                  final isMine = controller.isMine(msg);
 
                   return Align(
-                    alignment:
-                    msg.isMe ? Alignment.centerRight : Alignment.centerLeft,
+                    alignment: isMine ? Alignment.centerRight : Alignment.centerLeft,
                     child: Container(
                       margin: const EdgeInsets.only(bottom: 10),
                       padding: const EdgeInsets.symmetric(
@@ -38,15 +67,15 @@ class ChatPage extends GetView<ChatController> {
                         vertical: 10,
                       ),
                       decoration: BoxDecoration(
-                        color: msg.isMe
+                        color: isMine
                             ? colorScheme.primary
                             : colorScheme.surfaceContainerLowest,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Text(
-                        msg.text,
+                        msg.content,
                         style: TextStyle(
-                          color: msg.isMe
+                          color: isMine
                               ? colorScheme.onPrimary
                               : colorScheme.onSurface,
                         ),
@@ -54,38 +83,39 @@ class ChatPage extends GetView<ChatController> {
                     ),
                   );
                 },
-              ),
-            ),
+              );
+            }),
           ),
-          SafeArea(
-            top: false,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: controller.messageController,
-                      decoration: InputDecoration(
-                        hintText: TKeys.typeMessage.tr,
-                        filled: true,
-                        fillColor: colorScheme.surfaceContainerLowest,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14),
-                          borderSide: BorderSide.none,
+          if (controller.canSend)
+            SafeArea(
+              top: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: controller.messageController,
+                        decoration: InputDecoration(
+                          hintText: TKeys.typeMessage.tr,
+                          filled: true,
+                          fillColor: colorScheme.surfaceContainerLowest,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: BorderSide.none,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 10),
-                  IconButton.filled(
-                    onPressed: controller.sendMessage,
-                    icon: const Icon(Icons.send),
-                  ),
-                ],
+                    const SizedBox(width: 10),
+                    Obx(() => IconButton.filled(
+                          onPressed: controller.isSending.value ? null : controller.sendMessage,
+                          icon: const Icon(Icons.send),
+                        )),
+                  ],
+                ),
               ),
             ),
-          ),
         ],
       ),
     );

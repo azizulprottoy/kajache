@@ -19,6 +19,9 @@ class ApiEndpoints {
   static const String portfolio = '/portfolio';
   static String portfolioById(String id) => '/portfolio/$id';
 
+  // Social Media
+  static const String socialMedia = '/socialMedia';
+
   // Banner
   static const String banner = '/banner';
   static const String advertisements = '/advertisement';
@@ -126,4 +129,9 @@ class ApiEndpoints {
   static const String rewards = '/reward';
   static const String reward = '/reward';
   static String rewardById(String id) => '/reward/$id';
+
+  // Support Chat
+  static const String supportChatMessage = '/supportChat/message';
+  static const String supportChatMe = '/supportChat/me';
+  static const String supportChatRead = '/supportChat/me/read';
 }
