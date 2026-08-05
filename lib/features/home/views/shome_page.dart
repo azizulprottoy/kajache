@@ -153,23 +153,6 @@ class SHomePage extends GetView<SHomeController> {
                     ),
                   ),
 
-                const SizedBox(height: 24),
-
-                Text(
-                  TKeys.recentActivities.tr,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: colorScheme.onSurface,
-                  ),
-                ),
-                const SizedBox(height: 12),
-
-                ...controller.recentActivities.map(
-                      (item) => _ActivityTile(
-                    title: item.title,
-                    subtitle: item.subtitle,
-                  ),
-                ),
               ],
             ),
           ),

@@ -40,13 +40,14 @@ class MenuPage extends StatelessWidget {
                   },
                 ),
                 _MenuDivider(),
-                _MenuTile(
-                  icon: Icons.work_outline,
-                  title: TKeys.myBookings.tr,
-                  onTap: () {
-                    Get.toNamed(AppRoutes.myBookings);
-                  },
-                ),
+                if (mainController.isBuyer)
+                  _MenuTile(
+                    icon: Icons.work_outline,
+                    title: TKeys.myBookings.tr,
+                    onTap: () {
+                      Get.toNamed(AppRoutes.myBookings);
+                    },
+                  ),
                 if (mainController.isServiceProvider) ...[
                   _MenuTile(
                     icon: Icons.work_history_outlined,

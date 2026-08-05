@@ -66,6 +66,9 @@ class ApiEndpoints {
   // Payment
   static String payment(String bookingId) => '/booking/$bookingId/confirm-payment';
   static String markCashReceived(String bookingId) => '/booking/$bookingId/mark-cash-received';
+  static String customerCancelBid(String bookingId) => '/booking/$bookingId/customer-cancel-bid';
+  static String technicianCancelBid(String bookingId) => '/booking/$bookingId/technician-cancel-bid';
+  static String respondReassignment(String bookingId) => '/booking/$bookingId/respond-reassignment';
   static String updateTechnicianLocation(String bookingId) => '/booking/$bookingId/technician-location';
   static String getTechnicianLocation(String bookingId) => '/booking/$bookingId/technician-location';
   static const String paymentMethods = '/paymentMethod';

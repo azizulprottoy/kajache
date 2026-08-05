@@ -6,7 +6,9 @@ import 'package:get/get.dart';
 import '../../../core/utils/translation_keys.dart';
 import '../../../shared/shimmers/statistics_shimmer.dart';
 import '../../../shared/widgets/common_app_bar.dart';
+import '../../../app/routes/app_routes.dart';
 import '../../home/models/available_booking_response_model.dart';
+import '../../sbooking/booking_details_arguments.dart';
 import '../controller/statistics_controller.dart';
 
 class StatisticsPage extends GetView<StatisticsController> {
@@ -62,9 +64,15 @@ class StatisticsPage extends GetView<StatisticsController> {
                 ...controller.acceptedBookings.map(
                   (booking) => Padding(
                     padding: const EdgeInsets.only(bottom: 14),
-                    child: _AcceptedBookingCard(
-                      booking: booking,
-                      controller: controller,
+                    child: GestureDetector(
+                      onTap: () => Get.toNamed(
+                        AppRoutes.bookingDetails,
+                        arguments: BookingDetailsArgument(bookingId: booking.bookingId),
+                      ),
+                      child: _AcceptedBookingCard(
+                        booking: booking,
+                        controller: controller,
+                      ),
                     ),
                   ),
                 ),

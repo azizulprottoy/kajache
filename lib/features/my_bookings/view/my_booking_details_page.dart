@@ -48,6 +48,34 @@ class MyBookingDetailsPage extends GetView<MyBookingDetailsController> {
                 _PaymentDueBanner(controller: controller),
               ],
 
+              // Customer cancel — allowed when bid_selected (no refund)
+              if (booking.status.trim().toLowerCase() == 'bid_selected') ...[
+                const SizedBox(height: 14),
+                Obx(() => SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: controller.isCancellingBid.value
+                        ? null
+                        : () async {
+                            final reason = await _promptReason(context, 'Cancel Booking',
+                                'Why are you cancelling? (Payment non-refundable)');
+                            if (reason == null) return;
+                            await controller.cancelBid(reason: reason);
+                          },
+                    icon: controller.isCancellingBid.value
+                        ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                        : const Icon(Icons.cancel_outlined),
+                    label: const Text('Cancel Booking'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Theme.of(context).colorScheme.error,
+                      side: BorderSide(color: Theme.of(context).colorScheme.error),
+                      minimumSize: const Size.fromHeight(48),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    ),
+                  ),
+                )),
+              ],
+
               // Track Technician button (shown when in_progress and booking has coordinates)
               if ((booking.status.trim().toLowerCase() == 'in_progress' ||
                   booking.status.trim().toLowerCase() == 'bid_selected') &&
@@ -234,6 +262,32 @@ class MyBookingDetailsPage extends GetView<MyBookingDetailsController> {
           ),
         );
       }),
+    );
+  }
+
+  Future<String?> _promptReason(BuildContext context, String title, String hint) async {
+    final ctrl = TextEditingController();
+    return showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(title),
+        content: TextField(
+          controller: ctrl,
+          maxLines: 3,
+          decoration: InputDecoration(
+            hintText: hint,
+            border: const OutlineInputBorder(),
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(TKeys.cancel.tr)),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.error),
+            onPressed: () => Navigator.pop(ctx, ctrl.text.trim()),
+            child: Text(TKeys.confirm.tr),
+          ),
+        ],
+      ),
     );
   }
 

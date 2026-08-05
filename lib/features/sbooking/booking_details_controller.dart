@@ -14,6 +14,8 @@ class BookingDetailsController extends GetxController {
   final RxBool isLoading = true.obs;
   final RxBool isBidLoading = false.obs;
   final RxBool isMarkingCash = false.obs;
+  final RxBool isCancellingBid = false.obs;
+  final RxBool isRespondingReassignment = false.obs;
   final Rxn<AvailableBookingModel> booking =
       Rxn<AvailableBookingModel>();
 
@@ -100,6 +102,42 @@ class BookingDetailsController extends GetxController {
       return false;
     } finally {
       if (!isClosed) isBidLoading.value = false;
+    }
+  }
+
+  Future<bool> cancelBid({String reason = ''}) async {
+    if (isCancellingBid.value) return false;
+    isCancellingBid.value = true;
+    try {
+      await _repository.cancelBid(bookingId, reason: reason);
+      await fetchBooking();
+      Get.snackbar(TKeys.success.tr, 'Bid cancelled.',
+          snackPosition: SnackPosition.BOTTOM);
+      return true;
+    } catch (e) {
+      Get.snackbar(TKeys.error.tr,
+          e.toString().replaceFirst('Exception: ', ''),
+          snackPosition: SnackPosition.BOTTOM);
+      return false;
+    } finally {
+      if (!isClosed) isCancellingBid.value = false;
+    }
+  }
+
+  Future<bool> respondReassignment({required bool accept}) async {
+    if (isRespondingReassignment.value) return false;
+    isRespondingReassignment.value = true;
+    try {
+      await _repository.respondReassignment(bookingId, accept: accept);
+      await fetchBooking();
+      return true;
+    } catch (e) {
+      Get.snackbar(TKeys.error.tr,
+          e.toString().replaceFirst('Exception: ', ''),
+          snackPosition: SnackPosition.BOTTOM);
+      return false;
+    } finally {
+      if (!isClosed) isRespondingReassignment.value = false;
     }
   }
 

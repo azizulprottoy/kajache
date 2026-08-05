@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../../core/storage/secure_storage_service.dart';
+import '../../../core/storage/local_storage_service.dart';
 import '../model/chat_model.dart';
 import '../repository/chat_repository.dart';
 
@@ -12,7 +12,7 @@ const _pollInterval = Duration(seconds: 5);
 
 class ChatController extends GetxController {
   final ChatRepository _repository = ChatRepository();
-  final _secureStorage = Get.find<SecureStorageService>();
+  final _localStorage = Get.find<LocalStorageService>();
 
   final messageController = TextEditingController();
   final RxList<BookingChatMessageModel> messages = <BookingChatMessageModel>[].obs;
@@ -49,7 +49,7 @@ class ChatController extends GetxController {
   }
 
   Future<void> _init() async {
-    _currentUserId = await _secureStorage.getUserId();
+    _currentUserId = _localStorage.read<String>('user_id');
     await _loadMessages();
     _pollTimer = Timer.periodic(_pollInterval, (_) => _loadMessages(silent: true));
   }

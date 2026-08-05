@@ -75,4 +75,16 @@ class BookingDetailsRepository {
     await _requireConnection();
     await _dio.post(ApiEndpoints.markCashReceived(bookingId));
   }
+
+  Future<void> cancelBid(String bookingId, {String reason = ''}) async {
+    await _requireConnection();
+    await _dio.post(ApiEndpoints.technicianCancelBid(bookingId),
+        data: {'reason': reason});
+  }
+
+  Future<void> respondReassignment(String bookingId, {required bool accept}) async {
+    await _requireConnection();
+    await _dio.post(ApiEndpoints.respondReassignment(bookingId),
+        data: {'accept': accept});
+  }
 }

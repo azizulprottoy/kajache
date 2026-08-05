@@ -24,119 +24,259 @@ class AboutUsPage extends GetView<AboutUsController> {
       ),
       body: RefreshIndicator(
         onRefresh: controller.refresh,
-        child: Obx(() {
-          if (controller.isLoading.value) {
-            return const _SocialMediaShimmer();
-          }
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 12),
 
-          if (controller.socialMedias.isEmpty) {
-            return ListView(
-              padding: const EdgeInsets.symmetric(vertical: 24),
-              children: [
-                Center(
-                  child: Text(
-                    TKeys.noSocialMediaAvailable.tr,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
+              // ── Logo ──────────────────────────────────────────────────────
+              ClipRRect(
+                borderRadius: BorderRadius.circular(24),
+                child: Image.asset(
+                  'assets/images/logo.png',
+                  width: 96,
+                  height: 96,
+                  fit: BoxFit.contain,
+                  errorBuilder: (_, __, ___) => Container(
+                    width: 96, height: 96,
+                    decoration: BoxDecoration(
+                      color: colorScheme.primaryContainer,
+                      borderRadius: BorderRadius.circular(24),
                     ),
+                    child: Icon(Icons.handyman_outlined,
+                        size: 48, color: colorScheme.onPrimaryContainer),
                   ),
                 ),
-              ],
-            );
-          }
+              ),
+              const SizedBox(height: 16),
 
-          return ListView.separated(
-            padding: const EdgeInsets.all(16),
-            itemCount: controller.socialMedias.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 10),
-            itemBuilder: (context, index) {
-              final item = controller.socialMedias[index];
-              return _SocialMediaTile(
-                item: item,
-                onTap: () => controller.openLink(item.url),
-              );
-            },
-          );
-        }),
-      ),
-    );
-  }
-}
+              // ── App name ──────────────────────────────────────────────────
+              Text(
+                'Kaj Ache',
+                style: theme.textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.w900,
+                  color: colorScheme.primary,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                TKeys.aboutUsTagline.tr,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 28),
 
-class _SocialMediaTile extends StatelessWidget {
-  final SocialMediaModel item;
-  final VoidCallback onTap;
+              // ── About card ────────────────────────────────────────────────
+              _InfoCard(
+                icon: Icons.info_outline_rounded,
+                title: TKeys.aboutUsTitle.tr,
+                body: TKeys.aboutUsBody.tr,
+                colorScheme: colorScheme,
+                theme: theme,
+              ),
+              const SizedBox(height: 14),
 
-  const _SocialMediaTile({required this.item, required this.onTap});
+              // ── Mission card ──────────────────────────────────────────────
+              _InfoCard(
+                icon: Icons.emoji_objects_outlined,
+                title: TKeys.ourMission.tr,
+                body: TKeys.ourMissionBody.tr,
+                colorScheme: colorScheme,
+                theme: theme,
+              ),
+              const SizedBox(height: 14),
 
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+              // ── Contact card ──────────────────────────────────────────────
+              _InfoCard(
+                icon: Icons.contact_support_outlined,
+                title: TKeys.contactTitle.tr,
+                body: TKeys.contactBody.tr,
+                colorScheme: colorScheme,
+                theme: theme,
+              ),
+              const SizedBox(height: 28),
 
-    return Container(
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: colorScheme.borderColor),
-      ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-        leading: ClipRRect(
-          borderRadius: BorderRadius.circular(10),
-          child: item.image.isNotEmpty
-              ? Image.network(
-                  item.image,
-                  width: 42,
-                  height: 42,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => _fallbackIcon(colorScheme),
-                )
-              : _fallbackIcon(colorScheme),
-        ),
-        title: Text(
-          item.name,
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-            color: colorScheme.onSurface,
+              // ── Social media row ──────────────────────────────────────────
+              Text(
+                TKeys.followUs.tr,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.onSurface,
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              Obx(() {
+                if (controller.isLoading.value) {
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(4, (_) => Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 8),
+                      width: 52, height: 52,
+                      decoration: BoxDecoration(
+                        color: colorScheme.surfaceContainerLowest,
+                        shape: BoxShape.circle,
+                      ),
+                    )),
+                  );
+                }
+
+                if (controller.socialMedias.isEmpty) {
+                  return Text(
+                    TKeys.noSocialMediaAvailable.tr,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant),
+                  );
+                }
+
+                return Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 16,
+                  runSpacing: 16,
+                  children: controller.socialMedias.map((item) =>
+                    _SocialIcon(
+                      item: item,
+                      onTap: () => controller.openLink(item.url),
+                      colorScheme: colorScheme,
+                    ),
+                  ).toList(),
+                );
+              }),
+
+              const SizedBox(height: 32),
+
+              // ── Version ───────────────────────────────────────────────────
+              Text(
+                TKeys.appVersion.tr,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
           ),
         ),
-        trailing: Icon(
-          Icons.open_in_new_rounded,
-          size: 18,
-          color: colorScheme.onSurfaceVariant,
-        ),
-        onTap: onTap,
       ),
-    );
-  }
-
-  Widget _fallbackIcon(ColorScheme colorScheme) {
-    return Container(
-      width: 42,
-      height: 42,
-      color: colorScheme.primary.withOpacity(0.10),
-      child: Icon(Icons.public_rounded, color: colorScheme.primary),
     );
   }
 }
 
-class _SocialMediaShimmer extends StatelessWidget {
-  const _SocialMediaShimmer();
+// ── Info card ─────────────────────────────────────────────────────────────────
+class _InfoCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String body;
+  final ColorScheme colorScheme;
+  final ThemeData theme;
+
+  const _InfoCard({
+    required this.icon,
+    required this.title,
+    required this.body,
+    required this.colorScheme,
+    required this.theme,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return ListView.separated(
+    return Container(
+      width: double.infinity,
       padding: const EdgeInsets.all(16),
-      itemCount: 5,
-      separatorBuilder: (_, __) => const SizedBox(height: 10),
-      itemBuilder: (_, __) => Container(
-        height: 58,
-        decoration: BoxDecoration(
-          color: colorScheme.surfaceContainerLowest,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: colorScheme.borderColor),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: colorScheme.borderColor),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(children: [
+            Container(
+              width: 34, height: 34,
+              decoration: BoxDecoration(
+                color: colorScheme.primaryContainer,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(icon, size: 18, color: colorScheme.onPrimaryContainer),
+            ),
+            const SizedBox(width: 10),
+            Text(title,
+                style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: colorScheme.onSurface)),
+          ]),
+          const SizedBox(height: 10),
+          Text(body,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant, height: 1.6)),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Social icon button ────────────────────────────────────────────────────────
+class _SocialIcon extends StatelessWidget {
+  final SocialMediaModel item;
+  final VoidCallback onTap;
+  final ColorScheme colorScheme;
+
+  const _SocialIcon({
+    required this.item,
+    required this.onTap,
+    required this.colorScheme,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: item.name,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 56, height: 56,
+              decoration: BoxDecoration(
+                color: colorScheme.surfaceContainerLowest,
+                shape: BoxShape.circle,
+                border: Border.all(color: colorScheme.borderColor),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.06),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: ClipOval(
+                child: item.image.isNotEmpty
+                    ? Image.network(
+                        item.image,
+                        width: 56, height: 56,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => Icon(
+                            Icons.public_rounded,
+                            color: colorScheme.primary),
+                      )
+                    : Icon(Icons.public_rounded, color: colorScheme.primary),
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              item.name,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
         ),
       ),
     );

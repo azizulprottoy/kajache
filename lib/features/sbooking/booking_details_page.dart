@@ -63,6 +63,82 @@ class BookingDetailsPage extends GetView<BookingDetailsController> {
                   ),
                 ),
 
+              // Reassignment offer — technician accept/decline
+              if (booking.status == 'pending_reassignment') ...[
+                const SizedBox(height: 20),
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: Colors.orange.shade300),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(children: [
+                        Icon(Icons.assignment_late_outlined, color: Colors.orange.shade700),
+                        const SizedBox(width: 8),
+                        Text('Job Reassigned to You',
+                            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                fontWeight: FontWeight.bold, color: Colors.orange.shade800)),
+                      ]),
+                      const SizedBox(height: 6),
+                      Text('Previous technician cancelled. Accept to take this job.',
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.orange.shade700)),
+                      const SizedBox(height: 14),
+                      Obx(() => Row(children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: controller.isRespondingReassignment.value
+                                ? null
+                                : () => controller.respondReassignment(accept: false),
+                            style: OutlinedButton.styleFrom(foregroundColor: Colors.red,
+                                side: const BorderSide(color: Colors.red),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                            child: const Text('Decline'),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: FilledButton(
+                            onPressed: controller.isRespondingReassignment.value
+                                ? null
+                                : () => controller.respondReassignment(accept: true),
+                            style: FilledButton.styleFrom(backgroundColor: Colors.green,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                            child: const Text('Accept Job'),
+                          ),
+                        ),
+                      ])),
+                    ],
+                  ),
+                ),
+              ],
+
+              // Technician cancel bid — only when bid_selected
+              if (booking.status == 'bid_selected') ...[
+                const SizedBox(height: 20),
+                Obx(() => SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: controller.isCancellingBid.value
+                        ? null
+                        : () => _showCancelDialog(context),
+                    icon: controller.isCancellingBid.value
+                        ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                        : const Icon(Icons.cancel_outlined),
+                    label: const Text('Cancel Bid'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.red,
+                      side: const BorderSide(color: Colors.red),
+                      minimumSize: const Size.fromHeight(48),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    ),
+                  ),
+                )),
+              ],
+
               // Navigate to customer location map
               if (booking.locationLat != null &&
                   (booking.status == 'bidding_open' ||
@@ -194,6 +270,40 @@ class BookingDetailsPage extends GetView<BookingDetailsController> {
           ),
         );
       }),
+    );
+  }
+
+  void _showCancelDialog(BuildContext context) {
+    final reasonCtrl = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Cancel Bid'),
+        content: Column(mainAxisSize: MainAxisSize.min, children: [
+          const Text('⚠️ You will receive a strike and lose 20 reward points.',
+              style: TextStyle(color: Colors.red, fontSize: 13)),
+          const SizedBox(height: 12),
+          TextField(
+            controller: reasonCtrl,
+            maxLines: 3,
+            decoration: const InputDecoration(
+              hintText: 'Reason for cancellation (required)',
+              border: OutlineInputBorder(),
+            ),
+          ),
+        ]),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Back')),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () {
+              Navigator.pop(ctx);
+              controller.cancelBid(reason: reasonCtrl.text.trim());
+            },
+            child: const Text('Confirm Cancel'),
+          ),
+        ],
+      ),
     );
   }
 

@@ -331,6 +331,15 @@ const Map<String, String> bnBD = {
 
   // About Us
   TKeys.noSocialMediaAvailable: 'কোনো সোশ্যাল মিডিয়া লিংক পাওয়া যায়নি',
+  TKeys.aboutUsTagline:  'কাজ আছে — Need Work Done',
+  TKeys.aboutUsTitle:    'আমাদের সম্পর্কে',
+  TKeys.aboutUsBody:     'কাজ আছে বাংলাদেশের একটি বিশ্বস্ত হোম সার্ভিস মার্কেটপ্লেস — দক্ষ টেকনিশিয়ানদের সাথে গ্রাহকদের সংযুক্ত করে। ইলেকট্রিক্যাল মেরামত থেকে প্লাম্বিং, ক্লিনিং থেকে যন্ত্রপাতি সার্ভিসিং — কাছের বিশ্বস্ত পেশাদার খোঁজা এখন সহজ।',
+  TKeys.ourMission:      'আমাদের লক্ষ্য',
+  TKeys.ourMissionBody:  'স্থানীয় সেবা প্রদানকারীদের প্রযুক্তি দিয়ে ক্ষমতায়ন করা এবং গ্রাহকদের স্বচ্ছ, সাশ্রয়ী ও নিরাপদ হোম সার্ভিস দেওয়া — একটি কাজ একটি বিশ্বাস।',
+  TKeys.contactTitle:    'যোগাযোগ',
+  TKeys.contactBody:     'ইমেইল: support@kajache.com\nফোন: +880 1800 000000\nওয়েবসাইট: www.kajache.com',
+  TKeys.followUs:        'আমাদের অনুসরণ করুন',
+  TKeys.appVersion:      'v1.0.0 · © ২০২৫ কাজ আছে',
   TKeys.couldNotOpenLink:       'লিংক খোলা যায়নি',
 
   // Customer Support

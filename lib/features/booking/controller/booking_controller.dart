@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../app/routes/app_routes.dart';
+import '../../main/controller/main_controller.dart';
 import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/success_model.dart';
 import '../arguments/service_booking_arguments.dart';
@@ -76,6 +77,17 @@ class BookingController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+
+    // Block technicians from booking flow
+    final mainCtrl = Get.find<MainController>();
+    if (mainCtrl.isServiceProvider) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Get.back();
+        Get.snackbar(TKeys.error.tr, 'Technicians cannot book services.',
+            snackPosition: SnackPosition.BOTTOM);
+      });
+      return;
+    }
 
     final args = Get.arguments as ServiceBookingArgument?;
 

@@ -240,6 +240,27 @@ class MyBookingDetailsController extends GetxController {
     }
   }
 
+  final isCancellingBid = false.obs;
+
+  Future<bool> cancelBid({String reason = ''}) async {
+    if (isCancellingBid.value) return false;
+    isCancellingBid.value = true;
+    try {
+      await repository.cancelBid(bookingId, reason: reason);
+      await fetchBooking();
+      Get.snackbar(TKeys.success.tr, 'Booking cancelled.',
+          snackPosition: SnackPosition.BOTTOM);
+      return true;
+    } catch (e) {
+      Get.snackbar(TKeys.error.tr,
+          e.toString().replaceFirst('Exception: ', ''),
+          snackPosition: SnackPosition.BOTTOM);
+      return false;
+    } finally {
+      isCancellingBid.value = false;
+    }
+  }
+
   Future<bool> completeTask() async {
     if (bookingId.isEmpty) {
       Get.snackbar(

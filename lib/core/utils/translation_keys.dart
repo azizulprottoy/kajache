@@ -329,6 +329,15 @@ class TKeys {
 
   // ── About Us ──────────────────────────────────────────────────────────────────────
   static const noSocialMediaAvailable   = 'no_social_media_available';
+  static const aboutUsTagline           = 'about_us_tagline';
+  static const aboutUsTitle            = 'about_us_title';
+  static const aboutUsBody             = 'about_us_body';
+  static const ourMission              = 'our_mission';
+  static const ourMissionBody          = 'our_mission_body';
+  static const contactTitle            = 'contact_title';
+  static const contactBody             = 'contact_body';
+  static const followUs                = 'follow_us';
+  static const appVersion              = 'app_version';
   static const couldNotOpenLink         = 'could_not_open_link';
 
   // ── Customer Support ────────────────────────────────────────────────────────────────

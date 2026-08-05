@@ -329,6 +329,15 @@ const Map<String, String> enUS = {
 
   // About Us
   TKeys.noSocialMediaAvailable: 'No social media links available',
+  TKeys.aboutUsTagline:  'Kaj Ache — Need Work Done',
+  TKeys.aboutUsTitle:    'About Us',
+  TKeys.aboutUsBody:     'Kaj Ache is Bangladesh\'s trusted home services marketplace — connecting skilled technicians with customers who need quality work done. From electrical repairs to plumbing, cleaning to appliance servicing, we make it easy to find reliable professionals near you.',
+  TKeys.ourMission:      'Our Mission',
+  TKeys.ourMissionBody:  'To empower local service providers with technology and provide customers with transparent, affordable, and safe home services — building trust one job at a time.',
+  TKeys.contactTitle:    'Contact',
+  TKeys.contactBody:     'Email: support@kajache.com\nPhone: +880 1800 000000\nWebsite: www.kajache.com',
+  TKeys.followUs:        'Follow Us',
+  TKeys.appVersion:      'v1.0.0 · © 2025 Kaj Ache',
   TKeys.couldNotOpenLink:       'Could not open link',
 
   // Customer Support

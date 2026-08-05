@@ -175,4 +175,10 @@ class MyBookingRepository {
       },
     );
   }
+
+  Future<void> cancelBid(String bookingId, {String reason = ''}) async {
+    if (!await _networkInfo.isConnected) throw Exception('No internet connection');
+    await _dio.post(ApiEndpoints.customerCancelBid(bookingId),
+        data: {'reason': reason});
+  }
 }
