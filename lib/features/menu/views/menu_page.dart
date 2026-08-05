@@ -40,7 +40,7 @@ class MenuPage extends StatelessWidget {
                   },
                 ),
                 _MenuDivider(),
-                if (mainController.isBuyer)
+                if (mainController.isBuyer) ...[
                   _MenuTile(
                     icon: Icons.work_outline,
                     title: TKeys.myBookings.tr,
@@ -48,12 +48,45 @@ class MenuPage extends StatelessWidget {
                       Get.toNamed(AppRoutes.myBookings);
                     },
                   ),
+                  _MenuDivider(),
+                  _MenuTile(
+                    icon: Icons.bolt_outlined,
+                    title: TKeys.myInstantServices.tr,
+                    onTap: () {
+                      Get.toNamed(AppRoutes.myInstantServices);
+                    },
+                  ),
+                  _MenuDivider(),
+                  _MenuTile(
+                    icon: Icons.badge_outlined,
+                    title: TKeys.myRecruitmentRequests.tr,
+                    onTap: () {
+                      Get.toNamed(AppRoutes.myRecruitmentRequests);
+                    },
+                  ),
+                ],
                 if (mainController.isServiceProvider) ...[
                   _MenuTile(
                     icon: Icons.work_history_outlined,
                     title: TKeys.portfolio.tr,
                     onTap: () {
                       Get.toNamed(AppRoutes.portfolioPage);
+                    },
+                  ),
+                  _MenuDivider(),
+                  _MenuTile(
+                    icon: Icons.bolt_outlined,
+                    title: TKeys.availableInstantServices.tr,
+                    onTap: () {
+                      Get.toNamed(AppRoutes.availableInstantServices);
+                    },
+                  ),
+                  _MenuDivider(),
+                  _MenuTile(
+                    icon: Icons.badge_outlined,
+                    title: TKeys.availableRecruitmentRequests.tr,
+                    onTap: () {
+                      Get.toNamed(AppRoutes.availableRecruitmentRequests);
                     },
                   ),
                 ],

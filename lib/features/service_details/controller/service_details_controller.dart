@@ -7,6 +7,7 @@ import '../../home/models/available_booking_response_model.dart';
 import '../../reviews/models/review_model.dart';
 import '../arguments/service_details_arguments.dart';
 import '../model/comment_model.dart';
+import '../../../core/storage/local_storage_service.dart';
 import '../../../core/utils/translation_keys.dart';
 import '../repository/service_details_repository.dart';
 
@@ -257,9 +258,9 @@ class ServiceDetailsController extends GetxController {
     try {
       final newComment = await _repository.addComment(
         serviceId: serviceId,
-        name: userName ?? 'User',
+        name: userName ?? Get.find<LocalStorageService>().read<String>('username') ?? 'User',
+        propic: userPropic ?? Get.find<LocalStorageService>().read<String>('user_avatar'),
         comment: text,
-        propic: userPropic,
       );
       comments.insert(0, newComment);
       commentInputController.clear();

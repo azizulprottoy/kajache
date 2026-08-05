@@ -283,48 +283,6 @@ class _Step1Body extends GetView<BookingController> {
             style: theme.textTheme.bodySmall
                 ?.copyWith(color: colorScheme.onSurfaceVariant)),
 
-        SizedBox(height: 20,),
-        Text(TKeys.selectSubservices.tr,
-            style: theme.textTheme.labelLarge
-                ?.copyWith(fontWeight: FontWeight.bold)),
-        const SizedBox(height: 10),
-
-        Obx(() => Wrap(
-          spacing: 10,
-          runSpacing: 10,
-          children: controller.subServiceOptions.map((sub) {
-            final isSelected = controller.selectedSubServices.contains(sub);
-            return GestureDetector(
-              onTap: () => controller.toggleSubService(sub),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? colorScheme.primary.withOpacity(0.08)
-                      : colorScheme.surface,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: isSelected
-                        ? colorScheme.primary
-                        : colorScheme.borderColor,
-                    width: isSelected ? 1.5 : 1,
-                  ),
-                ),
-                child: Text(
-                  sub,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: isSelected
-                        ? colorScheme.primary
-                        : colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ),
-            );
-          }).toList(),
-        )),
-
         const SizedBox(height: 20),
 
         // Problem details

@@ -31,6 +31,18 @@ class AppRoutes {
   static const myBookings       = '/myBookings';
   static const myBookingDetails   ='/myBookingDetails';
   static const supportChatPage = '/supportChat';
+
+  // Instant Service
+  static const instantServicePage = '/instantServicePage';
+  static const myInstantServices = '/myInstantServices';
+  static const myInstantServiceDetails = '/myInstantServiceDetails';
+  static const availableInstantServices = '/availableInstantServices';
+
+  // Recruitment Request
+  static const recruitmentRequestPage = '/recruitmentRequestPage';
+  static const myRecruitmentRequests = '/myRecruitmentRequests';
+  static const myRecruitmentRequestDetails = '/myRecruitmentRequestDetails';
+  static const availableRecruitmentRequests = '/availableRecruitmentRequests';
 }
 //   static const onboarding = '/onboarding';
 //   // Main

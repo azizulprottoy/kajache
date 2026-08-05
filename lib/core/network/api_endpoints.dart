@@ -137,4 +137,33 @@ class ApiEndpoints {
   static const String supportChatMessage = '/supportChat/message';
   static const String supportChatMe = '/supportChat/me';
   static const String supportChatRead = '/supportChat/me/read';
+
+  // Instant Service (fee paid AFTER a bid is selected)
+  static const String instantServices = '/instantService';
+  static const String instantService = '/instantService';
+  static const String myInstantServices = '/instantService/me';
+  static const String availableInstantServices = '/instantService/available';
+  static String instantServiceById(String id) => '/instantService/$id';
+  static String instantServiceSelectBid(String id) => '/instantService/$id/select-bid';
+  static String instantServicePayment(String id) => '/instantService/$id/confirm-payment';
+  static String instantServiceAccept(String id) => '/instantService/$id/accept';
+  static String instantServiceComplete(String id) => '/instantService/$id/complete';
+  static String instantServiceCancel(String id) => '/instantService/$id/cancel';
+  static String instantServiceBids(String id) => '/instantService/$id/bids';
+  static String instantServiceBid_(String id) => '/instantService/$id/bid';
+  static String instantServiceUpdateBid(String id, String bidId) => '/instantService/$id/bid/$bidId';
+
+  // Recruitment Request (fee paid UPFRONT, before bidding opens)
+  static const String recruitmentRequests = '/recruitmentRequest';
+  static const String recruitmentRequest = '/recruitmentRequest';
+  static const String myRecruitmentRequests = '/recruitmentRequest/me';
+  static const String availableRecruitmentRequests = '/recruitmentRequest/available';
+  static String recruitmentRequestById(String id) => '/recruitmentRequest/$id';
+  static String recruitmentRequestSelectBid(String id) => '/recruitmentRequest/$id/select-bid';
+  static String recruitmentRequestPayment(String id) => '/recruitmentRequest/$id/confirm-payment';
+  static String recruitmentRequestEnd(String id) => '/recruitmentRequest/$id/end';
+  static String recruitmentRequestCancel(String id) => '/recruitmentRequest/$id/cancel';
+  static String recruitmentRequestBids(String id) => '/recruitmentRequest/$id/bids';
+  static String recruitmentRequestBid_(String id) => '/recruitmentRequest/$id/bid';
+  static String recruitmentRequestUpdateBid(String id, String bidId) => '/recruitmentRequest/$id/bid/$bidId';
 }

@@ -275,6 +275,61 @@ class TKeys {
   static const viewDetails              = 'view_details';
   static const noServicesAvailable      = 'no_services_available';
 
+  // ── Instant Service / Recruitment Request ────────────────────────────────────────
+  static const postInstantService       = 'post_instant_service';
+  static const myInstantServices        = 'my_instant_services';
+  static const availableInstantServices = 'available_instant_services';
+  static const postRecruitmentRequest   = 'post_recruitment_request';
+  static const myRecruitmentRequests    = 'my_recruitment_requests';
+  static const availableRecruitmentRequests = 'available_recruitment_requests';
+
+  // ── Recruitment Request details ──────────────────────────────────────────────────
+  static const recruitmentDetailsLabel     = 'recruitment_details_label';
+  static const recruitmentDetailsHint      = 'recruitment_details_hint';
+  static const durationLabel               = 'duration_label';
+  static const durationHint                = 'duration_hint';
+  static const salaryLabel                 = 'salary_label';
+  static const salaryHint                  = 'salary_hint';
+  static const payToPost                   = 'pay_to_post';
+  static const payToPostSubtitle           = 'pay_to_post_subtitle';
+  static const recruitmentPosted           = 'recruitment_posted';
+  static const recruitmentPostedMsg        = 'recruitment_posted_msg';
+  static const recruitmentPaymentFailedMsg = 'recruitment_payment_failed_msg';
+  static const viewMyJobPosts              = 'view_my_job_posts';
+  static const noJobPostsFound             = 'no_job_posts_found';
+  static const noOpenJobsFound             = 'no_open_jobs_found';
+  static const proposedSalaryLabel         = 'proposed_salary_label';
+  static const proposedSalaryHint          = 'proposed_salary_hint';
+  static const applicationMessageLabel     = 'application_message_label';
+  static const applicationMessageHint      = 'application_message_hint';
+  static const applyNow                    = 'apply_now';
+  static const updateApplication           = 'update_application';
+  static const applicationSubmitted        = 'application_submitted';
+  static const applicationSubmittedMsg     = 'application_submitted_msg';
+  static const applicationUpdated          = 'application_updated';
+  static const hireApplicant               = 'hire_applicant';
+  static const hiredSuccessfully           = 'hired_successfully';
+  static const hiredSuccessfullyMsg        = 'hired_successfully_msg';
+  static const endEngagement               = 'end_engagement';
+  static const engagementEnded             = 'engagement_ended';
+  static const cancelJobPost               = 'cancel_job_post';
+  static const jobPostCancelled            = 'job_post_cancelled';
+  static const recruitmentDetailsTitle     = 'recruitment_details_title';
+  static const applicantsLabel             = 'applicants_label';
+  static const instantServiceTitleLabel = 'instant_service_title_label';
+  static const instantServiceTitleHint  = 'instant_service_title_hint';
+  static const priceMin                 = 'price_min';
+  static const priceMax                 = 'price_max';
+  static const priceRangeHint           = 'price_range_hint';
+  static const invalidPriceRangeError   = 'invalid_price_range_error';
+  static const instantServiceSubmitted    = 'instant_service_submitted';
+  static const instantServiceSubmittedMsg = 'instant_service_submitted_msg';
+  static const noInstantServicesFound   = 'no_instant_services_found';
+  static const selectBidder             = 'select_bidder';
+  static const acceptJob                = 'accept_job';
+  static const cancelInstantService     = 'cancel_instant_service';
+  static const instantServiceDetailsTitle = 'instant_service_details_title';
+
   // ── Service Details / Bidding ─────────────────────────────────────────────────────
   static const bidNow                   = 'bid_now';
   static const editBid                  = 'edit_bid';

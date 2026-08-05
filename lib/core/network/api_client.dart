@@ -60,8 +60,9 @@ class _AuthInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
     if (err.response?.statusCode == 401) {
-      // Token expired — log out
       AppServices.handleUnauthorized();
+      handler.reject(err); // stop — don't propagate to controllers
+      return;
     }
     handler.next(err);
   }
@@ -149,20 +150,6 @@ class _PrettyLogInterceptor extends Interceptor {
 class _ErrorInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    String message;
-    switch (err.type) {
-      case DioExceptionType.connectionTimeout:
-      case DioExceptionType.receiveTimeout:
-      case DioExceptionType.sendTimeout:
-        message = 'Connection timed out. Please try again.';
-        break;
-      case DioExceptionType.connectionError:
-        message = 'No internet connection.';
-        break;
-      default:
-        message = err.response?.data?['message'] ?? 'Something went wrong.';
-    }
-    AppServices.showError(message);
     handler.next(err);
   }
 }

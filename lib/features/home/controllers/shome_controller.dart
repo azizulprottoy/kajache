@@ -3,6 +3,10 @@ import 'package:get/get.dart';
 import '../../../core/utils/translation_keys.dart';
 import '../models/available_booking_response_model.dart';
 import '../repository/shome_repository.dart';
+import '../../instantService/model/instant_service_model.dart';
+import '../../instantService/repository/instant_service_repository.dart';
+import '../../recruitmentRequest/model/recruitment_request_model.dart';
+import '../../recruitmentRequest/repository/recruitment_request_repository.dart';
 
 /// Controller for the technician (service-provider) home dashboard.
 ///
@@ -10,8 +14,12 @@ import '../repository/shome_repository.dart';
 
 class SHomeController extends GetxController {
   final SHomeRepository _repository = Get.find<SHomeRepository>();
+  final _instantRepo = InstantServiceRepository();
+  final _recruitRepo = RecruitmentRequestRepository();
 
   final RxBool isLoading = false.obs;
+  final RxList<InstantServiceModel> instantServices = <InstantServiceModel>[].obs;
+  final RxList<RecruitmentRequestModel> recruitmentRequests = <RecruitmentRequestModel>[].obs;
 
 
   final RxList<AvailableBookingModel> availableBookings =
@@ -40,6 +48,7 @@ class SHomeController extends GetxController {
   Future<void> fetchDashboardData() {
     isLoading.value = true;
 
+    _fetchInstantAndRecruitment();
     return _repository.getDashboard().then(_applyDashboard).catchError((error) {
       Get.snackbar(
         'error'.tr,
@@ -49,6 +58,19 @@ class SHomeController extends GetxController {
     }).whenComplete(() {
       isLoading.value = false;
     });
+  }
+
+  Future<void> _fetchInstantAndRecruitment() async {
+    try {
+      final results = await Future.wait([
+        _instantRepo.getAvailableInstantServices(),
+        _recruitRepo.getAvailableRecruitmentRequests(),
+      ]);
+      if (!isClosed) {
+        instantServices.assignAll(results[0] as List<InstantServiceModel>);
+        recruitmentRequests.assignAll(results[1] as List<RecruitmentRequestModel>);
+      }
+    } catch (_) {}
   }
 
   void _applyDashboard(SHomeDashboardModel dashboard) {

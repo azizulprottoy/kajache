@@ -54,6 +54,22 @@ import '../../features/service_details/binding/service_details_binding.dart';
 import '../../features/service_details/view/service_details_page.dart';
 import '../../features/services/bindings/service_binding.dart';
 import '../../features/spash/view/splash_page.dart';
+import '../../features/instantService/bindings/instant_service_binding.dart';
+import '../../features/instantService/view/instant_service_page.dart';
+import '../../features/instantService/bindings/my_instant_services_binding.dart';
+import '../../features/instantService/view/my_instant_services_page.dart';
+import '../../features/instantService/bindings/my_instant_service_details_binding.dart';
+import '../../features/instantService/view/my_instant_service_details_page.dart';
+import '../../features/instantService/bindings/available_instant_services_binding.dart';
+import '../../features/instantService/view/available_instant_services_page.dart';
+import '../../features/recruitmentRequest/bindings/recruitment_request_binding.dart';
+import '../../features/recruitmentRequest/view/recruitment_request_page.dart';
+import '../../features/recruitmentRequest/bindings/my_recruitment_requests_binding.dart';
+import '../../features/recruitmentRequest/view/my_recruitment_requests_page.dart';
+import '../../features/recruitmentRequest/bindings/my_recruitment_request_details_binding.dart';
+import '../../features/recruitmentRequest/view/my_recruitment_request_details_page.dart';
+import '../../features/recruitmentRequest/bindings/available_recruitment_requests_binding.dart';
+import '../../features/recruitmentRequest/view/available_recruitment_requests_page.dart';
 import 'app_routes.dart';
 
 class AppPages {
@@ -206,6 +222,46 @@ class AppPages {
       name: AppRoutes.supportChatPage,
       page: () => const SupportChatPage(),
       binding: SupportChatBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.instantServicePage,
+      page: () => const InstantServicePage(),
+      binding: InstantServiceBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.myInstantServices,
+      page: () => const MyInstantServicesPage(),
+      binding: MyInstantServicesBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.myInstantServiceDetails,
+      page: () => const MyInstantServiceDetailsPage(),
+      binding: MyInstantServiceDetailsBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.availableInstantServices,
+      page: () => const AvailableInstantServicesPage(),
+      binding: AvailableInstantServicesBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.recruitmentRequestPage,
+      page: () => const RecruitmentRequestPage(),
+      binding: RecruitmentRequestBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.myRecruitmentRequests,
+      page: () => const MyRecruitmentRequestsPage(),
+      binding: MyRecruitmentRequestsBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.myRecruitmentRequestDetails,
+      page: () => const MyRecruitmentRequestDetailsPage(),
+      binding: MyRecruitmentRequestDetailsBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.availableRecruitmentRequests,
+      page: () => const AvailableRecruitmentRequestsPage(),
+      binding: AvailableRecruitmentRequestsBinding(),
     ),
   ];
 }

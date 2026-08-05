@@ -8,6 +8,7 @@ import '../models/profile_model.dart';
 import '../models/worker_profile_model.dart';
 import '../../../core/utils/translation_keys.dart';
 import '../../../core/network/geo_repository.dart';
+import '../../../core/storage/local_storage_service.dart';
 import '../repository/profile_repository.dart';
 
 class ProfileController extends GetxController {
@@ -131,6 +132,11 @@ class ProfileController extends GetxController {
 
       final p = await _repository.getMyProfile();
       profile.value = p;
+
+      // Cache avatar for use in comments/replies
+      if (p.avatar.isNotEmpty) {
+        Get.find<LocalStorageService>().write('user_avatar', p.avatar);
+      }
 
       // Account type comes from the server (roleModelName)
       profileType.value = p.isServiceProvider

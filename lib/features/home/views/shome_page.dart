@@ -123,6 +123,56 @@ class SHomePage extends GetView<SHomeController> {
 
                 const SizedBox(height: 24),
 
+                // ── Instant Services ──────────────────────────────────────
+                _SectionHeader(
+                  title: TKeys.availableInstantServices.tr,
+                  icon: Icons.bolt_outlined,
+                  onSeeAll: () => Get.toNamed(AppRoutes.availableInstantServices),
+                  theme: theme,
+                  colorScheme: colorScheme,
+                ),
+                const SizedBox(height: 10),
+                if (controller.instantServices.isEmpty)
+                  _EmptyState(message: 'No instant service requests right now.')
+                else
+                  ...controller.instantServices.take(3).map((item) =>
+                    _QuickJobTile(
+                      title: item.title,
+                      subtitle: '৳${item.priceMin}–৳${item.priceMax}',
+                      icon: Icons.bolt_outlined,
+                      onTap: () => Get.toNamed(AppRoutes.availableInstantServices),
+                      colorScheme: colorScheme,
+                      theme: theme,
+                    ),
+                  ),
+
+                const SizedBox(height: 24),
+
+                // ── Recruitment Requests ──────────────────────────────────
+                _SectionHeader(
+                  title: TKeys.availableRecruitmentRequests.tr,
+                  icon: Icons.badge_outlined,
+                  onSeeAll: () => Get.toNamed(AppRoutes.availableRecruitmentRequests),
+                  theme: theme,
+                  colorScheme: colorScheme,
+                ),
+                const SizedBox(height: 10),
+                if (controller.recruitmentRequests.isEmpty)
+                  _EmptyState(message: 'No recruitment posts right now.')
+                else
+                  ...controller.recruitmentRequests.take(3).map((item) =>
+                    _QuickJobTile(
+                      title: item.title,
+                      subtitle: '৳${item.salary.toInt()} • ${item.category}',
+                      icon: Icons.badge_outlined,
+                      onTap: () => Get.toNamed(AppRoutes.availableRecruitmentRequests),
+                      colorScheme: colorScheme,
+                      theme: theme,
+                    ),
+                  ),
+
+                const SizedBox(height: 24),
+
                 Text(
                   TKeys.availableJobs.tr,
                   style: theme.textTheme.titleMedium?.copyWith(
@@ -439,6 +489,86 @@ class _ActivityTile extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _SectionHeader extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  final VoidCallback onSeeAll;
+  final ThemeData theme;
+  final ColorScheme colorScheme;
+
+  const _SectionHeader({
+    required this.title, required this.icon,
+    required this.onSeeAll, required this.theme, required this.colorScheme,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(children: [
+      Icon(icon, size: 18, color: colorScheme.primary),
+      const SizedBox(width: 8),
+      Expanded(child: Text(title, style: theme.textTheme.titleMedium?.copyWith(
+          fontWeight: FontWeight.bold, color: colorScheme.onSurface))),
+      TextButton(
+        onPressed: onSeeAll,
+        child: Text(TKeys.seeAll.tr,
+            style: theme.textTheme.labelMedium?.copyWith(color: colorScheme.primary)),
+      ),
+    ]);
+  }
+}
+
+class _QuickJobTile extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final VoidCallback onTap;
+  final ColorScheme colorScheme;
+  final ThemeData theme;
+
+  const _QuickJobTile({
+    required this.title, required this.subtitle, required this.icon,
+    required this.onTap, required this.colorScheme, required this.theme,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: colorScheme.borderColor),
+        ),
+        child: Row(children: [
+          Container(
+            width: 40, height: 40,
+            decoration: BoxDecoration(
+              color: colorScheme.primaryContainer,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, color: colorScheme.onPrimaryContainer, size: 20),
+          ),
+          const SizedBox(width: 12),
+          Expanded(child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis),
+              const SizedBox(height: 3),
+              Text(subtitle, style: theme.textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant)),
+            ],
+          )),
+          Icon(Icons.chevron_right_rounded, color: colorScheme.onSurfaceVariant, size: 18),
+        ]),
       ),
     );
   }
