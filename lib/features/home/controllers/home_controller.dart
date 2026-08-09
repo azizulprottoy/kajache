@@ -10,11 +10,19 @@ import '../models/banner_response_model.dart';
 import '../models/category_response_model.dart';
 import '../models/services_response_model.dart';
 import '../repository/home_repository.dart';
+import '../../instantService/model/instant_service_model.dart';
+import '../../instantService/repository/instant_service_repository.dart';
+import '../../recruitmentRequest/model/recruitment_request_model.dart';
+import '../../recruitmentRequest/repository/recruitment_request_repository.dart';
 
 class HomeController extends GetxController {
   final HomeRepository _homeRepository = Get.find<HomeRepository>();
+  final _instantRepo = InstantServiceRepository();
+  final _recruitRepo = RecruitmentRequestRepository();
 
   final RxBool isLoading = false.obs;
+  final RxList<InstantServiceModel> instantServices = <InstantServiceModel>[].obs;
+  final RxList<RecruitmentRequestModel> recruitmentPosts = <RecruitmentRequestModel>[].obs;
   final RxInt currentIndex = 1.obs;
   final RxInt currentBannerIndex = 0.obs;
 
@@ -35,6 +43,7 @@ class HomeController extends GetxController {
   Future<void> fetchHomeData() {
     isLoading.value = true;
 
+    _fetchPublicLists();
     return Future.wait([
       fetchBanners(),
       fetchCategories(),
@@ -65,6 +74,19 @@ class HomeController extends GetxController {
     return _homeRepository.getCategories().then((data) {
       categories.assignAll(data);
     });
+  }
+
+  Future<void> _fetchPublicLists() async {
+    try {
+      final results = await Future.wait([
+        _instantRepo.getAvailableInstantServices(),
+        _recruitRepo.getAvailableRecruitmentRequests(),
+      ]);
+      if (!isClosed) {
+        instantServices.assignAll(results[0] as List<InstantServiceModel>);
+        recruitmentPosts.assignAll(results[1] as List<RecruitmentRequestModel>);
+      }
+    } catch (_) {}
   }
 
   Future<void> fetchPopularServices() {

@@ -109,7 +109,7 @@ class ServiceDetailsPage extends GetView<ServiceDetailsController> {
 
               const SizedBox(height: 20),
 
-              AdBanner(position: 'service_top', height: 100, padding: EdgeInsets.only(bottom: 16)),
+              AdBanner(position: 'service_top',  padding: EdgeInsets.only(bottom: 16)),
 
               Text(
                 service.localizedTitle,
@@ -212,7 +212,7 @@ class ServiceDetailsPage extends GetView<ServiceDetailsController> {
 
               const SizedBox(height: 16),
 
-              AdBanner(position: 'service_middle', height: 100, padding: EdgeInsets.symmetric(vertical: 12)),
+              AdBanner(position: 'service_middle',  padding: EdgeInsets.symmetric(vertical: 12)),
 
               service.localizedDescription.isNotEmpty
                   ? Html(

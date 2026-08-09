@@ -8,13 +8,11 @@ import '../model/advertisement_model.dart';
 
 class AdBanner extends StatelessWidget {
   final String position;
-  final double height;
   final EdgeInsetsGeometry padding;
 
   const AdBanner({
     super.key,
     required this.position,
-    this.height = 120,
     this.padding = const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
   });
 
@@ -30,20 +28,19 @@ class AdBanner extends StatelessWidget {
       return Padding(
         padding: padding,
         child: ads.length == 1
-            ? _AdImage(ad: ads.first, height: height, onTap: () => ctrl.trackClick(ads.first.id))
-            : _AdCarousel(ads: ads, height: height, onTap: ctrl.trackClick),
+            ? _AdImage(ad: ads.first, onTap: () => ctrl.trackClick(ads.first.id))
+            : _AdCarousel(ads: ads, onTap: ctrl.trackClick),
       );
     });
   }
 }
 
-// ── Auto-advancing PageView carousel ────────────────────────────────────────
+// ── Auto-advancing PageView carousel ─────────────────────────────────────────
 class _AdCarousel extends StatefulWidget {
   final List<AdvertisementModel> ads;
-  final double height;
   final void Function(String adId) onTap;
 
-  const _AdCarousel({required this.ads, required this.height, required this.onTap});
+  const _AdCarousel({required this.ads, required this.onTap});
 
   @override
   State<_AdCarousel> createState() => _AdCarouselState();
@@ -53,12 +50,25 @@ class _AdCarouselState extends State<_AdCarousel> {
   late final PageController _pageController;
   Timer? _timer;
   int _current = 0;
+  double? _ratio;
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController();
     _startTimer();
+    _readRatio();
+  }
+
+  void _readRatio() {
+    if (widget.ads.isEmpty) return;
+    NetworkImage(widget.ads.first.imageUrl)
+        .resolve(ImageConfiguration.empty)
+        .addListener(ImageStreamListener((info, _) {
+      if (mounted) {
+        setState(() => _ratio = info.image.width / info.image.height);
+      }
+    }));
   }
 
   void _startTimer() {
@@ -82,53 +92,84 @@ class _AdCarouselState extends State<_AdCarousel> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: widget.height,
+    return AspectRatio(
+      aspectRatio: _ratio ?? 2.5,
       child: PageView.builder(
         controller: _pageController,
         onPageChanged: (i) => setState(() => _current = i),
         itemCount: widget.ads.length,
-        itemBuilder: (_, i) => _AdImage(
-          ad: widget.ads[i],
-          height: widget.height,
-          onTap: () => widget.onTap(widget.ads[i].id),
+        itemBuilder: (_, i) => ClipRRect(
+          borderRadius: BorderRadius.circular(14),
+          child: Image.network(
+            widget.ads[i].imageUrl,
+            width: double.infinity,
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+          ),
         ),
       ),
     );
   }
 }
 
-// ── Single ad image ──────────────────────────────────────────────────────────
-class _AdImage extends StatelessWidget {
+// ── Single ad image — reads actual image ratio ───────────────────────────────
+class _AdImage extends StatefulWidget {
   final AdvertisementModel ad;
-  final double height;
   final VoidCallback onTap;
 
-  const _AdImage({required this.ad, required this.height, required this.onTap});
+  const _AdImage({required this.ad, required this.onTap});
+
+  @override
+  State<_AdImage> createState() => _AdImageState();
+}
+
+class _AdImageState extends State<_AdImage> {
+  double? _ratio;
+
+  @override
+  void initState() {
+    super.initState();
+    _readRatio();
+  }
+
+  void _readRatio() {
+    final stream = NetworkImage(widget.ad.imageUrl)
+        .resolve(ImageConfiguration.empty);
+    stream.addListener(ImageStreamListener((info, _) {
+      if (mounted) {
+        setState(() {
+          _ratio = info.image.width / info.image.height;
+        });
+      }
+    }));
+  }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
+    if (_ratio == null) {
+      return AspectRatio(
+        aspectRatio: 2.5,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(14),
+          child: Container(color: colorScheme.surfaceContainerLowest),
+        ),
+      );
+    }
+
     return GestureDetector(
-      onTap: onTap,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(14),
-        child: Image.network(
-          ad.imageUrl,
-          height: height,
-          width: double.infinity,
-          fit: BoxFit.cover,
-          loadingBuilder: (_, child, progress) => progress == null
-              ? child
-              : Container(
-                  height: height,
-                  decoration: BoxDecoration(
-                    color: colorScheme.surfaceContainerLowest,
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                ),
-          errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+      onTap: widget.onTap,
+      child: AspectRatio(
+        aspectRatio: _ratio!,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(14),
+          child: Image.network(
+            widget.ad.imageUrl,
+            width: double.infinity,
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+          ),
         ),
       ),
     );

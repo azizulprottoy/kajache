@@ -100,7 +100,7 @@ class MyProfilePage extends GetView<ProfileController> {
                     ],
                   ),
                 ),
-                AdBanner(position: 'profile_middle', height: 100, padding: EdgeInsets.symmetric(vertical: 12)),
+                AdBanner(position: 'profile_middle',  padding: EdgeInsets.symmetric(vertical: 12)),
 
                 const SizedBox(height: 16),
                 _ProfileSection(

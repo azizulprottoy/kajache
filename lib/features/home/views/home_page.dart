@@ -8,6 +8,9 @@ import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/common_app_bar.dart';
 import '../../advertisements/widget/ad_banner.dart';
 import '../../services/views/popular_services_list.dart';
+import '../../../app/theme/context_extension.dart';
+import '../../instantService/model/instant_service_model.dart';
+import '../../recruitmentRequest/model/recruitment_request_model.dart';
 import '../controllers/home_controller.dart';
 
 class HomePage extends GetView<HomeController> {
@@ -92,27 +95,73 @@ class HomePage extends GetView<HomeController> {
                     onCategoryTap: controller.onCategoryTap,
                   ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
 
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () => Get.toNamed(AppRoutes.instantServicePage),
-                          icon: const Icon(Icons.bolt_outlined),
-                          label: Text(TKeys.postInstantService.tr),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () => Get.toNamed(AppRoutes.recruitmentRequestPage),
-                          icon: const Icon(Icons.badge_outlined),
-                          label: Text(TKeys.postRecruitmentRequest.tr),
-                        ),
-                      ),
-                    ],
+                  // ── Instant Service Requests ────────────────────────────
+                  _HomeSection(
+                    title: TKeys.availableInstantServices.tr,
+                    icon: Icons.bolt_outlined,
+                    onSeeAll: () => Get.toNamed(AppRoutes.myInstantServices),
+                    theme: theme,
+                    colorScheme: colorScheme,
                   ),
+                  const SizedBox(height: 8),
+                  Obx(() {
+                    if (controller.instantServices.isEmpty) {
+                      return _HomeSectionEmpty(icon: Icons.bolt_outlined, colorScheme: colorScheme, theme: theme);
+                    }
+                    return SizedBox(
+                      height: 88,
+                      child: ListView(
+                        scrollDirection: Axis.horizontal,
+                        children: controller.instantServices.map((item) =>
+                          _HomeJobTile(
+                            title: item.title,
+                            subtitle: '৳${item.priceMin}–৳${item.priceMax}',
+                            icon: Icons.bolt_outlined,
+                            image: item.image,
+                            onTap: () => Get.toNamed(AppRoutes.myInstantServices),
+                            colorScheme: colorScheme,
+                            theme: theme,
+                          ),
+                        ).toList(),
+                      ),
+                    );
+                  }),
+
+                  const SizedBox(height: 20),
+
+                  // ── Recruitment Requests ────────────────────────────────
+                  _HomeSection(
+                    title: TKeys.availableRecruitmentRequests.tr,
+                    icon: Icons.badge_outlined,
+                    onSeeAll: () => Get.toNamed(AppRoutes.myRecruitmentRequests),
+                    theme: theme,
+                    colorScheme: colorScheme,
+                  ),
+                  const SizedBox(height: 8),
+                  Obx(() {
+                    if (controller.recruitmentPosts.isEmpty) {
+                      return _HomeSectionEmpty(icon: Icons.badge_outlined, colorScheme: colorScheme, theme: theme);
+                    }
+                    return SizedBox(
+                      height: 88,
+                      child: ListView(
+                        scrollDirection: Axis.horizontal,
+                        children: controller.recruitmentPosts.map((item) =>
+                          _HomeJobTile(
+                            title: item.title,
+                            subtitle: '৳${item.salary.toInt()} • ${item.category}',
+                            icon: Icons.badge_outlined,
+                            image: item.image,
+                            onTap: () => Get.toNamed(AppRoutes.myRecruitmentRequests),
+                            colorScheme: colorScheme,
+                            theme: theme,
+                          ),
+                        ).toList(),
+                      ),
+                    );
+                  }),
 
                   AdBanner(position: 'home_middle'),
 
@@ -150,4 +199,100 @@ class HomePage extends GetView<HomeController> {
           ),
         )    );
   }
+}
+
+class _HomeSection extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  final VoidCallback onSeeAll;
+  final ThemeData theme;
+  final ColorScheme colorScheme;
+
+  const _HomeSection({required this.title, required this.icon,
+      required this.onSeeAll, required this.theme, required this.colorScheme});
+
+  @override
+  Widget build(BuildContext context) => Row(children: [
+    Icon(icon, size: 18, color: colorScheme.primary),
+    const SizedBox(width: 8),
+    Expanded(child: Text(title, style: theme.textTheme.titleSmall?.copyWith(
+        fontWeight: FontWeight.bold, color: colorScheme.onSurface))),
+    TextButton(onPressed: onSeeAll, child: Text(TKeys.seeAll.tr,
+        style: theme.textTheme.labelMedium?.copyWith(color: colorScheme.primary))),
+  ]);
+}
+
+class _HomeJobTile extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final String image;
+  final VoidCallback onTap;
+  final ColorScheme colorScheme;
+  final ThemeData theme;
+
+  const _HomeJobTile({required this.title, required this.subtitle, required this.icon,
+      this.image = '', required this.onTap, required this.colorScheme, required this.theme});
+
+  Widget _iconBox() => Container(
+    width: 30, height: 30,
+    decoration: BoxDecoration(color: colorScheme.primaryContainer, borderRadius: BorderRadius.circular(7)),
+    child: Icon(icon, color: colorScheme.onPrimaryContainer, size: 16),
+  );
+
+  @override
+  Widget build(BuildContext context) => GestureDetector(
+    onTap: onTap,
+    child: Container(
+      width: 200,
+      margin: const EdgeInsets.only(right: 10),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: colorScheme.borderColor),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(7),
+              child: image.isNotEmpty
+                  ? Image.network(image, width: 30, height: 30, fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => _iconBox())
+                  : _iconBox(),
+            ),
+            const Spacer(),
+            Icon(Icons.chevron_right_rounded, size: 14, color: colorScheme.onSurfaceVariant),
+          ]),
+          const SizedBox(height: 8),
+          Text(title, style: theme.textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis),
+          const SizedBox(height: 2),
+          Text(subtitle, style: theme.textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurfaceVariant), maxLines: 1, overflow: TextOverflow.ellipsis),
+        ],
+      ),
+    ),
+  );
+}
+
+class _HomeSectionEmpty extends StatelessWidget {
+  final IconData icon;
+  final ColorScheme colorScheme;
+  final ThemeData theme;
+
+  const _HomeSectionEmpty({required this.icon, required this.colorScheme, required this.theme});
+
+  @override
+  Widget build(BuildContext context) => Container(
+    width: double.infinity,
+    padding: const EdgeInsets.symmetric(vertical: 16),
+    child: Center(
+      child: Text('No posts yet', style: theme.textTheme.bodySmall?.copyWith(
+          color: colorScheme.onSurfaceVariant)),
+    ),
+  );
 }
