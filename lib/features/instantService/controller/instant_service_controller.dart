@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:html_editor_enhanced/html_editor.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../app/routes/app_routes.dart';
 import '../../../core/utils/translation_keys.dart';
@@ -19,11 +23,12 @@ class InstantServiceController extends GetxController {
   final formKey = GlobalKey<FormState>();
 
   final InstantServiceRepository repository = InstantServiceRepository();
+  final ImagePicker _imagePicker = ImagePicker();
 
   final isLoading = false.obs;
 
   final titleController = TextEditingController();
-  final detailsController = TextEditingController();
+  final detailsEditorController = HtmlEditorController();
   final priceMinController = TextEditingController();
   final priceMaxController = TextEditingController();
   final addressController = TextEditingController();
@@ -32,6 +37,9 @@ class InstantServiceController extends GetxController {
 
   final RxnDouble pickedLat = RxnDouble();
   final RxnDouble pickedLng = RxnDouble();
+
+  /// Optional cover photo submitted alongside the post.
+  final pickedImage = Rxn<File>();
 
   RxnString selectedCity = RxnString();
   RxnString selectedTime = RxnString();
@@ -78,13 +86,33 @@ class InstantServiceController extends GetxController {
   @override
   void onClose() {
     titleController.dispose();
-    detailsController.dispose();
     priceMinController.dispose();
     priceMaxController.dispose();
     addressController.dispose();
     districtController.dispose();
     dateController.dispose();
     super.onClose();
+  }
+
+  /// Returns true when the HTML editor's output is effectively empty (some
+  /// editors return an empty wrapper like `<p><br></p>` for a blank editor).
+  bool _isDetailsHtmlEmpty(String html) {
+    final stripped = html
+        .replaceAll(RegExp(r'<[^>]*>'), '')
+        .replaceAll('&nbsp;', '')
+        .trim();
+    return stripped.isEmpty;
+  }
+
+  Future<void> pickCoverImage() async {
+    final picked = await _imagePicker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 85,
+    );
+
+    if (picked != null) {
+      pickedImage.value = File(picked.path);
+    }
   }
 
   Future<void> pickDate(BuildContext context) async {
@@ -121,6 +149,20 @@ class InstantServiceController extends GetxController {
       return;
     }
 
+    final detailsHtml = (await detailsEditorController.getText()).trim();
+    if (_isDetailsHtmlEmpty(detailsHtml)) {
+      Get.snackbar(
+        TKeys.validation.tr,
+        TKeys.describeProblemError.tr,
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red.shade50,
+        colorText: Colors.red.shade700,
+        margin: const EdgeInsets.all(16),
+        borderRadius: 14,
+      );
+      return;
+    }
+
     try {
       isLoading.value = true;
 
@@ -128,7 +170,7 @@ class InstantServiceController extends GetxController {
       /// payment happens after the client selects a winning bid).
       await repository.createInstantService(
         title: titleController.text.trim(),
-        details: detailsController.text.trim(),
+        details: detailsHtml,
         priceMin: priceMin,
         priceMax: priceMax,
         location: InstantServiceLocationModel(
@@ -142,6 +184,7 @@ class InstantServiceController extends GetxController {
           date: dateController.text.trim(),
           time: selectedTime.value ?? '',
         ),
+        imageFile: pickedImage.value,
       );
 
       await Get.dialog(

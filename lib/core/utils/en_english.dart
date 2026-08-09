@@ -264,6 +264,7 @@ const Map<String, String> enUS = {
   TKeys.complaintSubmittedMsg:  'Your complaint has been submitted for review.',
   TKeys.deletePortfolioConfirm: 'Delete portfolio work?',
   TKeys.tapToSelectImage:       'Tap to select an image',
+  TKeys.coverImage:             'Cover Image',
   TKeys.next:                   'Next',
   TKeys.bdt:                    'BDT',
 

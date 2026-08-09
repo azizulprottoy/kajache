@@ -61,6 +61,7 @@ dependencies:
   permission_handler: ^11.3.0
   flutter_animate: ^4.5.0        # smooth animations
   flutter_html: ^3.0.0-beta.2   # render HTML descriptions
+  html_editor_enhanced: ^2.6.0  # rich text (HTML) authoring for description fields
   flutter_launcher_icons: ^0.13.1
 dev_dependencies:
   flutter_test:

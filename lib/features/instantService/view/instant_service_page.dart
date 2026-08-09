@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:html_editor_enhanced/html_editor.dart';
 
 import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/common_app_bar.dart';
@@ -54,6 +57,18 @@ class InstantServicePage extends GetView<InstantServiceController> {
 
               const SizedBox(height: 22),
 
+              Text(TKeys.coverImage.tr,
+                  style: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              Obx(
+                () => _CoverImagePicker(
+                  image: controller.pickedImage.value,
+                  onTap: controller.pickCoverImage,
+                ),
+              ),
+
+              const SizedBox(height: 18),
+
               Text(TKeys.instantServiceTitleLabel.tr,
                   style: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
@@ -73,16 +88,35 @@ class InstantServicePage extends GetView<InstantServiceController> {
               Text(TKeys.problemDetails.tr,
                   style: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
-              TextFormField(
-                controller: controller.detailsController,
-                maxLines: 5,
-                validator: (v) => v == null || v.trim().isEmpty
-                    ? TKeys.describeProblemError.tr
-                    : null,
-                decoration: InputDecoration(
-                  hintText: TKeys.problemDetailsHint.tr,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
-                  alignLabelWithHint: true,
+              ClipRRect(
+                borderRadius: BorderRadius.circular(14),
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: colorScheme.outlineVariant),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: HtmlEditor(
+                    controller: controller.detailsEditorController,
+                    htmlEditorOptions: HtmlEditorOptions(
+                      hint: TKeys.problemDetailsHint.tr,
+                      shouldEnsureVisible: true,
+                    ),
+                    htmlToolbarOptions: const HtmlToolbarOptions(
+                      defaultToolbarButtons: [
+                        FontButtons(
+                          bold: true,
+                          italic: true,
+                          underline: true,
+                          clearAll: false,
+                          strikethrough: false,
+                          superscript: false,
+                          subscript: false,
+                        ),
+                        ListButtons(listStyles: false),
+                      ],
+                    ),
+                    otherOptions: const OtherOptions(height: 260),
+                  ),
                 ),
               ),
 
@@ -249,6 +283,74 @@ class InstantServicePage extends GetView<InstantServiceController> {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Tappable cover-photo picker box shown above the title field. Shows a
+/// dashed-look placeholder with an icon when no image has been picked yet,
+/// otherwise previews the picked file.
+class _CoverImagePicker extends StatelessWidget {
+  final File? image;
+  final VoidCallback onTap;
+
+  const _CoverImagePicker({required this.image, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        height: 160,
+        width: double.infinity,
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          color: colorScheme.surfaceContainerLowest,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: colorScheme.outlineVariant),
+        ),
+        child: image != null
+            ? Stack(
+                fit: StackFit.expand,
+                children: [
+                  Image.file(image!, fit: BoxFit.cover),
+                  Positioned(
+                    right: 10,
+                    bottom: 10,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: colorScheme.surface.withOpacity(0.9),
+                        borderRadius: BorderRadius.circular(99),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.edit_outlined, size: 16),
+                          const SizedBox(width: 6),
+                          Text(TKeys.change.tr),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.add_photo_alternate_outlined,
+                    size: 40,
+                    color: colorScheme.primary,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(TKeys.tapToSelectImage.tr),
+                ],
+              ),
       ),
     );
   }

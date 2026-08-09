@@ -264,6 +264,7 @@ class TKeys {
   static const complaintSubmittedMsg    = 'complaint_submitted_msg';
   static const deletePortfolioConfirm   = 'delete_portfolio_confirm';
   static const tapToSelectImage         = 'tap_to_select_image';
+  static const coverImage               = 'cover_image';
   static const next                     = 'next';
   static const bdt                      = 'bdt';
 

@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:html_editor_enhanced/html_editor.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../app/routes/app_routes.dart';
 import '../../../core/utils/translation_keys.dart';
@@ -19,6 +23,7 @@ class RecruitmentRequestController extends GetxController {
 
   final RecruitmentRequestRepository repository = RecruitmentRequestRepository();
   final PaymentRepository _paymentRepository = PaymentRepository();
+  final ImagePicker _imagePicker = ImagePicker();
 
   static const int lastStep = 2;
   final currentStep = 1.obs;
@@ -26,10 +31,13 @@ class RecruitmentRequestController extends GetxController {
 
   /// Step 1 — job details
   final titleController = TextEditingController();
-  final detailsController = TextEditingController();
+  final detailsEditorController = HtmlEditorController();
   final durationController = TextEditingController();
   final salaryController = TextEditingController();
   final salaryValue = 0.0.obs;
+
+  /// Optional cover photo submitted alongside the post.
+  final pickedImage = Rxn<File>();
 
   /// Step 2 — pay to post
   final transactionIdController = TextEditingController();
@@ -46,7 +54,6 @@ class RecruitmentRequestController extends GetxController {
   @override
   void onClose() {
     titleController.dispose();
-    detailsController.dispose();
     durationController.dispose();
     salaryController.dispose();
     transactionIdController.dispose();
@@ -63,6 +70,27 @@ class RecruitmentRequestController extends GetxController {
       // Non-fatal — the payment step still allows entering a transaction id.
     } finally {
       if (!isClosed) isLoadingPaymentMethods.value = false;
+    }
+  }
+
+  /// Returns true when the HTML editor's output is effectively empty (some
+  /// editors return an empty wrapper like `<p><br></p>` for a blank editor).
+  bool _isDetailsHtmlEmpty(String html) {
+    final stripped = html
+        .replaceAll(RegExp(r'<[^>]*>'), '')
+        .replaceAll('&nbsp;', '')
+        .trim();
+    return stripped.isEmpty;
+  }
+
+  Future<void> pickCoverImage() async {
+    final picked = await _imagePicker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 85,
+    );
+
+    if (picked != null) {
+      pickedImage.value = File(picked.path);
     }
   }
 
@@ -130,13 +158,16 @@ class RecruitmentRequestController extends GetxController {
     try {
       isLoading.value = true;
 
+      final detailsHtml = (await detailsEditorController.getText()).trim();
+
       /// 1. CREATE the job posting — starts as `pending_payment`, bidding
       /// is not open yet.
       final created = await repository.createRecruitmentRequest(
         title: titleController.text,
-        details: detailsController.text,
+        details: _isDetailsHtmlEmpty(detailsHtml) ? null : detailsHtml,
         duration: durationController.text,
         salary: num.tryParse(salaryController.text.trim()) ?? 0,
+        imageFile: pickedImage.value,
       );
 
       /// 2. PAY THE POSTING FEE — THIS is what opens bidding. This is the

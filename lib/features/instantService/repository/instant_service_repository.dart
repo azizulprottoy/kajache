@@ -8,6 +8,9 @@
 // + `lib/features/my_bookings/repository/my_booking_repository.dart` +
 // `lib/features/sbooking/booking_details_repository.dart` conventions.
 
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 
 import '../../../core/network/api_client.dart';
@@ -41,22 +44,38 @@ class InstantServiceRepository {
     required int priceMax,
     required InstantServiceLocationModel location,
     InstantServiceScheduleModel? schedule,
+    File? imageFile,
   }) async {
     await _requireConnection();
 
     final response = await _dio.post(
       ApiEndpoints.instantService,
-      data: {
-        "title": title,
-        if (image != null && image.trim().isNotEmpty) "image": image,
-        "details": details,
-        if (category != null && category.trim().isNotEmpty)
-          "category": category,
-        "priceMin": priceMin,
-        "priceMax": priceMax,
-        "location": location.toJson(),
-        if (schedule != null && !schedule.isEmpty) "schedule": schedule.toJson(),
-      },
+      data: imageFile != null
+          ? await _instantServiceFormData(
+              title: title,
+              details: details,
+              category: category,
+              priceMin: priceMin,
+              priceMax: priceMax,
+              location: location,
+              schedule: schedule,
+              imageFile: imageFile,
+            )
+          : {
+              "title": title,
+              if (image != null && image.trim().isNotEmpty) "image": image,
+              "details": details,
+              if (category != null && category.trim().isNotEmpty)
+                "category": category,
+              "priceMin": priceMin,
+              "priceMax": priceMax,
+              "location": location.toJson(),
+              if (schedule != null && !schedule.isEmpty)
+                "schedule": schedule.toJson(),
+            },
+      options: imageFile != null
+          ? Options(contentType: 'multipart/form-data')
+          : null,
     );
 
     final payload = Map<String, dynamic>.from(response.data);
@@ -67,6 +86,38 @@ class InstantServiceRepository {
     return InstantServiceModel.fromJson(
       Map<String, dynamic>.from(payload['data']),
     );
+  }
+
+  /// Builds a multipart body for `createInstantService` when a cover image
+  /// is attached. `location`/`schedule` must be sent as JSON-encoded strings
+  /// since multipart form fields don't survive as nested objects — the
+  /// backend route does `JSON.parse()` on them when they arrive as strings.
+  Future<FormData> _instantServiceFormData({
+    required String title,
+    required String details,
+    String? category,
+    required int priceMin,
+    required int priceMax,
+    required InstantServiceLocationModel location,
+    InstantServiceScheduleModel? schedule,
+    required File imageFile,
+  }) async {
+    final fields = <String, dynamic>{
+      'title': title,
+      'details': details,
+      if (category != null && category.trim().isNotEmpty) 'category': category,
+      'priceMin': priceMin,
+      'priceMax': priceMax,
+      'location': jsonEncode(location.toJson()),
+      if (schedule != null && !schedule.isEmpty)
+        'schedule': jsonEncode(schedule.toJson()),
+      'image': await MultipartFile.fromFile(
+        imageFile.path,
+        filename: imageFile.path.split(Platform.pathSeparator).last,
+      ),
+    };
+
+    return FormData.fromMap(fields);
   }
 
   Future<List<InstantServiceModel>> getMyInstantServices() async {

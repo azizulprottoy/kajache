@@ -8,6 +8,9 @@
 // in the create-flow controller, unlike Booking/InstantService where
 // payment happens after a bid is selected.
 
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 
 import '../../../core/network/api_client.dart';
@@ -41,6 +44,7 @@ class RecruitmentRequestRepository {
     String? address,
     String? city,
     String? district,
+    File? imageFile,
   }) async {
     await _requireConnection();
 
@@ -48,26 +52,43 @@ class RecruitmentRequestRepository {
         (city != null && city.trim().isNotEmpty) ||
         (district != null && district.trim().isNotEmpty);
 
-    final response = await _dio.post(
-      ApiEndpoints.recruitmentRequest,
-      data: {
-        'title': title.trim(),
-        if (image != null && image.trim().isNotEmpty) 'image': image.trim(),
-        if (details != null && details.trim().isNotEmpty)
-          'details': details.trim(),
-        if (category != null && category.trim().isNotEmpty)
-          'category': category.trim(),
-        'duration': duration.trim(),
-        'salary': salary,
-        if (hasLocation)
-          'location': {
+    final locationMap = hasLocation
+        ? {
             if (address != null && address.trim().isNotEmpty)
               'address': address.trim(),
             if (city != null && city.trim().isNotEmpty) 'city': city.trim(),
             if (district != null && district.trim().isNotEmpty)
               'district': district.trim(),
-          },
-      },
+          }
+        : null;
+
+    final response = await _dio.post(
+      ApiEndpoints.recruitmentRequest,
+      data: imageFile != null
+          ? await _recruitmentRequestFormData(
+              title: title,
+              details: details,
+              category: category,
+              duration: duration,
+              salary: salary,
+              locationMap: locationMap,
+              imageFile: imageFile,
+            )
+          : {
+              'title': title.trim(),
+              if (image != null && image.trim().isNotEmpty)
+                'image': image.trim(),
+              if (details != null && details.trim().isNotEmpty)
+                'details': details.trim(),
+              if (category != null && category.trim().isNotEmpty)
+                'category': category.trim(),
+              'duration': duration.trim(),
+              'salary': salary,
+              if (locationMap != null) 'location': locationMap,
+            },
+      options: imageFile != null
+          ? Options(contentType: 'multipart/form-data')
+          : null,
     );
 
     final json = Map<String, dynamic>.from(response.data);
@@ -79,6 +100,37 @@ class RecruitmentRequestRepository {
     return RecruitmentRequestModel.fromJson(
       Map<String, dynamic>.from(json['data']),
     );
+  }
+
+  /// Builds a multipart body for `createRecruitmentRequest` when a cover
+  /// image is attached. `location` must be sent as a JSON-encoded string
+  /// since multipart form fields don't survive as nested objects — the
+  /// backend route does `JSON.parse()` on it when it arrives as a string.
+  Future<FormData> _recruitmentRequestFormData({
+    required String title,
+    String? details,
+    String? category,
+    required String duration,
+    required num salary,
+    Map<String, dynamic>? locationMap,
+    required File imageFile,
+  }) async {
+    final fields = <String, dynamic>{
+      'title': title.trim(),
+      if (details != null && details.trim().isNotEmpty)
+        'details': details.trim(),
+      if (category != null && category.trim().isNotEmpty)
+        'category': category.trim(),
+      'duration': duration.trim(),
+      'salary': salary,
+      if (locationMap != null) 'location': jsonEncode(locationMap),
+      'image': await MultipartFile.fromFile(
+        imageFile.path,
+        filename: imageFile.path.split(Platform.pathSeparator).last,
+      ),
+    };
+
+    return FormData.fromMap(fields);
   }
 
   /// Pays the posting fee. Only allowed while status is `pending_payment`.

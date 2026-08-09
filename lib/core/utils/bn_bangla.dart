@@ -266,6 +266,7 @@ const Map<String, String> bnBD = {
   TKeys.complaintSubmittedMsg:  'আপনার অভিযোগ পর্যালোচনার জন্য জমা দেওয়া হয়েছে।',
   TKeys.deletePortfolioConfirm: 'পোর্টফোলিও কাজ মুছে ফেলবেন?',
   TKeys.tapToSelectImage:       'ছবি নির্বাচন করতে ট্যাপ করুন',
+  TKeys.coverImage:             'কভার ছবি',
   TKeys.next:                   'পরবর্তী',
   TKeys.bdt:                    'টাকা',
 
