@@ -111,7 +111,7 @@ class HomePage extends GetView<HomeController> {
                       return _HomeSectionEmpty(icon: Icons.bolt_outlined, colorScheme: colorScheme, theme: theme);
                     }
                     return SizedBox(
-                      height: 88,
+                      height: 180,
                       child: ListView(
                         scrollDirection: Axis.horizontal,
                         children: controller.instantServices.map((item) =>
@@ -129,7 +129,7 @@ class HomePage extends GetView<HomeController> {
                     );
                   }),
 
-                  const SizedBox(height: 20),
+
 
                   // ── Recruitment Requests ────────────────────────────────
                   _HomeSection(
@@ -145,7 +145,7 @@ class HomePage extends GetView<HomeController> {
                       return _HomeSectionEmpty(icon: Icons.badge_outlined, colorScheme: colorScheme, theme: theme);
                     }
                     return SizedBox(
-                      height: 88,
+                      height: 180,
                       child: ListView(
                         scrollDirection: Axis.horizontal,
                         children: controller.recruitmentPosts.map((item) =>
@@ -162,8 +162,8 @@ class HomePage extends GetView<HomeController> {
                       ),
                     );
                   }),
-
-                  AdBanner(position: 'home_middle'),
+                  const SizedBox(height: 8),
+                  AdBanner(position: 'home_middle',padding: EdgeInsets.symmetric(vertical: 5),),
 
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -235,7 +235,7 @@ class _HomeJobTile extends StatelessWidget {
       this.image = '', required this.onTap, required this.colorScheme, required this.theme});
 
   Widget _iconBox() => Container(
-    width: 30, height: 30,
+    width: 150, height: 100,
     decoration: BoxDecoration(color: colorScheme.primaryContainer, borderRadius: BorderRadius.circular(7)),
     child: Icon(icon, color: colorScheme.onPrimaryContainer, size: 16),
   );
@@ -244,9 +244,10 @@ class _HomeJobTile extends StatelessWidget {
   Widget build(BuildContext context) => GestureDetector(
     onTap: onTap,
     child: Container(
-      width: 200,
+      width: 160,
+      height: 150,
       margin: const EdgeInsets.only(right: 10),
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(6),
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(12),
@@ -254,19 +255,18 @@ class _HomeJobTile extends StatelessWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Row(children: [
+
             ClipRRect(
               borderRadius: BorderRadius.circular(7),
               child: image.isNotEmpty
-                  ? Image.network(image, width: 30, height: 30, fit: BoxFit.cover,
+                  ? Image.network(image, width: 150, height: 100, fit: BoxFit.cover,
                       errorBuilder: (_, __, ___) => _iconBox())
                   : _iconBox(),
             ),
-            const Spacer(),
-            Icon(Icons.chevron_right_rounded, size: 14, color: colorScheme.onSurfaceVariant),
-          ]),
+
+
           const SizedBox(height: 8),
           Text(title, style: theme.textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis),

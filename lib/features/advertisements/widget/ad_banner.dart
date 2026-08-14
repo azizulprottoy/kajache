@@ -13,7 +13,7 @@ class AdBanner extends StatelessWidget {
   const AdBanner({
     super.key,
     required this.position,
-    this.padding = const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    this.padding = const EdgeInsets.only(bottom: 5),
   });
 
   @override
@@ -99,7 +99,7 @@ class _AdCarouselState extends State<_AdCarousel> {
         onPageChanged: (i) => setState(() => _current = i),
         itemCount: widget.ads.length,
         itemBuilder: (_, i) => ClipRRect(
-          borderRadius: BorderRadius.circular(14),
+          // borderRadius: BorderRadius.circular(14),
           child: Image.network(
             widget.ads[i].imageUrl,
             width: double.infinity,
@@ -152,7 +152,7 @@ class _AdImageState extends State<_AdImage> {
       return AspectRatio(
         aspectRatio: 2.5,
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(14),
+          // borderRadius: BorderRadius.circular(14),
           child: Container(color: colorScheme.surfaceContainerLowest),
         ),
       );
@@ -163,7 +163,7 @@ class _AdImageState extends State<_AdImage> {
       child: AspectRatio(
         aspectRatio: _ratio!,
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(14),
+          // borderRadius: BorderRadius.circular(14),
           child: Image.network(
             widget.ad.imageUrl,
             width: double.infinity,
