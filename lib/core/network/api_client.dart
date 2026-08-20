@@ -34,7 +34,8 @@ class ApiClient {
     dio.interceptors.addAll([
       _AuthInterceptor(),
       _ErrorInterceptor(),
-      _PrettyLogInterceptor(),
+      if (const bool.fromEnvironment('dart.vm.product') == false)
+        _PrettyLogInterceptor(),
     ]);
 
     return dio;

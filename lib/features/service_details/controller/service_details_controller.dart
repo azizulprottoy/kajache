@@ -79,7 +79,7 @@ class ServiceDetailsController extends GetxController {
       myBidEstimatedArrival = args.myBidEstimatedArrival;
       myBidMessage = args.myBidMessage;
       poster = args.poster;
-      debugPrint('[ServiceDetails] bookingId=$bookingId slug=$serviceSlug hasBid=$hasBid');
+
     } else {
       _hasInvalidArgument = true;
     }
@@ -109,7 +109,7 @@ class ServiceDetailsController extends GetxController {
     required String estimatedArrival,
     String message = '',
   }) async {
-    debugPrint('[submitBid] bookingId=$bookingId price=$price eta=$estimatedArrival');
+
     if (bookingId.isEmpty) {
       Get.snackbar(TKeys.error.tr, TKeys.bookingIdMissing.tr,
           snackPosition: SnackPosition.BOTTOM);

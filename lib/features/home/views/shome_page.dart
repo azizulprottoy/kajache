@@ -190,7 +190,7 @@ class SHomePage extends GetView<SHomeController> {
                   ...controller.availableBookings.map(
                         (item) => GestureDetector(
                       onTap: () async {
-                        debugPrint('[SHome] booking id=${item.id} slug=${item.serviceSlug}');
+                        
                         await Get.toNamed(
                           AppRoutes.bookingDetails,
                           arguments: BookingDetailsArgument(
