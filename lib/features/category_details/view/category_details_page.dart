@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 
 import '../../../app/routes/app_routes.dart';
 import '../../../core/utils/translation_keys.dart';
+import 'package:flutter_html/flutter_html.dart';
 import '../../../shared/widgets/common_app_bar.dart';
 import '../../../shared/widgets/custom_button.dart'; // CustomButton, ButtonVariant, ButtonSize
 import '../../../shared/shimmers/category_details_shimmer.dart';
@@ -61,7 +62,7 @@ class CategoryDetailsPage extends GetView<CategoryDetailsController> {
                     : _ImageFallback(colorScheme: colorScheme),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
 
               Text(
                 category.localizedName,
@@ -71,50 +72,29 @@ class CategoryDetailsPage extends GetView<CategoryDetailsController> {
                 ),
               ),
 
-              const SizedBox(height: 8),
-
-              Text(
-                category.slug,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: colorScheme.primary,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-
-              const SizedBox(height: 16),
-
-              Text(
-                category.localizedDescription.isNotEmpty
-                    ? category.localizedDescription
-                    : TKeys.noDescription.tr,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                  height: 1.5,
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              Row(
-                children: [
-                  Icon(
-                    Icons.touch_app_outlined,
-                    size: 18,
-                    color: colorScheme.primary,
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    '${category.clicks} ${TKeys.clicks.tr}',
-                    style: theme.textTheme.bodySmall?.copyWith(
+              if (category.localizedDescription.isNotEmpty)
+                Html(
+                  data: category.localizedDescription,
+                  style: {
+                    'body': Style(
+                      margin: Margins.zero,
+                      padding: HtmlPaddings.zero,
                       color: colorScheme.onSurfaceVariant,
+                      fontSize: FontSize(theme.textTheme.bodyMedium?.fontSize ?? 14),
+                      lineHeight: const LineHeight(1.5),
                     ),
+                  },
+                )
+              else
+                Text(
+                  TKeys.noDescription.tr,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                    height: 1.5,
                   ),
-                ],
-              ),
+                ),
 
-              const SizedBox(height: 24),
-              Divider(color: colorScheme.outlineVariant),
-              const SizedBox(height: 12),
+
 
               Text(
                 TKeys.services.tr,

@@ -38,10 +38,6 @@ class ChatController extends GetxController {
     bookingStatus = args is Map ? (args['bookingStatus']?.toString() ?? '') : '';
 
     if (bidId.isEmpty) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Get.snackbar('Error', 'Chat is unavailable: booking bid is missing',
-            snackPosition: SnackPosition.BOTTOM);
-      });
       return;
     }
 
@@ -76,11 +72,6 @@ class ChatController extends GetxController {
       await _repository.sendMessage(bidId, text);
       await _loadMessages(silent: true);
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        e.toString().replaceFirst('Exception: ', ''),
-        snackPosition: SnackPosition.BOTTOM,
-      );
     } finally {
       isSending.value = false;
     }

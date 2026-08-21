@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../home/models/available_booking_response_model.dart';
@@ -108,13 +107,6 @@ class MyBookingDetailsController extends GetxController {
     }
 
     if (bookingId.isEmpty) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Get.snackbar(
-          TKeys.error.tr,
-          'Booking ID is missing',
-          snackPosition: SnackPosition.BOTTOM,
-        );
-      });
       return;
     }
 
@@ -155,11 +147,6 @@ class MyBookingDetailsController extends GetxController {
       final result = await repository.getBooking(bookingId);
       booking.value = result;
     } catch (e) {
-      Get.snackbar(
-        TKeys.error.tr,
-        e.toString().replaceFirst('Exception: ', ''),
-        snackPosition: SnackPosition.BOTTOM,
-      );
     } finally {
       isLoading.value = false;
     }
@@ -175,11 +162,6 @@ class MyBookingDetailsController extends GetxController {
 
   Future<bool> bookTechnician(BookingBidModel bid) async {
     if (bookingId.isEmpty || bid.id.isEmpty) {
-      Get.snackbar(
-        TKeys.error.tr,
-        'Booking or bid ID is missing',
-        snackPosition: SnackPosition.BOTTOM,
-      );
       return false;
     }
 
@@ -196,11 +178,6 @@ class MyBookingDetailsController extends GetxController {
 
       return true;
     } catch (e) {
-      Get.snackbar(
-        TKeys.error.tr,
-        e.toString().replaceFirst('Exception: ', ''),
-        snackPosition: SnackPosition.BOTTOM,
-      );
       return false;
     } finally {
       isBookingTechnician.value = false;
@@ -209,11 +186,6 @@ class MyBookingDetailsController extends GetxController {
 
   Future<bool> confirmBookingPayment({required String transactionId, bool isCash = false}) async {
     if (!isPaymentDue) {
-      Get.snackbar(
-        TKeys.error.tr,
-        'Payment is not due for this booking',
-        snackPosition: SnackPosition.BOTTOM,
-      );
       return false;
     }
 
@@ -229,11 +201,6 @@ class MyBookingDetailsController extends GetxController {
       await fetchBooking();
       return true;
     } catch (e) {
-      Get.snackbar(
-        TKeys.error.tr,
-        e.toString().replaceFirst('Exception: ', ''),
-        snackPosition: SnackPosition.BOTTOM,
-      );
       return false;
     } finally {
       isSubmittingPayment.value = false;
@@ -252,9 +219,6 @@ class MyBookingDetailsController extends GetxController {
           snackPosition: SnackPosition.BOTTOM);
       return true;
     } catch (e) {
-      Get.snackbar(TKeys.error.tr,
-          e.toString().replaceFirst('Exception: ', ''),
-          snackPosition: SnackPosition.BOTTOM);
       return false;
     } finally {
       isCancellingBid.value = false;
@@ -263,11 +227,6 @@ class MyBookingDetailsController extends GetxController {
 
   Future<bool> completeTask() async {
     if (bookingId.isEmpty) {
-      Get.snackbar(
-        TKeys.error.tr,
-        'Booking ID is missing',
-        snackPosition: SnackPosition.BOTTOM,
-      );
       return false;
     }
 
@@ -290,11 +249,6 @@ class MyBookingDetailsController extends GetxController {
 
       return true;
     } catch (e) {
-      Get.snackbar(
-        TKeys.error.tr,
-        e.toString().replaceFirst('Exception: ', ''),
-        snackPosition: SnackPosition.BOTTOM,
-      );
       return false;
     } finally {
       isCompletingTask.value = false;
@@ -323,11 +277,6 @@ class MyBookingDetailsController extends GetxController {
       await fetchBooking();
       return true;
     } catch (e) {
-      Get.snackbar(
-        TKeys.error.tr,
-        e.toString().replaceFirst('Exception: ', ''),
-        snackPosition: SnackPosition.BOTTOM,
-      );
       return false;
     } finally {
       isSubmittingServiceReview.value = false;
@@ -356,11 +305,6 @@ class MyBookingDetailsController extends GetxController {
       await fetchBooking();
       return true;
     } catch (e) {
-      Get.snackbar(
-        TKeys.error.tr,
-        e.toString().replaceFirst('Exception: ', ''),
-        snackPosition: SnackPosition.BOTTOM,
-      );
       return false;
     } finally {
       isSubmittingProviderRating.value = false;
@@ -374,11 +318,6 @@ class MyBookingDetailsController extends GetxController {
     final technicianId = assignedTechnicianId;
 
     if (technicianId == null || technicianId.isEmpty) {
-      Get.snackbar(
-        TKeys.error.tr,
-        'No technician found for this booking',
-        snackPosition: SnackPosition.BOTTOM,
-      );
       return false;
     }
 
@@ -393,11 +332,6 @@ class MyBookingDetailsController extends GetxController {
       );
       return true;
     } catch (e) {
-      Get.snackbar(
-        TKeys.error.tr,
-        e.toString().replaceFirst('Exception: ', ''),
-        snackPosition: SnackPosition.BOTTOM,
-      );
       return false;
     } finally {
       isSubmittingComplaint.value = false;

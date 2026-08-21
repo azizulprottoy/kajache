@@ -12,6 +12,7 @@ import '../../../app/theme/context_extension.dart';
 import '../../instantService/model/instant_service_model.dart';
 import '../../recruitmentRequest/model/recruitment_request_model.dart';
 import '../controllers/home_controller.dart';
+import '../../../core/utils/media_url_helper.dart';
 
 class HomePage extends GetView<HomeController> {
   const HomePage({super.key});
@@ -65,7 +66,7 @@ class HomePage extends GetView<HomeController> {
                     onPageChanged: controller.onBannerPageChanged,
                   ),
 
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 2),
 
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -87,7 +88,7 @@ class HomePage extends GetView<HomeController> {
                     ],
                   ),
 
-                  const SizedBox(height: 8),
+
 
                   CategoryGrid(
                     categories: controller.categories,
@@ -95,7 +96,7 @@ class HomePage extends GetView<HomeController> {
                     onCategoryTap: controller.onCategoryTap,
                   ),
 
-                  const SizedBox(height: 20),
+
 
                   // ── Instant Service Requests ────────────────────────────
                   _HomeSection(
@@ -119,8 +120,8 @@ class HomePage extends GetView<HomeController> {
                             title: item.title,
                             subtitle: '৳${item.priceMin}–৳${item.priceMax}',
                             icon: Icons.bolt_outlined,
-                            image: item.image,
-                            onTap: () => Get.toNamed(AppRoutes.myInstantServices),
+                            image: MediaUrlHelper.resolve(item.image),
+                            onTap: () => Get.toNamed(AppRoutes.myInstantServiceDetails, arguments: item.id),
                             colorScheme: colorScheme,
                             theme: theme,
                           ),
@@ -153,7 +154,7 @@ class HomePage extends GetView<HomeController> {
                             title: item.title,
                             subtitle: '৳${item.salary.toInt()} • ${item.category}',
                             icon: Icons.badge_outlined,
-                            image: item.image,
+                            image: MediaUrlHelper.resolve(item.image),
                             onTap: () => Get.toNamed(AppRoutes.myRecruitmentRequests),
                             colorScheme: colorScheme,
                             theme: theme,

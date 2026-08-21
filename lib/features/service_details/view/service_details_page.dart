@@ -97,7 +97,7 @@ class ServiceDetailsPage extends GetView<ServiceDetailsController> {
                 borderRadius: BorderRadius.circular(16),
                 child: service.imageLink.isNotEmpty
                     ? Image.network(
-                  service.imageLink,
+                  MediaUrlHelper.resolve(service.imageLink),
                   height: 190,
                   width: double.infinity,
                   fit: BoxFit.cover,

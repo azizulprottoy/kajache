@@ -80,7 +80,9 @@ class ServiceModel {
           : null,
       createdAt: json['createdAt']?.toString() ?? '',
       updatedAt: json['updatedAt']?.toString() ?? '',
-      imageLink: MediaUrlHelper.resolve(json['imageLink']?.toString()),
+      imageLink: MediaUrlHelper.resolve(
+        (json['imageLink'] ?? json['image'])?.toString(),
+      ),
 
     );
   }

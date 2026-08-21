@@ -44,11 +44,6 @@ class LoginController extends GetxController {
       final response = await _authRepository.login(request);
 
       if (!response.success) {
-        Get.snackbar(
-          'Login Failed',
-          response.message,
-          snackPosition: SnackPosition.BOTTOM,
-        );
         return;
       }
 
@@ -70,12 +65,7 @@ class LoginController extends GetxController {
         AppRoutes.main,
         arguments: userType,
       );
-    } catch (error) {
-      Get.snackbar(
-        'Error',
-        error.toString().replaceFirst('Exception: ', ''),
-        snackPosition: SnackPosition.BOTTOM,
-      );
+    } catch (_) {
     } finally {
       isLoading.value = false;
     }

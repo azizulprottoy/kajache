@@ -92,12 +92,6 @@ class ServiceDetailsController extends GetxController {
     if (_hasInvalidArgument) {
       Get.back();
 
-      Get.snackbar(
-        TKeys.error.tr,
-        'Service ID not found',
-        snackPosition: SnackPosition.BOTTOM,
-      );
-
       return;
     }
 
@@ -111,8 +105,6 @@ class ServiceDetailsController extends GetxController {
   }) async {
 
     if (bookingId.isEmpty) {
-      Get.snackbar(TKeys.error.tr, TKeys.bookingIdMissing.tr,
-          snackPosition: SnackPosition.BOTTOM);
       return false;
     }
     isBidLoading.value = true;
@@ -157,15 +149,6 @@ class ServiceDetailsController extends GetxController {
       myBidMessage = message;
       return true;
     } catch (e) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!isClosed) {
-          Get.snackbar(
-            TKeys.error.tr,
-            e.toString().replaceFirst('Exception: ', ''),
-            snackPosition: SnackPosition.BOTTOM,
-          );
-        }
-      });
       return false;
     } finally {
       if (!isClosed) isBidLoading.value = false;
@@ -190,16 +173,7 @@ class ServiceDetailsController extends GetxController {
         fetchReviews(data.id);
       }
     })
-        .catchError((error) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!isClosed) {
-          Get.snackbar(
-            TKeys.error.tr,
-            error.toString().replaceFirst('Exception: ', ''),
-            snackPosition: SnackPosition.BOTTOM,
-          );
-        }
-      });
+        .catchError((_) {
     })
         .whenComplete(() {
       if (!isClosed) {
@@ -246,11 +220,6 @@ class ServiceDetailsController extends GetxController {
     }
 
     if (serviceId == null || serviceId.isEmpty) {
-      Get.snackbar(
-        TKeys.error.tr,
-        TKeys.serviceNotFound.tr,
-        snackPosition: SnackPosition.BOTTOM,
-      );
       return;
     }
 
@@ -270,11 +239,6 @@ class ServiceDetailsController extends GetxController {
         snackPosition: SnackPosition.BOTTOM,
       );
     } catch (e) {
-      Get.snackbar(
-        TKeys.error.tr,
-        e.toString().replaceFirst('Exception: ', ''),
-        snackPosition: SnackPosition.BOTTOM,
-      );
     } finally {
       if (!isClosed) isSubmittingComment.value = false;
     }
@@ -329,11 +293,6 @@ class ServiceDetailsController extends GetxController {
         snackPosition: SnackPosition.BOTTOM,
       );
     } catch (e) {
-      Get.snackbar(
-        TKeys.error.tr,
-        e.toString().replaceFirst('Exception: ', ''),
-        snackPosition: SnackPosition.BOTTOM,
-      );
     } finally {
       if (!isClosed) replySubmittingId.value = null;
     }
@@ -355,12 +314,6 @@ class ServiceDetailsController extends GetxController {
         comments[index] = updated;
       }
     } catch (e) {
-      Get.snackbar(
-        TKeys.error.tr,
-        e.toString().replaceFirst('Exception: ', ''),
-        snackPosition: SnackPosition.BOTTOM,
-      );
     }
   }
 }
-

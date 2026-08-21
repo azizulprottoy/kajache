@@ -6,7 +6,6 @@ import 'package:image_picker/image_picker.dart';
 
 import '../models/profile_model.dart';
 import '../models/worker_profile_model.dart';
-import '../../../core/utils/translation_keys.dart';
 import '../../../core/network/geo_repository.dart';
 import '../../../core/storage/local_storage_service.dart';
 import '../repository/profile_repository.dart';
@@ -20,7 +19,7 @@ class ProfileController extends GetxController {
   final Rxn<File> avatarFile = Rxn<File>();
 
   final formKey = GlobalKey<FormState>();
-  final RxBool isLoading = false.obs;
+  final RxBool isLoading = true.obs;
 
   late TextEditingController fullNameController;
   late TextEditingController emailController;
@@ -119,8 +118,6 @@ class ProfileController extends GetxController {
       isCategoriesLoading.value = true;
       categories.assignAll(await _repository.getCategoryNames());
     } catch (e) {
-      Get.snackbar(TKeys.error.tr, e.toString(),
-          snackPosition: SnackPosition.BOTTOM);
     } finally {
       isCategoriesLoading.value = false;
     }
@@ -171,8 +168,6 @@ class ProfileController extends GetxController {
       }
       if (p.area.isNotEmpty) selectedArea.value = p.area;
     } catch (e) {
-      Get.snackbar(TKeys.error.tr, e.toString(),
-          snackPosition: SnackPosition.BOTTOM);
     } finally {
       isLoading.value = false;
     }
@@ -230,8 +225,6 @@ class ProfileController extends GetxController {
 
       await fetchMyProfile(); // refresh with saved values
     } catch (e) {
-      Get.snackbar(TKeys.error.tr, e.toString(),
-          snackPosition: SnackPosition.BOTTOM);
     } finally {
       isLoading.value = false;
     }

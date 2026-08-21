@@ -7,6 +7,7 @@ import 'package:kaj_ache/features/service_details/arguments/service_details_argu
 import '../../../shared/shimmers/popular_services_shimmer.dart';
 
 import '../../../app/routes/app_routes.dart';
+import '../../../core/utils/media_url_helper.dart';
 import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/custom_button.dart';
 import '../../home/models/services_response_model.dart';
@@ -80,7 +81,7 @@ class PopularServicesList extends StatelessWidget {
                   alignment: Alignment.center,
                   child: service.imageLink.isNotEmpty
                       ? Image.network(
-                          service.imageLink,
+                          MediaUrlHelper.resolve(service.imageLink),
                           width: 72,
                           height: 72,
                           fit: BoxFit.cover,

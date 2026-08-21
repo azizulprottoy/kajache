@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:get/get.dart';
 
 import '../../../core/utils/media_url_helper.dart';
@@ -7,13 +8,6 @@ import '../../../shared/widgets/common_app_bar.dart';
 import '../controller/my_instant_service_details_controller.dart';
 import '../model/instant_service_model.dart';
 
-/// The customer's single instant-service details page — view bids, select
-/// bidder, pay platform fee, mark complete, cancel.
-///
-/// Mirrors `lib/features/my_bookings/view/my_booking_details_page.dart`
-/// closely, renamed to InstantService's own fields (title/details/
-/// priceMin-priceMax instead of service/minLimit, platformFee instead of
-/// bookingFee, no schedule requirement).
 class MyInstantServiceDetailsPage extends GetView<MyInstantServiceDetailsController> {
   const MyInstantServiceDetailsPage({super.key});
 
@@ -49,7 +43,7 @@ class MyInstantServiceDetailsPage extends GetView<MyInstantServiceDetailsControl
                 _PaymentDueBanner(controller: controller),
               ],
 
-              if (item.status.trim().toLowerCase() == 'bidding_open') ...[
+              if (controller.isOwner && item.status.trim().toLowerCase() == 'bidding_open') ...[
                 const SizedBox(height: 14),
                 Obx(() => SizedBox(
                       width: double.infinity,
@@ -790,7 +784,7 @@ class _JobCard extends StatelessWidget {
         .join(', ');
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(8),
       decoration: _cardDecoration(colors),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -832,12 +826,26 @@ class _JobCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 14),
-          Text(
-            item.details.trim().isEmpty ? TKeys.noDescription.tr : item.details,
-            style: theme.textTheme.bodyMedium?.copyWith(height: 1.45),
-          ),
-          const Divider(height: 28),
+
+          if (item.details.trim().isEmpty)
+            Text(
+              TKeys.noDescription.tr,
+              style: theme.textTheme.bodyMedium?.copyWith(color: colors.onSurfaceVariant),
+            )
+          else
+            Html(
+              data: item.details,
+              style: {
+                'body': Style(
+                  margin: Margins.zero,
+                  padding: HtmlPaddings.zero,
+                  color: colors.onSurface,
+                  fontSize: FontSize(theme.textTheme.bodyMedium?.fontSize ?? 14),
+                  lineHeight: const LineHeight(1.45),
+                ),
+              },
+            ),
+
           if (location.isNotEmpty) ...[
             _InfoRow(icon: Icons.location_on_outlined, text: location),
             const SizedBox(height: 12),

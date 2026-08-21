@@ -42,9 +42,9 @@ class CategoryGrid extends StatelessWidget {
       itemCount: categories.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 4,
-        mainAxisSpacing: 6,
-        crossAxisSpacing: 10,
-        childAspectRatio: 0.85,
+        mainAxisSpacing: 3,
+        crossAxisSpacing: 15,
+        childAspectRatio: 0.90,
       ),
       itemBuilder: (context, index) {
         final category = categories[index];
@@ -54,7 +54,7 @@ class CategoryGrid extends StatelessWidget {
           onTap: () => onCategoryTap(category),
           child: Container(
 
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(1),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -79,7 +79,7 @@ class CategoryGrid extends StatelessWidget {
                     color: colorScheme.primary,
                     size: 34,
                   ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 2),
                 Text(
                   category.localizedName,
                   maxLines: 2,
@@ -88,6 +88,7 @@ class CategoryGrid extends StatelessWidget {
                   style: theme.textTheme.labelSmall?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: colorScheme.onSurface,
+                    height: 1.2,
                   ),
                 ),
               ],

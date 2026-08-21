@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../core/storage/local_storage_service.dart';
 import '../../../core/utils/translation_keys.dart';
 import '../../payments/models/payment_method_model.dart';
 import '../../payments/repository/payment_repository.dart';
@@ -36,6 +37,11 @@ class MyInstantServiceDetailsController extends GetxController {
   bool get isPaymentDue =>
       instantService.value?.status.trim().toLowerCase() == 'bid_selected' &&
       instantService.value?.paymentStatus.trim().toLowerCase() != 'paid';
+
+  bool get isOwner {
+    final currentUserId = Get.find<LocalStorageService>().read<String>('user_id') ?? '';
+    return currentUserId.isNotEmpty && currentUserId == instantService.value?.clientId;
+  }
 
   int get platformFee => instantService.value?.platformFee ?? 0;
 

@@ -83,8 +83,6 @@ class BookingController extends GetxController {
     if (mainCtrl.isServiceProvider) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Get.back();
-        Get.snackbar(TKeys.error.tr, 'Technicians cannot book services.',
-            snackPosition: SnackPosition.BOTTOM);
       });
       return;
     }
@@ -262,11 +260,6 @@ class BookingController extends GetxController {
         barrierDismissible: false,
       );
     } catch (e) {
-      Get.snackbar(
-        TKeys.error.tr,
-        e.toString().replaceFirst('Exception: ', ''),
-        snackPosition: SnackPosition.BOTTOM,
-      );
     } finally {
       isLoading.value = false;
     }

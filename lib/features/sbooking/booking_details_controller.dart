@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../home/models/available_booking_response_model.dart';
@@ -34,7 +33,6 @@ class BookingDetailsController extends GetxController {
     super.onReady();
     if (bookingId.isEmpty) {
       Get.back();
-      Get.snackbar(TKeys.error.tr, TKeys.bookingIdMissing.tr);
       return;
     }
     fetchBooking();
@@ -45,15 +43,6 @@ class BookingDetailsController extends GetxController {
     try {
       booking.value = await _repository.getBooking(bookingId);
     } catch (error) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!isClosed) {
-          Get.snackbar(
-            TKeys.error.tr,
-            error.toString().replaceFirst('Exception: ', ''),
-            snackPosition: SnackPosition.BOTTOM,
-          );
-        }
-      });
     } finally {
       if (!isClosed) isLoading.value = false;
     }
@@ -94,11 +83,6 @@ class BookingDetailsController extends GetxController {
       await fetchBooking();
       return true;
     } catch (error) {
-      Get.snackbar(
-        TKeys.error.tr,
-        error.toString().replaceFirst('Exception: ', ''),
-        snackPosition: SnackPosition.BOTTOM,
-      );
       return false;
     } finally {
       if (!isClosed) isBidLoading.value = false;
@@ -115,9 +99,6 @@ class BookingDetailsController extends GetxController {
           snackPosition: SnackPosition.BOTTOM);
       return true;
     } catch (e) {
-      Get.snackbar(TKeys.error.tr,
-          e.toString().replaceFirst('Exception: ', ''),
-          snackPosition: SnackPosition.BOTTOM);
       return false;
     } finally {
       if (!isClosed) isCancellingBid.value = false;
@@ -132,9 +113,6 @@ class BookingDetailsController extends GetxController {
       await fetchBooking();
       return true;
     } catch (e) {
-      Get.snackbar(TKeys.error.tr,
-          e.toString().replaceFirst('Exception: ', ''),
-          snackPosition: SnackPosition.BOTTOM);
       return false;
     } finally {
       if (!isClosed) isRespondingReassignment.value = false;
@@ -150,9 +128,6 @@ class BookingDetailsController extends GetxController {
           snackPosition: SnackPosition.BOTTOM);
       return true;
     } catch (e) {
-      Get.snackbar(TKeys.error.tr,
-          e.toString().replaceFirst('Exception: ', ''),
-          snackPosition: SnackPosition.BOTTOM);
       return false;
     } finally {
       if (!isClosed) isMarkingCash.value = false;

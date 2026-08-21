@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../../models/banner_response_model.dart';
 
@@ -22,17 +23,17 @@ class BannerSlider extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     if (banners.isEmpty) {
-      return Container(
-        height: 180,
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: colorScheme.surfaceContainerLow,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        alignment: Alignment.center,
-        child: Text(
-          'No banners available',
-          style: TextStyle(color: colorScheme.onSurfaceVariant),
+      final isDark = Theme.of(context).brightness == Brightness.dark;
+      return Shimmer.fromColors(
+        baseColor: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
+        highlightColor: isDark ? Colors.grey.shade600 : Colors.grey.shade100,
+        child: Container(
+          height: 180,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+          ),
         ),
       );
     }
@@ -52,11 +53,12 @@ class BannerSlider extends StatelessWidget {
                 margin: const EdgeInsets.symmetric(horizontal: 4),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(16),
-                  color: colorScheme.primary,
+                  color: colorScheme.surfaceContainerLowest,
                   image: banner.imageUrl.isNotEmpty
                       ? DecorationImage(
                     image: NetworkImage(banner.imageUrl),
                     fit: BoxFit.cover,
+                    onError: (_, __) {},
                     // colorFilter: ColorFilter.mode(
                     //   Colors.black.withOpacity(0.35),
                     //   BlendMode.darken,
