@@ -10,6 +10,7 @@ import '../../../shared/widgets/common_app_bar.dart';
 import '../../../shared/widgets/custom_button.dart';
 import '../../service_details/arguments/service_details_arguments.dart';
 import '../arguments/service_argument.dart';
+import '../../../core/utils/media_url_helper.dart';
 import '../controllers/all_services_controller.dart';
 
 class AllServices extends GetView<AllServicesController> {
@@ -89,12 +90,27 @@ class AllServices extends GetView<AllServicesController> {
                           color: colorScheme.surfaceContainerLowest,
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        alignment: Alignment.center,
-                        child: Icon(
-                          Icons.home_repair_service_outlined,
-                          color: colorScheme.primary,
-                          size: 32,
-                        ),
+                        clipBehavior: Clip.antiAlias,
+                        child: () {
+                          final img = MediaUrlHelper.resolve(service.image);
+                          return img.isNotEmpty
+                              ? Image.network(
+                                  img,
+                                  width: 72,
+                                  height: 72,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, __, ___) => Icon(
+                                    Icons.home_repair_service_outlined,
+                                    color: colorScheme.primary,
+                                    size: 32,
+                                  ),
+                                )
+                              : Icon(
+                                  Icons.home_repair_service_outlined,
+                                  color: colorScheme.primary,
+                                  size: 32,
+                                );
+                        }(),
                       ),
 
                       const SizedBox(width: 12),

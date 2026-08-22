@@ -1537,6 +1537,7 @@ class _BidderProfileSheet extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // Handle + close
             SizedBox(
               height: 42,
               child: Stack(
@@ -1563,58 +1564,62 @@ class _BidderProfileSheet extends StatelessWidget {
             ),
             const SizedBox(height: 10),
 
-            CircleAvatar(
-              radius: 46,
-              backgroundColor: colors.primaryContainer,
-              backgroundImage: avatarUrl.isNotEmpty
-                  ? NetworkImage(avatarUrl)
-                  : null,
-              child: avatarUrl.isEmpty
-                  ? Icon(
-                      Icons.engineering_outlined,
-                      size: 44,
-                      color: colors.onPrimaryContainer,
-                    )
-                  : null,
-            ),
-            const SizedBox(height: 14),
-
-            Text(
-              bid.providerName,
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-
-            if (bid.providerUsername.isNotEmpty) ...[
-              const SizedBox(height: 4),
-              Text(
-                '@${bid.providerUsername}',
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: colors.onSurfaceVariant,
-                ),
-              ),
-            ],
-
-            const SizedBox(height: 22),
-
+            // Profile header: avatar left, name + stats right
             Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Expanded(
-                  child: _ProfileStat(
-                    icon: Icons.star_rounded,
-                    label: 'Rating',
-                    value: bid.rating.toStringAsFixed(1),
-                    color: Colors.amber.shade700,
-                  ),
+                CircleAvatar(
+                  radius: 40,
+                  backgroundColor: colors.primaryContainer,
+                  backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
+                  child: avatarUrl.isEmpty
+                      ? Icon(Icons.engineering_outlined, size: 38, color: colors.onPrimaryContainer)
+                      : null,
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 16),
                 Expanded(
-                  child: _ProfileStat(
-                    icon: Icons.task_alt_rounded,
-                    label: 'Jobs completed',
-                    value: '${bid.totalJobsCompleted}',
-                    color: Colors.green,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        bid.providerName,
+                        style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Icon(Icons.star_rounded, size: 16, color: Colors.amber.shade700),
+                          const SizedBox(width: 4),
+                          Text(
+                            bid.rating.toStringAsFixed(1),
+                            style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
+                          ),
+                          const SizedBox(width: 2),
+                          Text(
+                            'rating',
+                            style: theme.textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Icon(Icons.task_alt_rounded, size: 16, color: Colors.green.shade600),
+                          const SizedBox(width: 4),
+                          Text(
+                            '${bid.totalJobsCompleted}',
+                            style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
+                          ),
+                          const SizedBox(width: 2),
+                          Text(
+                            'jobs done',
+                            style: theme.textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -1725,22 +1730,15 @@ class _ProfileStat extends StatelessWidget {
     final colors = theme.colorScheme;
 
     return Container(
-      padding: const EdgeInsets.all(14),
+width: 100,
       decoration: BoxDecoration(
         color: colors.surfaceContainerHighest.withOpacity(0.45),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: Column(
+      child: Row(
         children: [
-          Icon(icon, color: color),
-          const SizedBox(height: 6),
-          Text(
-            value,
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: 2),
+          Icon(icon,color: colors.primary, size: 15,),
+SizedBox(width: 4,),
           Text(
             label,
             textAlign: TextAlign.center,
@@ -1748,6 +1746,15 @@ class _ProfileStat extends StatelessWidget {
               color: colors.onSurfaceVariant,
             ),
           ),
+          Spacer(),
+          Text(
+            value,
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+
+
         ],
       ),
     );

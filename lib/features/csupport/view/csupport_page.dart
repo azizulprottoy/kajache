@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 import '../../../app/theme/context_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -162,18 +163,18 @@ class _FaqTile extends StatelessWidget {
         ),
       ),
       child: ExpansionTile(
-        tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-        childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
+        tilePadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+        childrenPadding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
         shape: const Border(),
         leading: Container(
-          width: 34,
-          height: 34,
+          width: 38,
+          height: 38,
           decoration: BoxDecoration(
             color: colorScheme.primaryContainer,
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(Icons.help_outline_rounded,
-              size: 18, color: colorScheme.onPrimaryContainer),
+              size: 25, color: colorScheme.onPrimaryContainer),
         ),
         title: Text(
           faq.localizedQuestion(isBengali),
@@ -183,20 +184,26 @@ class _FaqTile extends StatelessWidget {
           ),
         ),
         children: [
-          Text(
-            faq.localizedAnswer(isBengali),
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-              height: 1.5,
-            ),
-          ),
+          Html(
+            data:  faq.localizedAnswer(isBengali),
+            style: {
+              'body': Style(
+                margin: Margins.zero,
+                padding: HtmlPaddings.zero,
+                fontSize: FontSize(
+                    theme.textTheme.bodyMedium?.fontSize ?? 14),
+                color: colorScheme.onSurface,
+                lineHeight: const LineHeight(1.2),
+              ),
+            },
+          )
+
         ],
       ),
     );
   }
 }
 
-// ── FAQ shimmer ───────────────────────────────────────────────────────────────
 class _FaqShimmer extends StatelessWidget {
   const _FaqShimmer();
 

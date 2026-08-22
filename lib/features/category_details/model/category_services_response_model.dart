@@ -5,6 +5,7 @@
 import 'dart:convert';
 
 import '../../../core/utils/localized_text.dart';
+import '../../../core/utils/media_url_helper.dart';
 
 CategoryServiceReponseModel categoryServiceReponseModelFromJson(String str) => CategoryServiceReponseModel.fromJson(json.decode(str));
 
@@ -42,8 +43,10 @@ class Datum {
   String? description;
   String? descriptionBn;
   Category? category;
+  String? imageLink;
   List<dynamic>? features;
   int? basePrice;
+  int? bookingFee;
   String? status;
   CreatedBy? createdBy;
   DateTime? createdAt;
@@ -58,8 +61,10 @@ class Datum {
     this.description,
     this.descriptionBn,
     this.category,
+    this.imageLink,
     this.features,
     this.basePrice,
+    this.bookingFee,
     this.status,
     this.createdBy,
     this.createdAt,
@@ -82,8 +87,10 @@ class Datum {
     description: json["description"],
     descriptionBn: json["descriptionBn"],
     category: json["category"] == null ? null : Category.fromJson(json["category"]),
+    imageLink: MediaUrlHelper.resolve((json["image"] ?? json["imageLink"])?.toString()),
     features: json["features"] == null ? [] : List<dynamic>.from(json["features"]!.map((x) => x)),
     basePrice: json["basePrice"],
+    bookingFee: json["bookingFee"],
     status: json["status"],
     createdBy: json["createdBy"] == null ? null : CreatedBy.fromJson(json["createdBy"]),
     createdAt: json["createdAt"] == null ? null : DateTime.parse(json["createdAt"]),
@@ -99,8 +106,10 @@ class Datum {
     "description": description,
     "descriptionBn": descriptionBn,
     "category": category?.toJson(),
+    "image": imageLink,
     "features": features == null ? [] : List<dynamic>.from(features!.map((x) => x)),
     "basePrice": basePrice,
+    "bookingFee": bookingFee,
     "status": status,
     "createdBy": createdBy?.toJson(),
     "createdAt": createdAt?.toIso8601String(),

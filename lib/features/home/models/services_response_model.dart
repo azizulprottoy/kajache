@@ -40,7 +40,7 @@ class ServiceModel {
   final CreatedByModel? createdBy;
   final String createdAt;
   final String updatedAt;
-  final String imageLink;
+  final String image;
 
 
   ServiceModel({
@@ -56,7 +56,7 @@ class ServiceModel {
     this.createdBy,
     required this.createdAt,
     required this.updatedAt,
-    required this.imageLink,
+    required this.image,
 
   });
 
@@ -80,8 +80,8 @@ class ServiceModel {
           : null,
       createdAt: json['createdAt']?.toString() ?? '',
       updatedAt: json['updatedAt']?.toString() ?? '',
-      imageLink: MediaUrlHelper.resolve(
-        (json['imageLink'] ?? json['image'])?.toString(),
+      image: MediaUrlHelper.resolve(
+        (json['image'] ?? json['image'])?.toString(),
       ),
 
     );

@@ -79,7 +79,7 @@ class CategoryDetailsPage extends GetView<CategoryDetailsController> {
                     'body': Style(
                       margin: Margins.zero,
                       padding: HtmlPaddings.zero,
-                      color: colorScheme.onSurfaceVariant,
+                      color: colorScheme.onSurface,
                       fontSize: FontSize(theme.textTheme.bodyMedium?.fontSize ?? 14),
                       lineHeight: const LineHeight(1.5),
                     ),
@@ -172,25 +172,23 @@ class _ServiceCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
               ),
               alignment: Alignment.center,
-              child:
-              // imageUrl.isNotEmpty
-              //     ? Image.network(
-              //   imageUrl,
-              //   width: 72,
-              //   height: 72,
-              //   fit: BoxFit.cover,
-              //   errorBuilder: (_, __, ___) => Icon(
-              //     Icons.home_repair_service_outlined,
-              //     color: colorScheme.primary,
-              //     size: 28,
-              //   ),
-              // )
-              //     :
-              Icon(
-                Icons.home_repair_service_outlined,
-                color: colorScheme.primary,
-                size: 28,
-              ),
+              child: (service.imageLink != null && service.imageLink!.isNotEmpty)
+                  ? Image.network(
+                      service.imageLink!,
+                      width: 72,
+                      height: 72,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => Icon(
+                        Icons.home_repair_service_outlined,
+                        color: colorScheme.primary,
+                        size: 28,
+                      ),
+                    )
+                  : Icon(
+                      Icons.home_repair_service_outlined,
+                      color: colorScheme.primary,
+                      size: 28,
+                    ),
             ),
 
             const SizedBox(width: 12),
@@ -211,13 +209,15 @@ class _ServiceCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    service.localizedDescription,
+                    service.localizedDescription
+                        .replaceAll(RegExp(r'<[^>]*>'), '')
+                        .trim(),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: colorScheme.onSurfaceVariant,
                     ),
-                  ),
+                  )
                 ],
               ),
             ),

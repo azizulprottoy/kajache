@@ -79,9 +79,9 @@ class PopularServicesList extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   alignment: Alignment.center,
-                  child: service.imageLink.isNotEmpty
+                  child: service.image.isNotEmpty
                       ? Image.network(
-                          MediaUrlHelper.resolve(service.imageLink),
+                          MediaUrlHelper.resolve(service.image),
                           width: 72,
                           height: 72,
                           fit: BoxFit.cover,
@@ -110,13 +110,16 @@ class PopularServicesList extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        service.localizedDescription,
+                        service.localizedDescription
+                            .replaceAll(RegExp(r'<[^>]*>'), '')
+                            .trim(),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: theme.textTheme.labelSmall?.copyWith(
                           color: colorScheme.onSurfaceVariant,
                         ),
-                      ),
+                      )
+
                     ],
                   ),
                 ),

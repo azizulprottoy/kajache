@@ -94,7 +94,7 @@ class BookingController extends GetxController {
     if (service != null) {
       serviceId = service.id;
       serviceTitle.value = service.title;
-      serviceImage.value = service.imageLink;
+      serviceImage.value = service.image;
       servicePrice.value = (service.basePrice ?? 0).toDouble();
     }
 
