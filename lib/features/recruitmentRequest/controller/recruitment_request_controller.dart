@@ -145,13 +145,22 @@ class RecruitmentRequestController extends GetxController {
   }
 
   Future<void> submitRequest() async {
-    final error = validateStep();
-    if (error != null) {
-      Get.snackbar(
-        TKeys.validation.tr,
-        error,
-        snackPosition: SnackPosition.BOTTOM,
-      );
+    // Validate all fields regardless of step
+    if (titleController.text.trim().isEmpty) {
+      Get.snackbar(TKeys.validation.tr, TKeys.recruitmentDetailsHint.tr, snackPosition: SnackPosition.BOTTOM);
+      return;
+    }
+    if (durationController.text.trim().isEmpty) {
+      Get.snackbar(TKeys.validation.tr, TKeys.durationHint.tr, snackPosition: SnackPosition.BOTTOM);
+      return;
+    }
+    final salary = num.tryParse(salaryController.text.trim());
+    if (salary == null || salary <= 0) {
+      Get.snackbar(TKeys.validation.tr, TKeys.salaryHint.tr, snackPosition: SnackPosition.BOTTOM);
+      return;
+    }
+    if (transactionIdController.text.trim().isEmpty) {
+      Get.snackbar(TKeys.validation.tr, TKeys.transactionIdRequired.tr, snackPosition: SnackPosition.BOTTOM);
       return;
     }
 

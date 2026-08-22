@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:get/get.dart';
 
 import '../../../app/theme/context_extension.dart';
@@ -254,10 +255,21 @@ class _JobCard extends StatelessWidget {
 
           if (request.details.trim().isNotEmpty) ...[
             const SizedBox(height: 14),
-            Text(
-              request.details,
-              style: theme.textTheme.bodyMedium
-                  ?.copyWith(color: colors.onSurfaceVariant, height: 1.4),
+            Html(
+              data: request.details,
+              style: {
+                'body': Style(
+                  margin: Margins.zero,
+                  padding: HtmlPaddings.zero,
+                  color: colors.onSurface,
+                  fontSize: FontSize(theme.textTheme.bodyMedium?.fontSize ?? 14),
+                  lineHeight: const LineHeight(1.5),
+                ),
+                'p': Style(margin: Margins.only(bottom: 4), padding: HtmlPaddings.zero),
+                'li': Style(margin: Margins.only(bottom: 2), padding: HtmlPaddings.zero, lineHeight: const LineHeight(1.4)),
+                'ol': Style(margin: Margins.only(left: 16, top: 4, bottom: 4), padding: HtmlPaddings.zero),
+                'ul': Style(margin: Margins.only(left: 16, top: 4, bottom: 4), padding: HtmlPaddings.zero),
+              },
             ),
           ],
 

@@ -130,6 +130,7 @@ class AvailableBookingModel {
   final bool cashReceived;
   final double? locationLat;
   final double? locationLng;
+  final String? selectedBidRef; // _id of the selected bid from backend
 
   AvailableBookingModel({
     required this.id,
@@ -165,6 +166,7 @@ class AvailableBookingModel {
     this.cashReceived = false,
     this.locationLat,
     this.locationLng,
+    this.selectedBidRef,
   });
 
   factory AvailableBookingModel.fromJson(Map<String, dynamic> json) {
@@ -270,6 +272,9 @@ class AvailableBookingModel {
       locationLng: (location['coordinates'] is Map)
           ? (location['coordinates']['lng'] as num?)?.toDouble()
           : null,
+      selectedBidRef: json['selectedBid'] is Map
+          ? json['selectedBid']['_id']?.toString()
+          : json['selectedBid']?.toString(),
     );
   }
 
@@ -304,11 +309,26 @@ class AvailableBookingModel {
       myBidEstimatedArrival: bid.estimatedArrival,
       myBidMessage: bid.message,
       myBidStatus: bid.status,
+      selectedBidRef: selectedBidRef,
     );
   }
 
   /// Whether any provider has already bid on this job.
   bool get hasBids => bidsCount > 0;
+
+  BookingBidModel? get selectedBid {
+    if (selectedBidRef != null && selectedBidRef!.isNotEmpty) {
+      final byId = bids.cast<BookingBidModel?>().firstWhere(
+        (b) => b?.id == selectedBidRef,
+        orElse: () => null,
+      );
+      if (byId != null) return byId;
+    }
+    return bids.cast<BookingBidModel?>().firstWhere(
+      (b) => b?.status.toLowerCase() == 'selected',
+      orElse: () => null,
+    );
+  }
 
   /// Human-facing budget label, e.g. "৳500".
   String get budgetLabel => '৳$minLimit';

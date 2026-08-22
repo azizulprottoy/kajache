@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../app/routes/app_routes.dart';
+import '../../../core/utils/media_url_helper.dart';
 import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/common_app_bar.dart';
 import '../controller/my_recruitment_requests_controller.dart';
@@ -125,17 +126,30 @@ class MyRecruitmentRequestsPage extends GetView<MyRecruitmentRequestsController>
                               Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Container(
-                                    width: 46,
-                                    height: 46,
-                                    decoration: BoxDecoration(
-                                      color: colorScheme.primaryContainer,
-                                      borderRadius: BorderRadius.circular(14),
-                                    ),
-                                    child: Icon(
-                                      Icons.badge_outlined,
-                                      color: colorScheme.onPrimaryContainer,
-                                    ),
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(14),
+                                    child: () {
+                                      final img = MediaUrlHelper.resolve(item.image);
+                                      return img.isNotEmpty
+                                          ? Image.network(
+                                              img,
+                                              width: 46,
+                                              height: 46,
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (_, __, ___) => Container(
+                                                width: 46,
+                                                height: 46,
+                                                color: colorScheme.primaryContainer,
+                                                child: Icon(Icons.badge_outlined, color: colorScheme.onPrimaryContainer),
+                                              ),
+                                            )
+                                          : Container(
+                                              width: 46,
+                                              height: 46,
+                                              color: colorScheme.primaryContainer,
+                                              child: Icon(Icons.badge_outlined, color: colorScheme.onPrimaryContainer),
+                                            );
+                                    }(),
                                   ),
                                   const SizedBox(width: 12),
                                   Expanded(
@@ -183,7 +197,7 @@ class MyRecruitmentRequestsPage extends GetView<MyRecruitmentRequestsController>
                               if (item.details.trim().isNotEmpty) ...[
                                 const SizedBox(height: 14),
                                 Text(
-                                  item.details,
+                                  item.details.replaceAll(RegExp(r'<[^>]*>'), '').trim(),
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                   style: theme.textTheme.bodyMedium?.copyWith(

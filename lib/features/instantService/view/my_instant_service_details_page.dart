@@ -411,7 +411,8 @@ class _InstantServicePaymentSheetState extends State<_InstantServicePaymentSheet
                     return Column(
                       children: controller.paymentMethodsList.map((m) {
                         final isSelected = controller.selectedPaymentMethod.value?.id == m.id;
-                        final desc = m.description.isNotEmpty ? m.description : m.account;
+                        final plainDesc = (m.description.isNotEmpty ? m.description : m.account)
+                            .replaceAll(RegExp(r'<[^>]*>'), '').trim();
                         return GestureDetector(
                           onTap: () => controller.selectedPaymentMethod.value = m,
                           child: AnimatedContainer(
@@ -452,10 +453,22 @@ class _InstantServicePaymentSheetState extends State<_InstantServicePaymentSheet
                                           color: isSelected ? colors.primary : colors.onSurface,
                                         ),
                                       ),
-                                      if (desc.isNotEmpty) ...[
+                                      if (isSelected && m.description.isNotEmpty) ...[
+                                        const SizedBox(height: 6),
+                                        Html(
+                                          data: m.description,
+                                          style: {
+                                            'body': Style(margin: Margins.zero, padding: HtmlPaddings.zero, fontSize: FontSize(theme.textTheme.bodySmall?.fontSize ?? 12), color: colors.onSurface, lineHeight: const LineHeight(1.3)),
+                                            'p': Style(margin: Margins.only(bottom: 2), padding: HtmlPaddings.zero),
+                                            'li': Style(margin: Margins.only(bottom: 1), padding: HtmlPaddings.zero, lineHeight: const LineHeight(1.3)),
+                                            'ol': Style(margin: Margins.only(left: 14, top: 2, bottom: 2), padding: HtmlPaddings.zero),
+                                            'ul': Style(margin: Margins.only(left: 14, top: 2, bottom: 2), padding: HtmlPaddings.zero),
+                                          },
+                                        ),
+                                      ] else if (!isSelected && plainDesc.isNotEmpty) ...[
                                         const SizedBox(height: 2),
                                         Text(
-                                          desc,
+                                          plainDesc,
                                           style: theme.textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,

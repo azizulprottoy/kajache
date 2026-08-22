@@ -41,9 +41,7 @@ class MyBookingDetailsController extends GetxController {
   int get basePaymentAmount {
     final b = booking.value;
     if (b == null) return 0;
-    final selectedBid = b.bids.cast<BookingBidModel?>()
-        .firstWhere((bid) => bid?.status.toLowerCase() == 'selected', orElse: () => null);
-    return b.bookingFee + (selectedBid?.price ?? 0);
+    return b.bookingFee + (b.selectedBid?.price ?? 0);
   }
 
   int get finalPaymentAmount => basePaymentAmount - discountAmount;
@@ -84,15 +82,7 @@ class MyBookingDetailsController extends GetxController {
     return null;
   }
 
-  String? get selectedBidId {
-    final bids = booking.value?.bids ?? [];
-    for (final bid in bids) {
-      if (bid.status.trim().toLowerCase() == 'selected') {
-        return bid.id;
-      }
-    }
-    return null;
-  }
+  String? get selectedBidId => booking.value?.selectedBid?.id;
 
   @override
   void onInit() {

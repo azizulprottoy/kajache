@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 import '../../../app/theme/context_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -25,6 +26,73 @@ class MyBookingDetailsPage extends GetView<MyBookingDetailsController> {
         title: "booking details",
         showLanguageToggle: true,
       ),
+      bottomNavigationBar: Obx(() {
+        final booking = controller.booking.value;
+        if (booking == null) return const SizedBox.shrink();
+
+        final status = booking.status.trim().toLowerCase();
+        final showCancel = status == 'bid_selected';
+        final showChat = controller.selectedBidId != null &&
+            ['bid_selected', 'in_progress', 'completed'].contains(status);
+
+        if (!showCancel && !showChat) return const SizedBox.shrink();
+
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+            child: Row(
+              children: [
+                if (showCancel) ...[
+                  Expanded(
+                    child: Obx(() => OutlinedButton.icon(
+                      onPressed: controller.isCancellingBid.value
+                          ? null
+                          : () async {
+                              final reason = await _promptReason(
+                                context,
+                                'Cancel Booking',
+                                'Why are you cancelling? (Payment non-refundable)',
+                              );
+                              if (reason == null) return;
+                              await controller.cancelBid(reason: reason);
+                            },
+                      icon: controller.isCancellingBid.value
+                          ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2))
+                          : const Icon(Icons.cancel_outlined, size: 18),
+                      label: const Text('Cancel'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: colorScheme.error,
+                        side: BorderSide(color: colorScheme.error),
+                        minimumSize: const Size.fromHeight(48),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      ),
+                    )),
+                  ),
+                  if (showChat) const SizedBox(width: 10),
+                ],
+                if (showChat)
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () => Get.toNamed(
+                        AppRoutes.chatPage,
+                        arguments: {
+                          'bidId': controller.selectedBidId,
+                          'bookingStatus': booking.status,
+                        },
+                      ),
+                      icon: const Icon(Icons.chat_bubble_outline, size: 18),
+                      label: const Text('Chat'),
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size.fromHeight(48),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        );
+      }),
       body: Obx(() {
         final booking = controller.booking.value;
         if (controller.isLoading.value && booking == null) {
@@ -48,33 +116,6 @@ class MyBookingDetailsPage extends GetView<MyBookingDetailsController> {
                 _PaymentDueBanner(controller: controller),
               ],
 
-              // Customer cancel — allowed when bid_selected (no refund)
-              if (booking.status.trim().toLowerCase() == 'bid_selected') ...[
-                const SizedBox(height: 14),
-                Obx(() => SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    onPressed: controller.isCancellingBid.value
-                        ? null
-                        : () async {
-                            final reason = await _promptReason(context, 'Cancel Booking',
-                                'Why are you cancelling? (Payment non-refundable)');
-                            if (reason == null) return;
-                            await controller.cancelBid(reason: reason);
-                          },
-                    icon: controller.isCancellingBid.value
-                        ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
-                        : const Icon(Icons.cancel_outlined),
-                    label: const Text('Cancel Booking'),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: Theme.of(context).colorScheme.error,
-                      side: BorderSide(color: Theme.of(context).colorScheme.error),
-                      minimumSize: const Size.fromHeight(48),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                    ),
-                  ),
-                )),
-              ],
 
               // Track Technician button (shown when in_progress and booking has coordinates)
               if ((booking.status.trim().toLowerCase() == 'in_progress' ||
@@ -104,32 +145,6 @@ class MyBookingDetailsPage extends GetView<MyBookingDetailsController> {
                 ),
               ],
 
-              if (controller.selectedBidId != null &&
-                  [
-                    'bid_selected',
-                    'in_progress',
-                    'completed',
-                  ].contains(booking.status.trim().toLowerCase())) ...[
-                const SizedBox(height: 14),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    onPressed: () => Get.toNamed(
-                      AppRoutes.chatPage,
-                      arguments: {
-                        'bidId': controller.selectedBidId,
-                        'bookingStatus': booking.status,
-                      },
-                    ),
-                    icon: const Icon(Icons.chat_bubble_outline),
-                    label: const Text('Chat with Technician'),
-                    style: OutlinedButton.styleFrom(
-                      minimumSize: const Size.fromHeight(48),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                    ),
-                  ),
-                ),
-              ],
 
               if (booking.status.trim().toLowerCase() == 'in_progress') ...[
                 const SizedBox(height: 14),
@@ -574,7 +589,6 @@ class _CombinedFeedbackSheetState extends State<_CombinedFeedbackSheet> {
                     ),
                   ],
 
-                  // ── Technician rating ──────────────────────────────────
                   if (widget.needsTechRating) ...[
                     SizedBox(height: widget.needsServiceReview ? 20 : 0),
                     if (widget.needsServiceReview)
@@ -626,7 +640,6 @@ class _CombinedFeedbackSheetState extends State<_CombinedFeedbackSheet> {
   }
 }
 
-// ── Coupon ticket card ────────────────────────────────────────────────────────
 class _CouponTicket extends StatelessWidget {
   final dynamic coupon; // CouponModel
   final int basePrice;
@@ -1054,8 +1067,7 @@ class _BookingPaymentSheetState extends State<_BookingPaymentSheet> {
     final colors = theme.colorScheme;
     final controller = widget.controller;
     final bookingFee = controller.booking.value?.bookingFee ?? 0;
-    final selectedBid = controller.booking.value?.bids.cast<BookingBidModel?>()
-        .firstWhere((b) => b?.status.toLowerCase() == 'selected', orElse: () => null);
+    final selectedBid = controller.booking.value?.selectedBid;
     final bidPrice = selectedBid?.price ?? 0;
     final total = bookingFee + bidPrice;
 
@@ -1385,9 +1397,8 @@ class _BookingPaymentSheetState extends State<_BookingPaymentSheet> {
                       children: controller.paymentMethodsList.map((m) {
                         final isSelected =
                             controller.selectedPaymentMethod.value?.id == m.id;
-                        final desc = m.description.isNotEmpty
-                            ? m.description
-                            : m.account;
+                        final plainDesc = (m.description.isNotEmpty ? m.description : m.account)
+                            .replaceAll(RegExp(r'<[^>]*>'), '').trim();
                         return GestureDetector(
                           onTap: () =>
                               controller.selectedPaymentMethod.value = m,
@@ -1438,10 +1449,28 @@ class _BookingPaymentSheetState extends State<_BookingPaymentSheet> {
                                             : colors.onSurface,
                                       ),
                                     ),
-                                    if (desc.isNotEmpty) ...[
+                                    if (isSelected && m.description.isNotEmpty) ...[
+                                      const SizedBox(height: 6),
+                                      Html(
+                                        data: m.description,
+                                        style: {
+                                          'body': Style(
+                                            margin: Margins.zero,
+                                            padding: HtmlPaddings.zero,
+                                            fontSize: FontSize(theme.textTheme.bodySmall?.fontSize ?? 12),
+                                            color: colors.onSurface,
+                                            lineHeight: const LineHeight(1.3),
+                                          ),
+                                          'p': Style(margin: Margins.only(bottom: 2), padding: HtmlPaddings.zero),
+                                          'li': Style(margin: Margins.only(bottom: 1), padding: HtmlPaddings.zero, lineHeight: const LineHeight(1.3)),
+                                          'ol': Style(margin: Margins.only(left: 14, top: 2, bottom: 2), padding: HtmlPaddings.zero),
+                                          'ul': Style(margin: Margins.only(left: 14, top: 2, bottom: 2), padding: HtmlPaddings.zero),
+                                        },
+                                      ),
+                                    ] else if (!isSelected && plainDesc.isNotEmpty) ...[
                                       const SizedBox(height: 2),
                                       Text(
-                                        desc,
+                                        plainDesc,
                                         style: theme.textTheme.bodySmall?.copyWith(
                                           color: colors.onSurfaceVariant,
                                         ),
@@ -1626,28 +1655,41 @@ class _BidderProfileSheet extends StatelessWidget {
             ),
 
             const SizedBox(height: 18),
-            const Divider(),
-            const SizedBox(height: 10),
 
-            _ProfileInformationRow(
-              icon: Icons.payments_outlined,
-              label: 'Bid amount',
-              value: '৳${bid.price}',
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: colors.surfaceContainerLowest,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: colors.outlineVariant),
+              ),
+              child: Column(
+                children: [
+                  _ProfileInformationRow(
+                    icon: Icons.payments_outlined,
+                    label: 'Bid amount',
+                    value: '৳${bid.price}',
+                  ),
+                  if (bid.estimatedArrival.isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    _ProfileInformationRow(
+                      icon: Icons.access_time_outlined,
+                      label: 'Estimated arrival',
+                      value: bid.estimatedArrival,
+                    ),
+                  ],
+                  if (bid.message.isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    _ProfileInformationRow(
+                      icon: Icons.message_outlined,
+                      label: 'Bid message',
+                      value: bid.message,
+                    ),
+                  ],
+                ],
+              ),
             ),
-
-            if (bid.estimatedArrival.isNotEmpty)
-              _ProfileInformationRow(
-                icon: Icons.access_time_outlined,
-                label: 'Estimated arrival',
-                value: bid.estimatedArrival,
-              ),
-
-            if (bid.message.isNotEmpty)
-              _ProfileInformationRow(
-                icon: Icons.message_outlined,
-                label: 'Bid message',
-                value: bid.message,
-              ),
 
             const SizedBox(height: 18),
 
@@ -1893,11 +1935,19 @@ class _BookingCard extends StatelessWidget {
         .join(', ');
 
     return Container(
-      padding: const EdgeInsets.all(16),
+
       decoration: _cardDecoration(colors),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const SizedBox(height: 16),
+          _SectionTitle(
+            icon: Icons.engineering_outlined,
+            title: "Requirments",
+
+          ),
+
+          const SizedBox(height: 6),
           Text(
             booking.details.trim().isEmpty
                 ? TKeys.noDescription.tr
@@ -1913,20 +1963,20 @@ class _BookingCard extends StatelessWidget {
               booking.subServices.map((item) => Chip(label: Text(item))).toList(),
             ),
           ],
-          const Divider(height: 28),
+          const Divider(height: 18),
           _InfoRow(
             icon: Icons.event_outlined,
             text: '${booking.scheduleDate}  ${booking.scheduleTime}'.trim(),
           ),
           if (location.isNotEmpty) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             _InfoRow(
               icon: Icons.location_on_outlined,
               text: location,
             ),
           ],
           if (booking.status.isNotEmpty) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             _InfoRow(
               icon: Icons.pending_actions_outlined,
               text: booking.status.replaceAll('_', ' '),

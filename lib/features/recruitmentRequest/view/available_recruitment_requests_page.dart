@@ -154,7 +154,7 @@ class _JobOpeningCard extends StatelessWidget {
               if (item.details.trim().isNotEmpty) ...[
                 const SizedBox(height: 12),
                 Text(
-                  item.details,
+                  item.details.replaceAll(RegExp(r'<[^>]*>'), '').trim(),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.bodySmall
