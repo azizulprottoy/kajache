@@ -1,28 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kaj_ache/core/utils/translation_keys.dart';
-import 'package:kaj_ache/features/auth/arguments/otp_argument.dart';
-import '../../../app/routes/app_routes.dart';
-import '../controllers/login_controller.dart';
 import '../controllers/register_controller.dart';
 
-class RegisterPage extends GetView<RegisterController> {
+class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
+
+  @override
+  State<RegisterPage> createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
+  // Owned by the page so two RegisterPage instances never share one GlobalKey.
+  final _formKey = GlobalKey<FormState>();
+
+  final RxString selectedAccountType = 'buyer'.obs;
+  final fullNameController = TextEditingController();
+  final emailController = TextEditingController();
+  final phoneController = TextEditingController();
+  final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
+
+  final RxBool obscurePassword = true.obs;
+  final RxBool obscureConfirmPassword = true.obs;
+
+  RegisterController get controller => Get.find<RegisterController>();
+
+  @override
+  void dispose() {
+    fullNameController.dispose();
+    emailController.dispose();
+    phoneController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-
-    final RxString selectedAccountType = 'buyer'.obs;
-    final fullNameController = TextEditingController();
-    final emailController = TextEditingController();
-    final phoneController = TextEditingController();
-    final passwordController = TextEditingController();
-    final confirmPasswordController = TextEditingController();
-
-    final RxBool obscurePassword = true.obs;
-    final RxBool obscureConfirmPassword = true.obs;
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
@@ -35,7 +52,7 @@ class RegisterPage extends GetView<RegisterController> {
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Form(
-            key: controller.formKey,
+            key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -269,6 +286,7 @@ class RegisterPage extends GetView<RegisterController> {
                           ? null
                           : () {
                         controller.register(
+                          formKey: _formKey,
                           accountType: selectedAccountType.value,
                           fullName: fullNameController.text,
                           email: emailController.text,
@@ -313,7 +331,7 @@ class RegisterPage extends GetView<RegisterController> {
                       ),
                     ),
                     TextButton(
-                      onPressed: () => Get.toNamed(AppRoutes.login),
+                      onPressed: RegisterController.backToLogin,
                       child: Text(
                         TKeys.login.tr,
                         style: TextStyle(

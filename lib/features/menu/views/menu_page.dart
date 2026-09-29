@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import '../../../app/theme/context_extension.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../app/routes/app_routes.dart';
 import '../../../core/utils/app_services.dart';
 import '../../../core/controller/local_controller.dart';
+import '../../../core/controller/theme_controller.dart';
 import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/common_app_bar.dart';
 import '../../main/controller/main_controller.dart';
@@ -159,9 +159,8 @@ class MenuPage extends StatelessWidget {
                   title: TKeys.darkMode.tr,
                   value: Get.isDarkMode,
                   onChanged: (value) {
-                    Get.changeThemeMode(
-                      value ? ThemeMode.dark : ThemeMode.light,
-                    );
+                    final theme = Get.find<ThemeController>();
+                    value ? theme.setDark() : theme.setLight();
                   },
                 ),
                 _MenuDivider(),

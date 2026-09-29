@@ -17,10 +17,17 @@ class PortfolioRepository {
   })  : _dio = dio ?? ApiClient.instance,
         _networkInfo = networkInfo ?? NetworkInfo();
 
-  Future<List<PortfolioItem>> getPortfolios() async {
+  /// Pass [technitianId] to fetch only that technician's items
+  /// (the backend filters on `?technitianId=`).
+  Future<List<PortfolioItem>> getPortfolios({String? technitianId}) async {
     await _ensureConnected();
 
-    final response = await _dio.get(ApiEndpoints.portfolio);
+    final response = await _dio.get(
+      ApiEndpoints.portfolio,
+      queryParameters: technitianId == null || technitianId.isEmpty
+          ? null
+          : {'technitianId': technitianId},
+    );
     final data = _responseData(response.data);
 
     final List<dynamic> items;

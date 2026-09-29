@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../../app/theme/context_extension.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kaj_ache/features/service_details/arguments/service_details_arguments.dart';
 
@@ -8,10 +7,8 @@ import '../../../shared/shimmers/popular_services_shimmer.dart';
 
 import '../../../app/routes/app_routes.dart';
 import '../../../core/utils/media_url_helper.dart';
-import '../../../core/utils/translation_keys.dart';
-import '../../../shared/widgets/custom_button.dart';
 import '../../home/models/services_response_model.dart';
-import '../arguments/service_argument.dart';
+import 'package:kaj_ache/shared/widgets/app_network_image.dart';
 
 class PopularServicesList extends StatelessWidget {
   final List<ServiceModel> services;
@@ -80,7 +77,7 @@ class PopularServicesList extends StatelessWidget {
                   ),
                   alignment: Alignment.center,
                   child: service.image.isNotEmpty
-                      ? Image.network(
+                      ? AppNetworkImage(
                           MediaUrlHelper.resolve(service.image),
                           width: 72,
                           height: 72,

@@ -6,6 +6,7 @@ import '../../../shared/widgets/common_app_bar.dart';
 import '../../../shared/widgets/custom_text_field.dart';
 import '../../../shared/widgets/serachable_dropdown_field.dart';
 import '../controllers/profile_controller.dart';
+import 'package:kaj_ache/shared/widgets/app_network_image.dart';
 
 class EditProfilePage extends GetView<ProfileController> {
   const EditProfilePage({super.key});
@@ -40,7 +41,7 @@ class EditProfilePage extends GetView<ProfileController> {
                           if (file != null) {
                             img = FileImage(file);
                           } else if (url.isNotEmpty) {
-                            img = NetworkImage(url);
+                            img = appNetworkImageProvider(url);
                           }
                           return CircleAvatar(
                             radius: 46,

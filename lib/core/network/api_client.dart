@@ -41,18 +41,38 @@ class ApiClient {
     return dio;
   }
 
-  static void resetInstance() => _dio = null;
+  static void resetInstance() {
+    _dio = null;
+    clearCachedToken();
+  }
+
+  /// Drops the in-memory token so the next request re-reads secure storage.
+  /// Called whenever the stored token changes (login, logout, 401).
+  static void clearCachedToken() => _AuthInterceptor.invalidate();
 }
 
 class _AuthInterceptor extends Interceptor {
+  // Secure storage reads go through a platform channel (Keystore/Keychain),
+  // so the token is read once and kept in memory until it changes.
+  static String? _token;
+  static bool _tokenLoaded = false;
+
+  static void invalidate() {
+    _token = null;
+    _tokenLoaded = false;
+  }
+
   @override
   Future<void> onRequest(
       RequestOptions options,
       RequestInterceptorHandler handler,
       ) async {
-    final storage = Get.find<SecureStorageService>();
-    final token = await storage.getToken();
-    if (token != null) {
+    if (!_tokenLoaded) {
+      _token = await Get.find<SecureStorageService>().getToken();
+      _tokenLoaded = true;
+    }
+    final token = _token;
+    if (token != null && token.isNotEmpty) {
       options.headers['Authorization'] = 'Bearer $token';
     }
     handler.next(options);

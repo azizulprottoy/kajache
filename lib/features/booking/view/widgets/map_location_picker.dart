@@ -37,6 +37,7 @@ class _MapLocationPickerState extends State<MapLocationPicker> {
   String _address = '';
   String _district = '';
   String _area = '';
+  int _geocodeRequest = 0;
 
   @override
   void initState() {
@@ -57,20 +58,37 @@ class _MapLocationPickerState extends State<MapLocationPicker> {
       LocationPermission perm = await Geolocator.checkPermission();
       if (perm == LocationPermission.denied) {
         perm = await Geolocator.requestPermission();
-        if (perm == LocationPermission.denied) return;
+      }
+      if (perm == LocationPermission.denied ||
+          perm == LocationPermission.deniedForever) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text(
+                'Location permission is off. Enable it in Settings or tap the map to set a location.'),
+          ));
+        }
+        return;
       }
       final pos = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high);
+      if (!mounted) return;
       final loc = LatLng(pos.latitude, pos.longitude);
       setState(() => _pin = loc);
       _mapController.move(loc, 16);
       await _reverseGeocode(loc);
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Could not get your location. Tap the map instead.'),
+        ));
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }
   }
 
   Future<void> _reverseGeocode(LatLng loc) async {
+    final request = ++_geocodeRequest;
     try {
       final dio = Dio();
       final res = await dio.get(
@@ -84,6 +102,8 @@ class _MapLocationPickerState extends State<MapLocationPicker> {
         options: Options(headers: {'User-Agent': 'KajAche/1.0'}),
       );
       final data = res.data is String ? jsonDecode(res.data) : res.data;
+      // Ignore stale answers (the pin moved again) and a closed picker.
+      if (!mounted || request != _geocodeRequest) return;
       final addr = data['address'] as Map? ?? {};
       setState(() {
         _address = data['display_name']?.toString().split(',').take(3).join(', ') ?? '';

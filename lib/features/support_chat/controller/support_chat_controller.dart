@@ -18,6 +18,7 @@ class SupportChatController extends GetxController {
   final RxBool isSending = false.obs;
 
   Timer? _pollTimer;
+  bool _loading = false;
 
   @override
   void onInit() {
@@ -26,20 +27,28 @@ class SupportChatController extends GetxController {
   }
 
   Future<void> _init() async {
+    // Start the timer before the first await so onClose always cancels it.
+    _pollTimer = Timer.periodic(_pollInterval, (_) {
+      // Skip a poll while the previous request is still running.
+      if (!_loading) _loadThread(silent: true);
+    });
     await _loadThread();
-    unawaited(_repository.markRead());
-    _pollTimer = Timer.periodic(_pollInterval, (_) => _loadThread(silent: true));
+    if (isClosed) return;
+    unawaited(_repository.markRead().catchError((_) {}));
   }
 
   Future<void> _loadThread({bool silent = false}) async {
+    if (isClosed) return;
+    _loading = true;
     if (!silent) isLoading.value = true;
     try {
       final result = await _repository.getThread();
-      messages.assignAll(result);
+      if (!isClosed) messages.assignAll(result);
     } catch (_) {
       // Keep last known history on a failed poll.
     } finally {
-      if (!silent) isLoading.value = false;
+      _loading = false;
+      if (!silent && !isClosed) isLoading.value = false;
     }
   }
 
@@ -53,6 +62,8 @@ class SupportChatController extends GetxController {
       await _repository.sendMessage(text);
       await _loadThread(silent: true);
     } catch (e) {
+      // Put the text back so a failed send doesn't lose the message
+      if (messageController.text.isEmpty) messageController.text = text;
       Get.snackbar(
         'Error',
         apiErrorMessage(e),

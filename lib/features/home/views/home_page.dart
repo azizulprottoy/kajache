@@ -9,10 +9,9 @@ import '../../../shared/widgets/common_app_bar.dart';
 import '../../advertisements/widget/ad_banner.dart';
 import '../../services/views/popular_services_list.dart';
 import '../../../app/theme/context_extension.dart';
-import '../../instantService/model/instant_service_model.dart';
-import '../../recruitmentRequest/model/recruitment_request_model.dart';
 import '../controllers/home_controller.dart';
 import '../../../core/utils/media_url_helper.dart';
+import 'package:kaj_ache/shared/widgets/app_network_image.dart';
 
 class HomePage extends GetView<HomeController> {
   const HomePage({super.key});
@@ -113,10 +112,12 @@ class HomePage extends GetView<HomeController> {
                     }
                     return SizedBox(
                       height: 180,
-                      child: ListView(
+                      child: ListView.builder(
                         scrollDirection: Axis.horizontal,
-                        children: controller.instantServices.map((item) =>
-                          _HomeJobTile(
+                        itemCount: controller.instantServices.length,
+                        itemBuilder: (_, i) {
+                          final item = controller.instantServices[i];
+                          return _HomeJobTile(
                             title: item.title,
                             subtitle: '৳${item.priceMin}–৳${item.priceMax}',
                             icon: Icons.bolt_outlined,
@@ -124,8 +125,8 @@ class HomePage extends GetView<HomeController> {
                             onTap: () => Get.toNamed(AppRoutes.myInstantServiceDetails, arguments: item.id),
                             colorScheme: colorScheme,
                             theme: theme,
-                          ),
-                        ).toList(),
+                          );
+                        },
                       ),
                     );
                   }),
@@ -147,10 +148,12 @@ class HomePage extends GetView<HomeController> {
                     }
                     return SizedBox(
                       height: 180,
-                      child: ListView(
+                      child: ListView.builder(
                         scrollDirection: Axis.horizontal,
-                        children: controller.recruitmentPosts.map((item) =>
-                          _HomeJobTile(
+                        itemCount: controller.recruitmentPosts.length,
+                        itemBuilder: (_, i) {
+                          final item = controller.recruitmentPosts[i];
+                          return _HomeJobTile(
                             title: item.title,
                             subtitle: '৳${item.salary.toInt()} • ${item.category}',
                             icon: Icons.badge_outlined,
@@ -158,8 +161,8 @@ class HomePage extends GetView<HomeController> {
                             onTap: () => Get.toNamed(AppRoutes.myRecruitmentRequests),
                             colorScheme: colorScheme,
                             theme: theme,
-                          ),
-                        ).toList(),
+                          );
+                        },
                       ),
                     );
                   }),
@@ -262,7 +265,7 @@ class _HomeJobTile extends StatelessWidget {
             ClipRRect(
               borderRadius: BorderRadius.circular(7),
               child: image.isNotEmpty
-                  ? Image.network(image, width: 150, height: 100, fit: BoxFit.cover,
+                  ? AppNetworkImage(image, width: 150, height: 100, fit: BoxFit.cover,
                       errorBuilder: (_, __, ___) => _iconBox())
                   : _iconBox(),
             ),

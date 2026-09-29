@@ -6,6 +6,7 @@ import '../../../core/utils/media_url_helper.dart';
 import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/common_app_bar.dart';
 import '../controller/my_recruitment_requests_controller.dart';
+import 'package:kaj_ache/shared/widgets/app_network_image.dart';
 
 class _StatusInfo {
   final String label;
@@ -131,7 +132,7 @@ class MyRecruitmentRequestsPage extends GetView<MyRecruitmentRequestsController>
                                     child: () {
                                       final img = MediaUrlHelper.resolve(item.image);
                                       return img.isNotEmpty
-                                          ? Image.network(
+                                          ? AppNetworkImage(
                                               img,
                                               width: 46,
                                               height: 46,

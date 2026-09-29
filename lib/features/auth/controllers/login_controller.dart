@@ -6,7 +6,6 @@ import '../../../core/error/api_error.dart';
 import '../../../core/storage/local_storage_service.dart';
 import '../../../core/storage/secure_storage_service.dart';
 import '../../../core/utils/app_services.dart';
-import '../arguments/otp_argument.dart';
 import '../models/register_request_model.dart';
 import '../repository/auth_repository.dart';
 
@@ -19,8 +18,6 @@ class LoginController extends GetxController {
 
   final RxBool isLoading = false.obs;
 
-  final formKey = GlobalKey<FormState>();
-
   final inputController = TextEditingController();
   final passwordController = TextEditingController();
 
@@ -30,8 +27,8 @@ class LoginController extends GetxController {
     obscurePassword.value = !obscurePassword.value;
   }
 
-  Future<void> login() async {
-    if (!formKey.currentState!.validate()) return;
+  Future<void> login(GlobalKey<FormState> formKey) async {
+    if (formKey.currentState?.validate() != true) return;
 
     FocusManager.instance.primaryFocus?.unfocus();
 
@@ -77,7 +74,12 @@ class LoginController extends GetxController {
     }
   }
 
-
+  @override
+  void onClose() {
+    inputController.dispose();
+    passwordController.dispose();
+    super.onClose();
+  }
 }
 UserType _mapRoleToUserType(String roleTitle) {
   final role = roleTitle.toLowerCase();

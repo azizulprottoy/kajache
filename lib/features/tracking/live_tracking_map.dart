@@ -39,12 +39,22 @@ class _CustomerTrackingMapState extends State<CustomerTrackingMap> {
     _timer = Timer.periodic(const Duration(seconds: 5), (_) => _poll());
   }
 
+  bool _polling = false;
+
   Future<void> _poll() async {
-    final loc = await _repo.getTechnicianLocation(widget.bookingId);
-    if (!mounted) return;
-    setState(() => _techLoc = loc);
-    if (loc != null && _following) {
-      _mapController.move(LatLng(loc.lat, loc.lng), _mapController.camera.zoom);
+    if (_polling) return;
+    _polling = true;
+    try {
+      final loc = await _repo.getTechnicianLocation(widget.bookingId);
+      if (!mounted) return;
+      setState(() => _techLoc = loc);
+      if (loc != null && _following) {
+        _mapController.move(LatLng(loc.lat, loc.lng), _mapController.camera.zoom);
+      }
+    } catch (_) {
+      // Keep the last known position on a failed poll.
+    } finally {
+      _polling = false;
     }
   }
 
@@ -205,28 +215,60 @@ class _TechnicianTrackingMapState extends State<TechnicianTrackingMap> {
   final _mapController = MapController();
   LatLng? _myPos;
   Timer? _timer;
+  bool _busy = false;
+  String? _locationError;
 
   @override
   void initState() {
     super.initState();
+    _start();
+  }
+
+  /// Asks for location permission once; broadcasting only starts if granted.
+  Future<void> _start() async {
+    String? error;
+    try {
+      if (!await Geolocator.isLocationServiceEnabled()) {
+        error = 'Location services are off. Turn them on to share your location.';
+      } else {
+        var perm = await Geolocator.checkPermission();
+        if (perm == LocationPermission.denied) {
+          perm = await Geolocator.requestPermission();
+        }
+        if (perm == LocationPermission.deniedForever) {
+          error = 'Location permission is blocked. Enable it in Settings to share your location.';
+        } else if (perm == LocationPermission.denied) {
+          error = 'Location permission denied. Your location is not being shared.';
+        }
+      }
+    } catch (_) {
+      error = 'Could not access your location.';
+    }
+    if (!mounted) return;
+    if (error != null) {
+      setState(() => _locationError = error);
+      return;
+    }
     _broadcastAndUpdate();
     _timer = Timer.periodic(const Duration(seconds: 5), (_) => _broadcastAndUpdate());
   }
 
   Future<void> _broadcastAndUpdate() async {
+    // Don't start a new high-accuracy fix while the previous one is running.
+    if (_busy) return;
+    _busy = true;
     try {
-      LocationPermission perm = await Geolocator.checkPermission();
-      if (perm == LocationPermission.denied) {
-        perm = await Geolocator.requestPermission();
-        if (perm == LocationPermission.denied) return;
-      }
       final pos = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high);
       if (!mounted) return;
       setState(() => _myPos = LatLng(pos.latitude, pos.longitude));
       await _repo.updateTechnicianLocation(
           widget.bookingId, pos.latitude, pos.longitude);
-    } catch (_) {}
+    } catch (_) {
+      // Retry on the next tick.
+    } finally {
+      _busy = false;
+    }
   }
 
   @override
@@ -317,9 +359,14 @@ class _TechnicianTrackingMapState extends State<TechnicianTrackingMap> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Container(width: 8, height: 8, decoration: const BoxDecoration(color: Colors.green, shape: BoxShape.circle)),
+                  Container(width: 8, height: 8, decoration: BoxDecoration(color: _locationError == null ? Colors.green : colors.error, shape: BoxShape.circle)),
                   const SizedBox(width: 6),
-                  const Text('Broadcasting location every 5s', style: TextStyle(fontSize: 13)),
+                  Flexible(
+                    child: Text(
+                      _locationError ?? 'Broadcasting location every 5s',
+                      style: const TextStyle(fontSize: 13),
+                    ),
+                  ),
                 ],
               ),
             ),

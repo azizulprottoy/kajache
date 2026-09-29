@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 
 import '../controller/advertisement_controller.dart';
 import '../model/advertisement_model.dart';
+import 'package:kaj_ache/shared/widgets/app_network_image.dart';
 
 class AdBanner extends StatelessWidget {
   final String position;
@@ -35,6 +36,47 @@ class AdBanner extends StatelessWidget {
   }
 }
 
+/// Reads an ad image's aspect ratio, removing the stream listener when the
+/// URL changes or the widget is disposed.
+mixin _ImageRatioReader<T extends StatefulWidget> on State<T> {
+  double? ratio;
+  ImageStream? _ratioStream;
+  ImageStreamListener? _ratioListener;
+
+  void readRatio(String? url) {
+    _stopReadingRatio();
+    if (url == null || url.isEmpty) return;
+    // A tiny decode is enough to know the ratio; the bytes come from the
+    // same disk cache the displayed image uses.
+    final stream = appNetworkImageProvider(url, width: 64)
+        .resolve(ImageConfiguration.empty);
+    final listener = ImageStreamListener(
+      (info, _) {
+        final w = info.image.width, h = info.image.height;
+        info.dispose();
+        if (mounted && h > 0) setState(() => ratio = w / h);
+      },
+      onError: (_, __) {},
+    );
+    stream.addListener(listener);
+    _ratioStream = stream;
+    _ratioListener = listener;
+  }
+
+  void _stopReadingRatio() {
+    final listener = _ratioListener;
+    if (listener != null) _ratioStream?.removeListener(listener);
+    _ratioStream = null;
+    _ratioListener = null;
+  }
+
+  @override
+  void dispose() {
+    _stopReadingRatio();
+    super.dispose();
+  }
+}
+
 // ── Auto-advancing PageView carousel ─────────────────────────────────────────
 class _AdCarousel extends StatefulWidget {
   final List<AdvertisementModel> ads;
@@ -46,34 +88,35 @@ class _AdCarousel extends StatefulWidget {
   State<_AdCarousel> createState() => _AdCarouselState();
 }
 
-class _AdCarouselState extends State<_AdCarousel> {
+class _AdCarouselState extends State<_AdCarousel>
+    with _ImageRatioReader<_AdCarousel> {
   late final PageController _pageController;
   Timer? _timer;
   int _current = 0;
-  double? _ratio;
+
+  String? get _firstUrl =>
+      widget.ads.isEmpty ? null : widget.ads.first.imageUrl;
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController();
     _startTimer();
-    _readRatio();
+    readRatio(_firstUrl);
   }
 
-  void _readRatio() {
-    if (widget.ads.isEmpty) return;
-    NetworkImage(widget.ads.first.imageUrl)
-        .resolve(ImageConfiguration.empty)
-        .addListener(ImageStreamListener((info, _) {
-      if (mounted) {
-        setState(() => _ratio = info.image.width / info.image.height);
-      }
-    }));
+  @override
+  void didUpdateWidget(covariant _AdCarousel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final oldUrl =
+        oldWidget.ads.isEmpty ? null : oldWidget.ads.first.imageUrl;
+    if (oldUrl != _firstUrl) readRatio(_firstUrl);
+    if (_current >= widget.ads.length) _current = 0;
   }
 
   void _startTimer() {
     _timer = Timer.periodic(const Duration(seconds: 4), (_) {
-      if (!mounted) return;
+      if (!mounted || widget.ads.isEmpty || !_pageController.hasClients) return;
       _current = (_current + 1) % widget.ads.length;
       _pageController.animateToPage(
         _current,
@@ -93,14 +136,14 @@ class _AdCarouselState extends State<_AdCarousel> {
   @override
   Widget build(BuildContext context) {
     return AspectRatio(
-      aspectRatio: _ratio ?? 2.5,
+      aspectRatio: ratio ?? 2.5,
       child: PageView.builder(
         controller: _pageController,
         onPageChanged: (i) => setState(() => _current = i),
         itemCount: widget.ads.length,
         itemBuilder: (_, i) => ClipRRect(
           // borderRadius: BorderRadius.circular(14),
-          child: Image.network(
+          child: AppNetworkImage(
             widget.ads[i].imageUrl,
             width: double.infinity,
             fit: BoxFit.cover,
@@ -123,32 +166,28 @@ class _AdImage extends StatefulWidget {
   State<_AdImage> createState() => _AdImageState();
 }
 
-class _AdImageState extends State<_AdImage> {
-  double? _ratio;
-
+class _AdImageState extends State<_AdImage> with _ImageRatioReader<_AdImage> {
   @override
   void initState() {
     super.initState();
-    _readRatio();
+    readRatio(widget.ad.imageUrl);
   }
 
-  void _readRatio() {
-    final stream = NetworkImage(widget.ad.imageUrl)
-        .resolve(ImageConfiguration.empty);
-    stream.addListener(ImageStreamListener((info, _) {
-      if (mounted) {
-        setState(() {
-          _ratio = info.image.width / info.image.height;
-        });
-      }
-    }));
+  @override
+  void didUpdateWidget(covariant _AdImage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.ad.imageUrl != widget.ad.imageUrl) {
+      ratio = null;
+      readRatio(widget.ad.imageUrl);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    if (_ratio == null) {
+    final ratio = this.ratio;
+    if (ratio == null) {
       return AspectRatio(
         aspectRatio: 2.5,
         child: ClipRRect(
@@ -161,10 +200,10 @@ class _AdImageState extends State<_AdImage> {
     return GestureDetector(
       onTap: widget.onTap,
       child: AspectRatio(
-        aspectRatio: _ratio!,
+        aspectRatio: ratio,
         child: ClipRRect(
           // borderRadius: BorderRadius.circular(14),
-          child: Image.network(
+          child: AppNetworkImage(
             widget.ad.imageUrl,
             width: double.infinity,
             fit: BoxFit.cover,

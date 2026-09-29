@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../../app/theme/context_extension.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../app/routes/app_routes.dart';
 import '../../../core/utils/translation_keys.dart';
@@ -17,6 +16,7 @@ import '../../../shared/shimmers/service_details_shimmer.dart';
 import '../../advertisements/widget/ad_banner.dart';
 import '../controller/service_details_controller.dart';
 import '../model/comment_model.dart';
+import 'package:kaj_ache/shared/widgets/app_network_image.dart';
 
 
 
@@ -96,7 +96,7 @@ class ServiceDetailsPage extends GetView<ServiceDetailsController> {
               ClipRRect(
                 borderRadius: BorderRadius.circular(16),
                 child: service.image.isNotEmpty
-                    ? Image.network(
+                    ? AppNetworkImage(
                   MediaUrlHelper.resolve(service.image),
                   height: 190,
                   width: double.infinity,
@@ -357,7 +357,7 @@ class _PosterDetailsCard extends StatelessWidget {
                 radius: 27,
                 backgroundColor: colorScheme.primaryContainer,
                 backgroundImage:
-                avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
+                avatarUrl.isNotEmpty ? appNetworkImageProvider(avatarUrl) : null,
                 child: avatarUrl.isEmpty
                     ? Icon(
                   Icons.person_outline,
@@ -1259,7 +1259,7 @@ class _CommentCard extends StatelessWidget {
                 radius: 16,
                 backgroundColor: colorScheme.primaryContainer,
                 backgroundImage: comment.propic.isNotEmpty
-                    ? NetworkImage(comment.propic)
+                    ? appNetworkImageProvider(comment.propic)
                     : null,
                 child: comment.propic.isEmpty
                     ? Text(
@@ -1436,7 +1436,7 @@ class _ReplyCard extends StatelessWidget {
                 radius: 12,
                 backgroundColor: colorScheme.primaryContainer,
                 backgroundImage:
-                    reply.propic.isNotEmpty ? NetworkImage(reply.propic) : null,
+                    reply.propic.isNotEmpty ? appNetworkImageProvider(reply.propic) : null,
                 child: reply.propic.isEmpty
                     ? Text(
                         reply.name.isNotEmpty

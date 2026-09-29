@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import '../../../app/theme/context_extension.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../app/routes/app_routes.dart';
 import '../../../core/utils/translation_keys.dart';
 import 'package:flutter_html/flutter_html.dart';
 import '../../../shared/widgets/common_app_bar.dart';
-import '../../../shared/widgets/custom_button.dart'; // CustomButton, ButtonVariant, ButtonSize
 import '../../../shared/shimmers/category_details_shimmer.dart';
 import '../../service_details/arguments/service_details_arguments.dart';
 import '../controller/category_details_controller.dart';
 import '../model/category_services_response_model.dart';
+import 'package:kaj_ache/shared/widgets/app_network_image.dart';
 
 class CategoryDetailsPage extends GetView<CategoryDetailsController> {
   const CategoryDetailsPage({super.key});
@@ -51,7 +50,7 @@ class CategoryDetailsPage extends GetView<CategoryDetailsController> {
               ClipRRect(
                 borderRadius: BorderRadius.circular(16),
                 child: category.imageLink.isNotEmpty
-                    ? Image.network(
+                    ? AppNetworkImage(
                   category.imageLink,
                   height: 190,
                   width: double.infinity,
@@ -173,7 +172,7 @@ class _ServiceCard extends StatelessWidget {
               ),
               alignment: Alignment.center,
               child: (service.imageLink != null && service.imageLink!.isNotEmpty)
-                  ? Image.network(
+                  ? AppNetworkImage(
                       service.imageLink!,
                       width: 72,
                       height: 72,

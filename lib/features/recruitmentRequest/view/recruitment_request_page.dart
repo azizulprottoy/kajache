@@ -9,6 +9,7 @@ import '../../../app/theme/context_extension.dart';
 import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/common_app_bar.dart';
 import '../controller/recruitment_request_controller.dart';
+import 'package:kaj_ache/shared/widgets/app_network_image.dart';
 
 class RecruitmentRequestPage extends GetView<RecruitmentRequestController> {
   const RecruitmentRequestPage({super.key});
@@ -299,7 +300,7 @@ class RecruitmentRequestPage extends GetView<RecruitmentRequestController> {
                                     ClipRRect(
                                       borderRadius: BorderRadius.circular(8),
                                       child: m.image.isNotEmpty
-                                          ? Image.network(m.image,
+                                          ? AppNetworkImage(m.image,
                                               width: 36,
                                               height: 36,
                                               fit: BoxFit.contain,

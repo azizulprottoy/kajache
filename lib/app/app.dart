@@ -14,6 +14,7 @@ class KajAcheApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Get.put(LocaleController(), permanent: true);
+    final themeController = Get.put(ThemeController(), permanent: true);
 
     return GetMaterialApp(
       title: 'Kaj Ache',
@@ -33,7 +34,7 @@ class KajAcheApp extends StatelessWidget {
 
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system,
+      themeMode: themeController.themeMode,
       initialRoute: AppRoutes.splash,
       getPages:     AppPages.pages,
     );

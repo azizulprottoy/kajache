@@ -198,12 +198,12 @@ class RecruitmentRequestController extends GetxController {
             onYes: () {
               Get.back();
               Get.until((r) => r.settings.name == AppRoutes.main);
-              Get.offNamed(AppRoutes.myRecruitmentRequests);
+              Get.toNamed(AppRoutes.myRecruitmentRequests);
             },
             onClose: () {
               Get.back();
               Get.until((r) => r.settings.name == AppRoutes.main);
-              Get.offNamed(AppRoutes.myRecruitmentRequests);
+              Get.toNamed(AppRoutes.myRecruitmentRequests);
             },
           ),
           barrierDismissible: false,
@@ -220,7 +220,7 @@ class RecruitmentRequestController extends GetxController {
           duration: const Duration(seconds: 4),
         );
         Get.until((r) => r.settings.name == AppRoutes.main);
-        Get.offNamed(AppRoutes.myRecruitmentRequests);
+        Get.toNamed(AppRoutes.myRecruitmentRequests);
       }
     } catch (e) {
       Get.snackbar(

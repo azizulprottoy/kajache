@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
 import '../../../app/theme/context_extension.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../app/routes/app_routes.dart';
 import '../../../shared/shimmers/popular_services_shimmer.dart';
-import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/common_app_bar.dart';
-import '../../../shared/widgets/custom_button.dart';
 import '../../service_details/arguments/service_details_arguments.dart';
-import '../arguments/service_argument.dart';
 import '../../../core/utils/media_url_helper.dart';
 import '../controllers/all_services_controller.dart';
+import 'package:kaj_ache/shared/widgets/app_network_image.dart';
 
 class AllServices extends GetView<AllServicesController> {
   const AllServices({super.key});
@@ -94,7 +91,7 @@ class AllServices extends GetView<AllServicesController> {
                         child: () {
                           final img = MediaUrlHelper.resolve(service.image);
                           return img.isNotEmpty
-                              ? Image.network(
+                              ? AppNetworkImage(
                                   img,
                                   width: 72,
                                   height: 72,

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../../app/theme/context_extension.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../app/routes/app_routes.dart';
@@ -12,6 +11,7 @@ import '../../core/utils/translation_keys.dart';
 import '../home/models/available_booking_response_model.dart';
 import 'booking_details_controller.dart';
 import '../tracking/live_tracking_map.dart';
+import 'package:kaj_ache/shared/widgets/app_network_image.dart';
 
 
 class BookingDetailsPage extends GetView<BookingDetailsController> {
@@ -348,7 +348,7 @@ class _ServiceCard extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: imageUrl.isNotEmpty
-                    ? Image.network(
+                    ? AppNetworkImage(
                         imageUrl,
                         width: 76,
                         height: 76,
@@ -491,7 +491,7 @@ class _ClientCard extends StatelessWidget {
                 radius: 28,
                 backgroundColor: colors.primaryContainer,
                 backgroundImage:
-                    avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
+                    avatarUrl.isNotEmpty ? appNetworkImageProvider(avatarUrl) : null,
                 child: avatarUrl.isEmpty
                     ? Icon(Icons.person_outline, color: colors.primary)
                     : null,
@@ -577,7 +577,7 @@ class _BidCard extends StatelessWidget {
               CircleAvatar(
                 radius: 21,
                 backgroundImage:
-                    avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
+                    avatarUrl.isNotEmpty ? appNetworkImageProvider(avatarUrl) : null,
                 child: avatarUrl.isEmpty
                     ? const Icon(Icons.engineering_outlined)
                     : null,

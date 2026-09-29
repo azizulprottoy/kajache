@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../models/banner_response_model.dart';
+import 'package:kaj_ache/shared/widgets/app_network_image.dart';
 
 class BannerSlider extends StatelessWidget {
   final List<AppBannerModel> banners;
@@ -56,7 +56,7 @@ class BannerSlider extends StatelessWidget {
                   color: colorScheme.surfaceContainerLowest,
                   image: banner.imageUrl.isNotEmpty
                       ? DecorationImage(
-                    image: NetworkImage(banner.imageUrl),
+                    image: appNetworkImageProvider(banner.imageUrl, width: 1080),
                     fit: BoxFit.cover,
                     onError: (_, __) {},
                     // colorFilter: ColorFilter.mode(

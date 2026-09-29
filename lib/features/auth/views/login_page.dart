@@ -5,8 +5,18 @@ import '../arguments/otp_argument.dart';
 import '../controllers/login_controller.dart';
 import '../../../app/routes/app_routes.dart';
 
-class LoginPage extends GetView<LoginController> {
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  // Owned by the page so two LoginPage instances never share one GlobalKey.
+  final _formKey = GlobalKey<FormState>();
+
+  LoginController get controller => Get.find<LoginController>();
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +49,7 @@ class LoginPage extends GetView<LoginController> {
               const SizedBox(height: 32),
 
               Form(
-                key: controller.formKey,
+                key: _formKey,
                 child: Column(
                   children: [
                     TextFormField(
@@ -73,7 +83,7 @@ class LoginPage extends GetView<LoginController> {
                         controller: controller.passwordController,
                         obscureText: controller.obscurePassword.value,
                         textInputAction: TextInputAction.done,
-                        onFieldSubmitted: (_) => controller.login(),
+                        onFieldSubmitted: (_) => controller.login(_formKey),
                         decoration: InputDecoration(
                           labelText: TKeys.password.tr,
                           prefixIcon: const Icon(Icons.lock_outline),
@@ -128,7 +138,7 @@ class LoginPage extends GetView<LoginController> {
                   child: FilledButton(
                     onPressed: controller.isLoading.value
                         ? null
-                        : controller.login,
+                        : () => controller.login(_formKey),
                     style: FilledButton.styleFrom(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),

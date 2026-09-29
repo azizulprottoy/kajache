@@ -7,6 +7,7 @@ import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/common_app_bar.dart';
 import '../controller/my_instant_service_details_controller.dart';
 import '../model/instant_service_model.dart';
+import 'package:kaj_ache/shared/widgets/app_network_image.dart';
 
 class MyInstantServiceDetailsPage extends GetView<MyInstantServiceDetailsController> {
   const MyInstantServiceDetailsPage({super.key});
@@ -432,7 +433,7 @@ class _InstantServicePaymentSheetState extends State<_InstantServicePaymentSheet
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(8),
                                   child: m.image.isNotEmpty
-                                      ? Image.network(
+                                      ? AppNetworkImage(
                                           m.image,
                                           width: 36,
                                           height: 36,
@@ -593,7 +594,7 @@ class _BidderProfileSheet extends StatelessWidget {
             CircleAvatar(
               radius: 46,
               backgroundColor: colors.primaryContainer,
-              backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
+              backgroundImage: avatarUrl.isNotEmpty ? appNetworkImageProvider(avatarUrl) : null,
               child: avatarUrl.isEmpty
                   ? Icon(Icons.engineering_outlined, size: 44, color: colors.onPrimaryContainer)
                   : null,
@@ -808,7 +809,7 @@ class _JobCard extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: imageUrl.isNotEmpty
-                    ? Image.network(
+                    ? AppNetworkImage(
                         imageUrl,
                         width: 76,
                         height: 76,
@@ -955,7 +956,7 @@ class _BidCard extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 23,
-                    backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
+                    backgroundImage: avatarUrl.isNotEmpty ? appNetworkImageProvider(avatarUrl) : null,
                     child: avatarUrl.isEmpty ? const Icon(Icons.engineering_outlined) : null,
                   ),
                   const SizedBox(width: 10),

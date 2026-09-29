@@ -2,9 +2,6 @@ import 'package:kaj_ache/core/error/api_error.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../app/routes/app_routes.dart';
-import '../../../core/storage/local_storage_service.dart';
-import '../../../core/storage/secure_storage_service.dart';
-import '../arguments/otp_argument.dart';
 import '../models/register_request_model.dart';
 import '../repository/auth_repository.dart';
 
@@ -18,26 +15,25 @@ class RegisterController extends GetxController {
 
   final RxBool isLoading = false.obs;
 
-  final formKey = GlobalKey<FormState>();
-
-  final inputController = TextEditingController();
-  final passwordController = TextEditingController();
-
-  final RxBool obscurePassword = true.obs;
-
-  void toggleObscurePassword() {
-    obscurePassword.value = !obscurePassword.value;
+  /// Returns to the login page without stacking a second LoginPage
+  /// (which would duplicate its GlobalKeys).
+  static void backToLogin() {
+    if (Get.previousRoute == AppRoutes.login) {
+      Get.back();
+    } else {
+      Get.offNamed(AppRoutes.login);
+    }
   }
 
-
   Future<void> register({
+    required GlobalKey<FormState> formKey,
     required String accountType,
     required String fullName,
     required String email,
     required String phone,
     required String password,
   }) {
-    if (!formKey.currentState!.validate()) {
+    if (formKey.currentState?.validate() != true) {
       return Future.value();
     }
 
@@ -69,10 +65,7 @@ class RegisterController extends GetxController {
           snackPosition: SnackPosition.BOTTOM,
         );
 
-        Get.toNamed(
-          AppRoutes.login,
-
-        );
+        backToLogin();
       } else {
         Get.snackbar(
           'Register Failed',
@@ -92,13 +85,4 @@ class RegisterController extends GetxController {
       isLoading.value = false;
     });
   }
-}
-UserType _mapRoleToUserType(String roleTitle) {
-  final role = roleTitle.toLowerCase();
-
-  if (role == 'technician' || role == 'service' || role == 'serviceprovider') {
-    return UserType.serviceProvider;
-  }
-
-  return UserType.buyer;
 }

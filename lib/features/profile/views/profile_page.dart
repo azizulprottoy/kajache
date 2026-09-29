@@ -7,6 +7,7 @@ import '../../../shared/shimmers/profile_shimmer.dart';
 import '../../advertisements/widget/ad_banner.dart';
 import '../controllers/profile_controller.dart';
 import 'edit_profile_page.dart';
+import 'package:kaj_ache/shared/widgets/app_network_image.dart';
 
 class MyProfilePage extends GetView<ProfileController> {
   const MyProfilePage({super.key});
@@ -57,7 +58,7 @@ class MyProfilePage extends GetView<ProfileController> {
                         radius: 42,
                         backgroundColor: colorScheme.primary.withOpacity(0.12),
                         backgroundImage:
-                        avatar.isNotEmpty ? NetworkImage(avatar) : null,
+                        avatar.isNotEmpty ? appNetworkImageProvider(avatar) : null,
                         child: avatar.isEmpty
                             ? Icon(Icons.person,
                             size: 42, color: colorScheme.primary)

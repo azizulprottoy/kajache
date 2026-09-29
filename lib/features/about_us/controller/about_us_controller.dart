@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
-import 'package:url_launcher/url_launcher.dart';
 
+import '../../../core/utils/safe_links.dart';
 import '../../../core/utils/translation_keys.dart';
 import '../model/social_media_model.dart';
 import '../repository/about_us_repository.dart';
@@ -30,8 +30,8 @@ class AboutUsController extends GetxController {
   Future<void> refresh() => _load();
 
   Future<void> openLink(String url) async {
-    final uri = Uri.tryParse(url);
-    if (uri == null || !await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+    // Links come from the server: only http/https/mailto/tel are opened.
+    if (!await launchSafeUrl(url)) {
       Get.snackbar(
         TKeys.error.tr,
         TKeys.couldNotOpenLink.tr,

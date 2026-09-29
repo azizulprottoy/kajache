@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import '../../../app/theme/context_extension.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../app/routes/app_routes.dart';
@@ -9,9 +8,9 @@ import '../../../core/utils/media_url_helper.dart';
 import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/common_app_bar.dart';
 import '../../home/models/available_booking_response_model.dart';
-import '../../sbooking/booking_details_controller.dart';
 import '../controller/my_booking_details_controller.dart';
 import '../../tracking/live_tracking_map.dart';
+import 'package:kaj_ache/shared/widgets/app_network_image.dart';
 
 class MyBookingDetailsPage extends GetView<MyBookingDetailsController> {
   const MyBookingDetailsPage({super.key});
@@ -1069,7 +1068,6 @@ class _BookingPaymentSheetState extends State<_BookingPaymentSheet> {
     final bookingFee = controller.booking.value?.bookingFee ?? 0;
     final selectedBid = controller.booking.value?.selectedBid;
     final bidPrice = selectedBid?.price ?? 0;
-    final total = bookingFee + bidPrice;
 
     return SafeArea(
       top: false,
@@ -1424,7 +1422,7 @@ class _BookingPaymentSheetState extends State<_BookingPaymentSheet> {
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(8),
                                 child: m.image.isNotEmpty
-                                    ? Image.network(
+                                    ? AppNetworkImage(
                                         m.image,
                                         width: 36,
                                         height: 36,
@@ -1600,7 +1598,7 @@ class _BidderProfileSheet extends StatelessWidget {
                 CircleAvatar(
                   radius: 40,
                   backgroundColor: colors.primaryContainer,
-                  backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
+                  backgroundImage: avatarUrl.isNotEmpty ? appNetworkImageProvider(avatarUrl) : null,
                   child: avatarUrl.isEmpty
                       ? Icon(Icons.engineering_outlined, size: 38, color: colors.onPrimaryContainer)
                       : null,
@@ -1753,56 +1751,6 @@ class _BidderProfileSheet extends StatelessWidget {
   }
 }
 
-class _ProfileStat extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String value;
-  final Color color;
-
-  const _ProfileStat({
-    required this.icon,
-    required this.label,
-    required this.value,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
-
-    return Container(
-width: 100,
-      decoration: BoxDecoration(
-        color: colors.surfaceContainerHighest.withOpacity(0.45),
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Row(
-        children: [
-          Icon(icon,color: colors.primary, size: 15,),
-SizedBox(width: 4,),
-          Text(
-            label,
-            textAlign: TextAlign.center,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: colors.onSurfaceVariant,
-            ),
-          ),
-          Spacer(),
-          Text(
-            value,
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-
-
-        ],
-      ),
-    );
-  }
-}
-
 class _ProfileInformationRow extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -1871,7 +1819,7 @@ class _ServiceCard extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: imageUrl.isNotEmpty
-                    ? Image.network(
+                    ? AppNetworkImage(
                   imageUrl,
                   width: 76,
                   height: 76,
@@ -2033,7 +1981,7 @@ class _BidCard extends StatelessWidget {
                   CircleAvatar(
                     radius: 23,
                     backgroundImage: avatarUrl.isNotEmpty
-                        ? NetworkImage(avatarUrl)
+                        ? appNetworkImageProvider(avatarUrl)
                         : null,
                     child: avatarUrl.isEmpty
                         ? const Icon(Icons.engineering_outlined)
@@ -2097,206 +2045,6 @@ class _BidCard extends StatelessWidget {
     );
   }
 }
-class _BidSheet extends StatefulWidget {
-  final bool isEditMode;
-  final int? initialPrice;
-  final String? initialEta;
-  final String? initialMessage;
-
-  const _BidSheet({
-    required this.isEditMode,
-    this.initialPrice,
-    this.initialEta,
-    this.initialMessage,
-  });
-
-  @override
-  State<_BidSheet> createState() => _BidSheetState();
-}
-
-class _BidSheetState extends State<_BidSheet> {
-  final _formKey = GlobalKey<FormState>();
-  late final TextEditingController _price;
-  late final TextEditingController _eta;
-  late final TextEditingController _message;
-
-  @override
-  void initState() {
-    super.initState();
-    _price = TextEditingController(
-      text: widget.initialPrice?.toString() ?? '',
-    );
-    _eta = TextEditingController(text: widget.initialEta ?? '');
-    _message = TextEditingController(text: widget.initialMessage ?? '');
-  }
-
-  @override
-  void dispose() {
-    _price.dispose();
-    _eta.dispose();
-    _message.dispose();
-    super.dispose();
-  }
-
-  Future<void> _pickTime() async {
-    final picked = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.now(),
-    );
-    if (picked != null && mounted) {
-      _eta.text = picked.format(context);
-    }
-  }
-
-  Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) return;
-    final controller = Get.find<BookingDetailsController>();
-    final success = await controller.submitBid(
-      price: double.parse(_price.text.trim()),
-      estimatedArrival: _eta.text.trim(),
-      message: _message.text.trim(),
-    );
-    if (!success || !mounted) return;
-    Navigator.of(context).pop();
-    Get.snackbar(
-      widget.isEditMode ? TKeys.bidUpdated.tr : TKeys.bidSubmitted.tr,
-      widget.isEditMode ? TKeys.bidUpdatedMsg.tr : TKeys.bidSubmittedMsg.tr,
-      snackPosition: SnackPosition.BOTTOM,
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
-
-    return SafeArea(
-      top: false,
-      child: Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-        ),
-        child: Container(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
-          decoration: BoxDecoration(
-            color: colors.surface,
-            borderRadius: const BorderRadius.vertical(
-              top: Radius.circular(24),
-            ),
-          ),
-          child: SingleChildScrollView(
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 42,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: colors.outlineVariant,
-                      borderRadius: BorderRadius.circular(99),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    widget.isEditMode
-                        ? TKeys.editYourBid.tr
-                        : TKeys.placeYourBid.tr,
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 18),
-                  TextFormField(
-                    controller: _price,
-                    keyboardType: TextInputType.number,
-                    validator: (value) {
-                      final amount = double.tryParse(value?.trim() ?? '');
-                      return amount == null || amount <= 0
-                          ? TKeys.enterBidPriceError.tr
-                          : null;
-                    },
-                    decoration: InputDecoration(
-                      labelText: TKeys.bidPrice.tr,
-                      prefixText: '৳ ',
-                      prefixIcon: const Icon(Icons.currency_exchange),
-                      border: const OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                  TextFormField(
-                    controller: _eta,
-                    readOnly: true,
-                    onTap: _pickTime,
-                    validator: (value) =>
-                    value == null || value.trim().isEmpty
-                        ? TKeys.selectEstimatedTimeError.tr
-                        : null,
-                    decoration: InputDecoration(
-                      labelText: TKeys.estimatedArrival.tr,
-                      prefixIcon: const Icon(Icons.access_time_outlined),
-                      border: const OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                  TextFormField(
-                    controller: _message,
-                    maxLines: 4,
-                    decoration: InputDecoration(
-                      labelText: TKeys.note.tr,
-                      hintText: TKeys.noteHint.tr,
-                      alignLabelWithHint: true,
-                      border: const OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 18),
-                  Obx(() {
-                    final loading = Get.find<BookingDetailsController>()
-                        .isBidLoading
-                        .value;
-                    return Row(
-                      children: [
-                        Expanded(
-                          child: OutlinedButton(
-                            onPressed: loading
-                                ? null
-                                : () => Navigator.of(context).pop(),
-                            child: Text(TKeys.cancel.tr),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: FilledButton(
-                            onPressed: loading ? null : _submit,
-                            child: loading
-                                ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                              ),
-                            )
-                                : Text(
-                              widget.isEditMode
-                                  ? TKeys.updateBid.tr
-                                  : TKeys.submitBid.tr,
-                            ),
-                          ),
-                        ),
-                      ],
-                    );
-                  }),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class _SectionTitle extends StatelessWidget {
   final IconData icon;
   final String title;

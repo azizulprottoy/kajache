@@ -5,6 +5,7 @@ import '../../../shared/widgets/common_app_bar.dart';
 import '../../../core/utils/translation_keys.dart';
 import '../controller/booking_controller.dart';
 import 'widgets/map_location_picker.dart';
+import 'package:kaj_ache/shared/widgets/app_network_image.dart';
 
 class BookingPage extends GetView<BookingController> {
   const BookingPage({super.key});
@@ -32,11 +33,6 @@ class BookingPage extends GetView<BookingController> {
             theme: theme,
           )),
 
-          // Obx(() => _StepperHeader(
-          //   currentStep: controller.currentStep.value,
-          //   colorScheme: colorScheme,
-          //   theme: theme,
-          // )),
           Obx(() => AnimatedSwitcher(
               duration: const Duration(milliseconds: 300),
               transitionBuilder: (child, animation) => SlideTransition(
@@ -86,107 +82,6 @@ SizedBox(height: 50,),
 }
 
 
-class _StepperHeader extends StatelessWidget {
-  final int currentStep;
-  final ColorScheme colorScheme;
-  final ThemeData theme;
-
-  const _StepperHeader({
-    required this.currentStep,
-    required this.colorScheme,
-    required this.theme,
-  });
-
-  static final _steps = [TKeys.serviceScope.tr, TKeys.logistics.tr];
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-      child: Row(
-        children: List.generate(_steps.length * 2 - 1, (i) {
-          if (i.isOdd) {
-            // Connector line
-            final stepIndex = i ~/ 2;
-            final isCompleted = currentStep > stepIndex + 1;
-            return Expanded(
-              child: Container(
-                height: 3,
-                margin: const EdgeInsets.only(bottom: 20),
-                decoration: BoxDecoration(
-                  color: isCompleted
-                      ? colorScheme.primary
-                      : colorScheme.borderColor,
-                  borderRadius: BorderRadius.circular(99),
-                ),
-              ),
-            );
-          }
-
-          final stepIndex = i ~/ 2;
-          final stepNum = stepIndex + 1;
-          final isCompleted = currentStep > stepNum;
-          final isCurrent = currentStep == stepNum;
-
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                width: 26,
-                height: 26,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: isCompleted || isCurrent
-                      ? colorScheme.primary
-                      : colorScheme.surface,
-                  border: Border.all(
-                    color: isCompleted || isCurrent
-                        ? colorScheme.primary
-                        : colorScheme.outlineVariant,
-                    width: 2,
-                  ),
-                  boxShadow: isCurrent
-                      ? [BoxShadow(
-                    color: colorScheme.primary.withOpacity(0.25),
-                    blurRadius: 8,
-                    spreadRadius: 2,
-                  )]
-                      : null,
-                ),
-                child: Center(
-                  child: isCompleted
-                      ? Icon(Icons.check, size: 16, color: colorScheme.onPrimary)
-                      : Text(
-                    '$stepNum',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                      color: isCurrent
-                          ? colorScheme.onPrimary
-                          : colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                _steps[stepIndex],
-                style: theme.textTheme.labelSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: isCurrent || isCompleted
-                      ? colorScheme.primary
-                      : colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ],
-          );
-        }),
-      ),
-    );
-  }
-}
-
 class _ServiceContextBar extends StatelessWidget {
   final String title;
   final String SImage;
@@ -225,7 +120,7 @@ class _ServiceContextBar extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
             ),
             child: SImage.isNotEmpty
-                ? Image.network(
+                ? AppNetworkImage(
                     SImage,
                     fit: BoxFit.cover,
                     errorBuilder: (_, __, ___) => Icon(

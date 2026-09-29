@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import '../../../app/theme/context_extension.dart';
 import 'dart:math';
 
-import 'package:flutter/material.dart';
-import '../../../app/theme/context_extension.dart';
 import 'package:get/get.dart';
 
 import '../../../core/controller/local_controller.dart';
@@ -13,6 +11,7 @@ import '../../../shared/widgets/common_app_bar.dart';
 import '../../../shared/widgets/error_widget.dart';
 import '../controllers/reword_controller.dart';
 import '../models/reword_model.dart';
+import 'package:kaj_ache/shared/widgets/app_network_image.dart';
 
 class RewardsPage extends GetView<RewardsController> {
   const RewardsPage({super.key});
@@ -424,11 +423,10 @@ class _RewardImage extends StatelessWidget {
       ),
       child: url.isEmpty
           ? Icon(Icons.card_giftcard_rounded, color: colorScheme.primary)
-          : Image.network(
+          : AppNetworkImage(
               url,
               fit: BoxFit.cover,
-              loadingBuilder: (_, child, progress) =>
-                  progress == null ? child : const SizedBox(),
+              memCacheWidth: 200,
               errorBuilder: (_, __, ___) =>
                   Icon(Icons.card_giftcard_rounded, color: colorScheme.primary),
             ),

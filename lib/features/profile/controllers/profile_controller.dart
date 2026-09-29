@@ -106,11 +106,13 @@ class ProfileController extends GetxController {
     if (args is ProfileType) profileType.value = args;
 
     _loadProfileData();
-    fetchDistricts();
   }
 
+  /// Categories and districts must be loaded before the profile, which
+  /// matches its saved category and district against them.
   Future<void> _loadProfileData() async {
-    await fetchCategories();
+    await Future.wait([fetchCategories(), fetchDistricts()]);
+    if (isClosed) return;
     await fetchMyProfile();
   }
 
@@ -118,7 +120,8 @@ class ProfileController extends GetxController {
     try {
       isCategoriesLoading.value = true;
       categories.assignAll(await _repository.getCategoryNames());
-    } catch (e) {
+    } catch (_) {
+      // Category list is optional; the profile still loads without it.
     } finally {
       isCategoriesLoading.value = false;
     }

@@ -4,13 +4,9 @@ import 'package:get/get.dart';
 
 import '../../../app/routes/app_routes.dart';
 import '../../../core/utils/translation_keys.dart';
+import '../../../core/utils/app_services.dart';
 import '../../../shared/widgets/success_model.dart';
-
-class OtpArgument {
-  final bool isReset;
-
-  OtpArgument({required this.isReset});
-}
+import '../arguments/otp_argument.dart';
 
 class OtpPage extends StatefulWidget {
   const OtpPage({super.key});
@@ -26,12 +22,21 @@ class _OtpPageState extends State<OtpPage> {
   final List<FocusNode> _focusNodes =
   List.generate(6, (_) => FocusNode());
 
-  late final OtpArgument? otpArgument;
+  OtpArgument? otpArgument;
 
   @override
   void initState() {
     super.initState();
-    otpArgument = Get.arguments as OtpArgument?;
+    final args = Get.arguments;
+    if (args is OtpArgument) {
+      otpArgument = args;
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        Get.back();
+        AppServices.showError('Could not open verification. Please try again.');
+      });
+    }
   }
 
   @override

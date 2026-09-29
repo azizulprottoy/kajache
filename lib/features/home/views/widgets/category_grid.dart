@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../models/category_response_model.dart';
 import '../../../../shared/shimmers/category_shimmer.dart';
+import 'package:kaj_ache/shared/widgets/app_network_image.dart';
 
 class CategoryGrid extends StatelessWidget {
   final List<CategoryModel> categories;
@@ -61,7 +62,7 @@ class CategoryGrid extends StatelessWidget {
                 if (category.imageLink.isNotEmpty)
                   ClipRRect(
                     borderRadius: BorderRadius.circular(6),
-                    child: Image.network(
+                    child: AppNetworkImage(
                       category.imageLink,
                       width: 60,
                       height: 60,

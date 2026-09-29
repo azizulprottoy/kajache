@@ -24,6 +24,7 @@ class ChatController extends GetxController {
   late final String bookingStatus;
   String? _currentUserId;
   Timer? _pollTimer;
+  bool _loading = false;
 
   bool get canSend => !_closedStatuses.contains(bookingStatus.trim().toLowerCase());
 
@@ -45,21 +46,28 @@ class ChatController extends GetxController {
     _init();
   }
 
-  Future<void> _init() async {
+  void _init() {
     _currentUserId = _localStorage.read<String>('user_id');
-    await _loadMessages();
-    _pollTimer = Timer.periodic(_pollInterval, (_) => _loadMessages(silent: true));
+    // Start the timer before the first await so onClose always cancels it.
+    _pollTimer = Timer.periodic(_pollInterval, (_) {
+      // Skip a poll while the previous request is still running.
+      if (!_loading) _loadMessages(silent: true);
+    });
+    _loadMessages();
   }
 
   Future<void> _loadMessages({bool silent = false}) async {
+    if (isClosed) return;
+    _loading = true;
     if (!silent) isLoading.value = true;
     try {
       final result = await _repository.getMessages(bidId);
-      messages.assignAll(result);
+      if (!isClosed) messages.assignAll(result);
     } catch (_) {
       // Keep last known history on a failed poll.
     } finally {
-      if (!silent) isLoading.value = false;
+      _loading = false;
+      if (!silent && !isClosed) isLoading.value = false;
     }
   }
 

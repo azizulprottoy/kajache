@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 
 import '../../../app/routes/app_routes.dart';
 import '../../main/controller/main_controller.dart';
+import '../../../core/utils/app_services.dart';
 import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/success_model.dart';
 import '../arguments/service_booking_arguments.dart';
@@ -22,7 +23,8 @@ class BookingController extends GetxController {
   final serviceImage = ''.obs;
   final systemFee = 50.0.obs;
 
-  late final String serviceId;
+  /// Empty when the page was opened without a valid service argument.
+  String serviceId = '';
 
   /// Step
   /// Booking creation is now 2 steps — payment moved to after a bid is
@@ -68,7 +70,7 @@ class BookingController extends GetxController {
   ];
 
 
-  late final List<String> subServiceOptions;
+  final List<String> subServiceOptions = _defaultSubs;
 
   static const _defaultSubs = [
     'Standard Service',
@@ -90,20 +92,25 @@ class BookingController extends GetxController {
       return;
     }
 
-    final args = Get.arguments as ServiceBookingArgument?;
+    final args = Get.arguments;
+    final service =
+        args is ServiceBookingArgument ? args.serviceDetails : null;
 
-    final service = args?.serviceDetails;
-
-    if (service != null) {
-      serviceId = service.id;
-      serviceTitle.value = service.title;
-      serviceImage.value = service.image;
-      servicePrice.value = (service.basePrice ?? 0).toDouble();
-      systemFee.value = service.systemFee;
+    if (service == null || service.id.isEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Get.back();
+        AppServices.showError('Could not open booking. Please select a service again.');
+      });
+      return;
     }
 
+    serviceId = service.id;
+    serviceTitle.value = service.title;
+    serviceImage.value = service.image;
+    servicePrice.value = service.basePrice;
+    systemFee.value = service.systemFee;
+
     selectedCity.value = 'Dhaka';
-    subServiceOptions = _defaultSubs;
   }
 
   @override
@@ -202,6 +209,11 @@ class BookingController extends GetxController {
   }
 
   Future<void> submitBooking() async {
+    if (serviceId.isEmpty) {
+      AppServices.showError('No service selected.');
+      return;
+    }
+
     /// 1. PAY SYSTEM FEE — the backend only opens bidding once it is paid.
     /// The booking fee itself is still paid after a bid is selected.
     final payment = await Get.dialog<SystemFeePaymentResult>(

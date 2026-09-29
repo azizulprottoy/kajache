@@ -41,23 +41,38 @@ class HomeController extends GetxController {
     fetchHomeData();
   }
 
-  Future<void> fetchHomeData() {
+  Future<void> fetchHomeData() async {
     isLoading.value = true;
 
     _fetchPublicLists();
-    return Future.wait([
-      fetchBanners(),
-      fetchCategories(),
-      fetchPopularServices(),
-    ]).catchError((error) {
+
+    // Each section loads independently so one failing endpoint doesn't
+    // hide the others; only the first error is shown.
+    Object? firstError;
+    Future<void> guard(Future<void> Function() load) async {
+      try {
+        await load();
+      } catch (e) {
+        firstError ??= e;
+      }
+    }
+
+    await Future.wait([
+      guard(fetchBanners),
+      guard(fetchCategories),
+      guard(fetchPopularServices),
+    ]);
+
+    if (isClosed) return;
+    isLoading.value = false;
+    final error = firstError;
+    if (error != null) {
       Get.snackbar(
         'error'.tr,
         apiErrorMessage(error),
         snackPosition: SnackPosition.BOTTOM,
       );
-    }).whenComplete(() {
-      isLoading.value = false;
-    });
+    }
   }
 
   Future<void> fetchBanners() {
@@ -77,17 +92,16 @@ class HomeController extends GetxController {
     });
   }
 
+  // Background lists: failures stay silent, but each loads on its own.
   Future<void> _fetchPublicLists() async {
-    try {
-      final results = await Future.wait([
-        _instantRepo.getAvailableInstantServices(),
-        _recruitRepo.getAvailableRecruitmentRequests(),
-      ]);
-      if (!isClosed) {
-        instantServices.assignAll(results[0] as List<InstantServiceModel>);
-        recruitmentPosts.assignAll(results[1] as List<RecruitmentRequestModel>);
-      }
-    } catch (_) {}
+    await Future.wait([
+      _instantRepo.getAvailableInstantServices().then((list) {
+        if (!isClosed) instantServices.assignAll(list);
+      }).catchError((_) {}),
+      _recruitRepo.getAvailableRecruitmentRequests().then((list) {
+        if (!isClosed) recruitmentPosts.assignAll(list);
+      }).catchError((_) {}),
+    ]);
   }
 
   Future<void> fetchPopularServices() {

@@ -20,7 +20,7 @@ class LocalStorageService extends GetxService {
   void setOnboardingDone()  => _box.write(_keyOnboardingDone, true);
 
   // ── Theme ───────────────────────────────────────────────────────────────────
-  String get themeMode => _box.read(_keyThemeMode) ?? 'light';
+  String get themeMode => _box.read(_keyThemeMode) ?? 'system';
   void setThemeMode(String mode) => _box.write(_keyThemeMode, mode);
 
   // ── Language ────────────────────────────────────────────────────────────────

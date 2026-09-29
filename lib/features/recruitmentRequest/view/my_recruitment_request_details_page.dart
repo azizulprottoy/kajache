@@ -8,6 +8,7 @@ import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/common_app_bar.dart';
 import '../controller/my_recruitment_request_details_controller.dart';
 import '../model/recruitment_request_model.dart';
+import 'package:kaj_ache/shared/widgets/app_network_image.dart';
 
 class MyRecruitmentRequestDetailsPage extends GetView<MyRecruitmentRequestDetailsController> {
   const MyRecruitmentRequestDetailsPage({super.key});
@@ -222,7 +223,7 @@ class _JobCard extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: imageUrl.isNotEmpty
-                    ? Image.network(
+                    ? AppNetworkImage(
                         imageUrl,
                         width: 64,
                         height: 64,
@@ -700,7 +701,7 @@ class _ApplicantCard extends StatelessWidget {
                 CircleAvatar(
                   radius: 22,
                   backgroundColor: colors.primaryContainer,
-                  backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
+                  backgroundImage: avatarUrl.isNotEmpty ? appNetworkImageProvider(avatarUrl) : null,
                   child: avatarUrl.isEmpty
                       ? Icon(Icons.engineering_outlined, color: colors.onPrimaryContainer)
                       : null,
@@ -798,7 +799,7 @@ class _ApplicantProfileSheet extends StatelessWidget {
             CircleAvatar(
               radius: 46,
               backgroundColor: colors.primaryContainer,
-              backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
+              backgroundImage: avatarUrl.isNotEmpty ? appNetworkImageProvider(avatarUrl) : null,
               child: avatarUrl.isEmpty
                   ? Icon(Icons.engineering_outlined, size: 44, color: colors.onPrimaryContainer)
                   : null,

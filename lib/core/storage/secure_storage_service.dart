@@ -1,6 +1,8 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 
+import '../network/api_client.dart';
+
 class SecureStorageService extends GetxService {
   late final FlutterSecureStorage _storage;
 
@@ -18,8 +20,10 @@ class SecureStorageService extends GetxService {
   }
 
   // ── Token ───────────────────────────────────────────────────────────────────
-  Future<void> saveToken(String token) async =>
-      _storage.write(key: _keyToken, value: token);
+  Future<void> saveToken(String token) async {
+    await _storage.write(key: _keyToken, value: token);
+    ApiClient.clearCachedToken();
+  }
 
   Future<String?> getToken() async =>
       _storage.read(key: _keyToken);
@@ -44,15 +48,22 @@ class SecureStorageService extends GetxService {
       _storage.read(key: _keyUserRole);
 
   // ── Generic ─────────────────────────────────────────────────────────────────
-  Future<void> write(String key, String value) async =>
-      _storage.write(key: key, value: value);
+  Future<void> write(String key, String value) async {
+    await _storage.write(key: key, value: value);
+    if (key == _keyToken) ApiClient.clearCachedToken();
+  }
 
   Future<String?> read(String key) async =>
       _storage.read(key: key);
 
-  Future<void> delete(String key) async =>
-      _storage.delete(key: key);
+  Future<void> delete(String key) async {
+    await _storage.delete(key: key);
+    if (key == _keyToken) ApiClient.clearCachedToken();
+  }
 
   // ── Clear all (logout) ──────────────────────────────────────────────────────
-  Future<void> clearAll() async => _storage.deleteAll();
+  Future<void> clearAll() async {
+    await _storage.deleteAll();
+    ApiClient.clearCachedToken();
+  }
 }

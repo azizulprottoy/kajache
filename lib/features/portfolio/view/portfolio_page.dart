@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import '../../../app/theme/context_extension.dart';
 import 'dart:io';
 
-import 'package:flutter/material.dart';
-import '../../../app/theme/context_extension.dart';
 import 'package:get/get.dart';
 
 import '../../../core/utils/translation_keys.dart';
@@ -11,6 +9,7 @@ import '../../../shared/shimmers/portfolio_shimmer.dart';
 import '../../../shared/widgets/common_app_bar.dart';
 import '../controller/portfolio_controller.dart';
 import '../model/portfolio_model.dart';
+import 'package:kaj_ache/shared/widgets/app_network_image.dart';
 
 class PortfolioPage extends GetView<PortfolioController> {
   const PortfolioPage({super.key});
@@ -474,13 +473,11 @@ class _NetworkPortfolioImage extends StatelessWidget {
 
     if (url.isEmpty) return _imagePlaceholder(colorScheme);
 
-    return Image.network(
+    return AppNetworkImage(
       url,
       fit: BoxFit.cover,
-      loadingBuilder: (context, child, progress) {
-        if (progress == null) return child;
-        return const Center(child: CircularProgressIndicator(strokeWidth: 2));
-      },
+      placeholder:
+          const Center(child: CircularProgressIndicator(strokeWidth: 2)),
       errorBuilder: (_, __, ___) => _imagePlaceholder(colorScheme),
     );
   }

@@ -46,13 +46,11 @@ class PortfolioController extends GetxController {
       isLoading.value = true;
       errorMessage.value = '';
 
-      final results = await Future.wait<dynamic>([
-        _profileRepository.getMyProfile(),
-        _repository.getPortfolios(),
-      ]);
-
-      final currentProfile = results[0] as ProfileModel;
-      final portfolios = results[1] as List<PortfolioItem>;
+      final currentProfile = await _profileRepository.getMyProfile();
+      // Ask the server for this technician's items only instead of
+      // downloading every portfolio and filtering here.
+      final portfolios =
+          await _repository.getPortfolios(technitianId: currentProfile.id);
 
       profile.value = currentProfile;
       portfolioItems.assignAll(

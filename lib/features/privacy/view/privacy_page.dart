@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import '../../../core/utils/app_constants.dart';
 import '../../../core/utils/localized_text.dart';
+import '../../../core/utils/safe_links.dart';
 import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/common_app_bar.dart';
 
@@ -36,6 +37,9 @@ class _PrivacyPolicyPageState extends State<PrivacyPolicyPage> {
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setNavigationDelegate(
         NavigationDelegate(
+          // Keep the WebView on our own site; other links open externally.
+          onNavigationRequest: (request) =>
+              webNavigationDecision(request, AppConstants.privacyUrl),
           onPageStarted: (_) {
             _hasError.value = false;
             _isLoading.value = true;

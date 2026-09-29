@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../core/storage/local_storage_service.dart';
+import '../storage/local_storage_service.dart';
 
 class ThemeController extends GetxController {
   final _storage = Get.find<LocalStorageService>();
 
-  final _themeMode = ThemeMode.light.obs;
+  final _themeMode = ThemeMode.system.obs;
   ThemeMode get themeMode => _themeMode.value;
 
   bool get isDarkMode => _themeMode.value == ThemeMode.dark;
@@ -17,9 +17,15 @@ class ThemeController extends GetxController {
   }
 
   void _loadSavedTheme() {
-    final saved = _storage.themeMode;
-    _themeMode.value = saved == 'dark' ? ThemeMode.dark : ThemeMode.light;
-    Get.changeThemeMode(_themeMode.value);
+    // Read before GetMaterialApp builds, so app.dart passes it as themeMode.
+    switch (_storage.themeMode) {
+      case 'dark':
+        _themeMode.value = ThemeMode.dark;
+      case 'light':
+        _themeMode.value = ThemeMode.light;
+      default:
+        _themeMode.value = ThemeMode.system;
+    }
   }
 
   void toggleTheme() {

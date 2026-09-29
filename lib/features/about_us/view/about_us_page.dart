@@ -6,6 +6,7 @@ import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/common_app_bar.dart';
 import '../controller/about_us_controller.dart';
 import '../model/social_media_model.dart';
+import 'package:kaj_ache/shared/widgets/app_network_image.dart';
 
 class AboutUsPage extends GetView<AboutUsController> {
   const AboutUsPage({super.key});
@@ -256,7 +257,7 @@ class _SocialIcon extends StatelessWidget {
               ),
               child: ClipOval(
                 child: item.image.isNotEmpty
-                    ? Image.network(
+                    ? AppNetworkImage(
                         item.image,
                         width: 56, height: 56,
                         fit: BoxFit.cover,
