@@ -65,6 +65,7 @@ class ApiEndpoints {
 
   // Payment
   static String payment(String bookingId) => '/booking/$bookingId/confirm-payment';
+  static String paySystemFee(String bookingId) => '/booking/$bookingId/pay-system-fee';
   static String markCashReceived(String bookingId) => '/booking/$bookingId/mark-cash-received';
   static String customerCancelBid(String bookingId) => '/booking/$bookingId/customer-cancel-bid';
   static String technicianCancelBid(String bookingId) => '/booking/$bookingId/technician-cancel-bid';

@@ -5,6 +5,8 @@ class BookingRequestModel {
   final LocationModel location;
   final ScheduleModel schedule;
   final int maxLimit;
+  final String? paymentMethod;
+  final String? transactionId;
 
   BookingRequestModel({
     required this.service,
@@ -13,6 +15,8 @@ class BookingRequestModel {
     required this.location,
     required this.schedule,
     required this.maxLimit,
+    this.paymentMethod,
+    this.transactionId,
   });
 
   Map<String, dynamic> toJson() {
@@ -23,6 +27,9 @@ class BookingRequestModel {
       "location": location.toJson(),
       "schedule": schedule.toJson(),
       "maxLimit": maxLimit,
+      if (paymentMethod != null) "paymentMethod": paymentMethod,
+      if (transactionId != null && transactionId!.isNotEmpty)
+        "transactionId": transactionId,
     };
   }
 }

@@ -42,6 +42,9 @@ class ServiceModel {
   final String updatedAt;
   final String image;
 
+  /// Fee the customer pays to publish a booking for bidding. Mirrors the
+  /// backend: bidPlacementFee, else bookingFee, else 50.
+  final double systemFee;
 
   ServiceModel({
     required this.id,
@@ -57,7 +60,7 @@ class ServiceModel {
     required this.createdAt,
     required this.updatedAt,
     required this.image,
-
+    this.systemFee = 50,
   });
 
   factory ServiceModel.fromJson(Map<String, dynamic> json) {
@@ -83,7 +86,10 @@ class ServiceModel {
       image: MediaUrlHelper.resolve(
         (json['image'] ?? json['image'])?.toString(),
       ),
-
+      systemFee: double.tryParse(
+            (json['bidPlacementFee'] ?? json['bookingFee'])?.toString() ?? '',
+          ) ??
+          50,
     );
   }
 

@@ -54,7 +54,7 @@ class RegisterController extends GetxController {
       roleTitle: roleTitle,
       profileData: {
         'fullName': fullName.trim(),
-        'phone': phone.trim(),
+        'phoneNumber': phone.trim(),
       },
     );
 

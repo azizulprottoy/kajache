@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -8,6 +9,7 @@ import '../../../shared/widgets/success_model.dart';
 import '../arguments/service_booking_arguments.dart';
 import '../model/booking_request_model.dart';
 import '../repository/booking_repository.dart';
+import '../view/widgets/system_fee_payment_dialog.dart';
 
 class BookingController extends GetxController {
   final formKey = GlobalKey<FormState>();
@@ -18,6 +20,7 @@ class BookingController extends GetxController {
   final serviceTitle = ''.obs;
   final servicePrice = 0.0.obs;
   final serviceImage = ''.obs;
+  final systemFee = 50.0.obs;
 
   late final String serviceId;
 
@@ -96,6 +99,7 @@ class BookingController extends GetxController {
       serviceTitle.value = service.title;
       serviceImage.value = service.image;
       servicePrice.value = (service.basePrice ?? 0).toDouble();
+      systemFee.value = service.systemFee;
     }
 
     selectedCity.value = 'Dhaka';
@@ -198,11 +202,17 @@ class BookingController extends GetxController {
   }
 
   Future<void> submitBooking() async {
+    /// 1. PAY SYSTEM FEE — the backend only opens bidding once it is paid.
+    /// The booking fee itself is still paid after a bid is selected.
+    final payment = await Get.dialog<SystemFeePaymentResult>(
+      SystemFeePaymentDialog(systemFee: systemFee.value),
+    );
+    if (payment == null) return;
+
     try {
       isLoading.value = true;
 
-      /// 1. CREATE BOOKING (no payment yet — bidding opens right away;
-      /// payment happens after the client selects a winning bid)
+      /// 2. CREATE BOOKING with the system fee payment
       final request = BookingRequestModel(
         service: serviceId,
         details: problemDetailsController.text.trim(),
@@ -220,6 +230,8 @@ class BookingController extends GetxController {
         ),
         maxLimit:
         int.tryParse(budgetController.text.trim()) ?? 0,
+        paymentMethod: payment.paymentMethod,
+        transactionId: payment.transactionId,
       );
 
       final createRes =
@@ -231,7 +243,7 @@ class BookingController extends GetxController {
         throw Exception('Failed to create booking');
       }
 
-      /// 2. SHOW SUCCESS MODAL
+      /// 3. SHOW SUCCESS MODAL
       await Get.dialog(
         SuccessModal(
           title: TKeys.bookingSuccessful.tr,
@@ -260,6 +272,19 @@ class BookingController extends GetxController {
         barrierDismissible: false,
       );
     } catch (e) {
+      final data = e is DioException ? e.response?.data : null;
+      final message = data is Map && data['message'] != null
+          ? data['message'].toString()
+          : 'Could not submit your booking. Please try again.';
+      Get.snackbar(
+        TKeys.error.tr,
+        message,
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red.shade50,
+        colorText: Colors.red.shade700,
+        margin: const EdgeInsets.all(16),
+        borderRadius: 14,
+      );
     } finally {
       isLoading.value = false;
     }

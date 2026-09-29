@@ -33,4 +33,27 @@ class BookingRepository {
 
     return Map<String, dynamic>.from(response.data);
   }
+
+  /// Pays the system fee that moves a draft booking to `bidding_open`.
+  Future<Map<String, dynamic>> paySystemFee(
+    String bookingId, {
+    required String paymentMethod,
+    String transactionId = '',
+  }) async {
+    final isConnected = await _networkInfo.isConnected;
+
+    if (!isConnected) {
+      throw Exception('No internet connection');
+    }
+
+    final response = await _dio.post(
+      ApiEndpoints.paySystemFee(bookingId),
+      data: {
+        'paymentMethod': paymentMethod,
+        if (transactionId.isNotEmpty) 'transactionId': transactionId,
+      },
+    );
+
+    return Map<String, dynamic>.from(response.data);
+  }
 }
