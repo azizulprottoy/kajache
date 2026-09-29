@@ -1,3 +1,4 @@
+import 'package:kaj_ache/core/error/api_error.dart';
 import 'package:get/get.dart';
 
 import '../../../core/utils/translation_keys.dart';
@@ -52,7 +53,7 @@ class SHomeController extends GetxController {
     return _repository.getDashboard().then(_applyDashboard).catchError((error) {
       Get.snackbar(
         'error'.tr,
-        error.toString().replaceFirst('Exception: ', ''),
+        apiErrorMessage(error),
         snackPosition: SnackPosition.BOTTOM,
       );
     }).whenComplete(() {

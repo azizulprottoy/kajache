@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../app/routes/app_routes.dart';
+import '../../../core/utils/app_services.dart';
 import '../../../core/controller/local_controller.dart';
 import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/common_app_bar.dart';
@@ -224,7 +225,7 @@ class MenuPage extends StatelessWidget {
             ),
             onPressed: () {
               Get.back();
-              Get.offAllNamed(AppRoutes.login);
+              AppServices.logout();
             },
             child: Text(TKeys.logout.tr),
           ),

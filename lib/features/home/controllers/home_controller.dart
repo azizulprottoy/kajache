@@ -1,3 +1,4 @@
+import 'package:kaj_ache/core/error/api_error.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -51,7 +52,7 @@ class HomeController extends GetxController {
     ]).catchError((error) {
       Get.snackbar(
         'error'.tr,
-        error.toString().replaceFirst('Exception: ', ''),
+        apiErrorMessage(error),
         snackPosition: SnackPosition.BOTTOM,
       );
     }).whenComplete(() {

@@ -1,3 +1,4 @@
+import 'package:kaj_ache/core/error/api_error.dart';
 import 'package:get/get.dart';
 
 import '../../../core/utils/translation_keys.dart';
@@ -34,7 +35,7 @@ class AvailableInstantServicesController extends GetxController {
     } catch (e) {
       Get.snackbar(
         TKeys.error.tr,
-        e.toString().replaceFirst('Exception: ', ''),
+        apiErrorMessage(e),
         snackPosition: SnackPosition.BOTTOM,
       );
     } finally {
@@ -51,7 +52,7 @@ class AvailableInstantServicesController extends GetxController {
     } catch (e) {
       Get.snackbar(
         TKeys.error.tr,
-        e.toString().replaceFirst('Exception: ', ''),
+        apiErrorMessage(e),
         snackPosition: SnackPosition.BOTTOM,
       );
     } finally {
@@ -92,7 +93,7 @@ class AvailableInstantServicesController extends GetxController {
     } catch (e) {
       Get.snackbar(
         TKeys.error.tr,
-        e.toString().replaceFirst('Exception: ', ''),
+        apiErrorMessage(e),
         snackPosition: SnackPosition.BOTTOM,
       );
       return false;
@@ -117,7 +118,7 @@ class AvailableInstantServicesController extends GetxController {
     } catch (e) {
       Get.snackbar(
         TKeys.error.tr,
-        e.toString().replaceFirst('Exception: ', ''),
+        apiErrorMessage(e),
         snackPosition: SnackPosition.BOTTOM,
       );
       return false;

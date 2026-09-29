@@ -1,3 +1,4 @@
+import 'package:kaj_ache/core/utils/app_services.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -72,6 +73,9 @@ class ChatController extends GetxController {
       await _repository.sendMessage(bidId, text);
       await _loadMessages(silent: true);
     } catch (e) {
+      // Put the text back so a failed send doesn't lose the message
+      if (messageController.text.isEmpty) messageController.text = text;
+      AppServices.showApiError(e);
     } finally {
       isSending.value = false;
     }

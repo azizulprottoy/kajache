@@ -1,3 +1,4 @@
+import 'package:kaj_ache/core/error/api_error.dart';
 import 'package:get/get.dart';
 
 import '../../home/models/services_response_model.dart';
@@ -26,7 +27,7 @@ class AllServicesController extends GetxController {
         .catchError((error) {
       Get.snackbar(
         'error'.tr,
-        error.toString().replaceFirst('Exception: ', ''),
+        apiErrorMessage(error),
         snackPosition: SnackPosition.BOTTOM,
       );
     })

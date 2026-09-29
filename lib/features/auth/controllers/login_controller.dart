@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kaj_ache/features/auth/controllers/register_controller.dart';
 import '../../../app/routes/app_routes.dart';
+import '../../../core/error/api_error.dart';
 import '../../../core/storage/local_storage_service.dart';
 import '../../../core/storage/secure_storage_service.dart';
+import '../../../core/utils/app_services.dart';
 import '../arguments/otp_argument.dart';
 import '../models/register_request_model.dart';
 import '../repository/auth_repository.dart';
@@ -44,6 +46,9 @@ class LoginController extends GetxController {
       final response = await _authRepository.login(request);
 
       if (!response.success) {
+        AppServices.showError(
+          response.message.isNotEmpty ? response.message : 'Login failed',
+        );
         return;
       }
 
@@ -65,7 +70,8 @@ class LoginController extends GetxController {
         AppRoutes.main,
         arguments: userType,
       );
-    } catch (_) {
+    } catch (e) {
+      AppServices.showError(apiErrorMessage(e, fallback: 'Login failed'));
     } finally {
       isLoading.value = false;
     }

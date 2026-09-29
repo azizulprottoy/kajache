@@ -1,3 +1,4 @@
+import 'package:kaj_ache/core/utils/app_services.dart';
 import 'package:get/get.dart';
 
 import '../../home/models/available_booking_response_model.dart';
@@ -137,6 +138,7 @@ class MyBookingDetailsController extends GetxController {
       final result = await repository.getBooking(bookingId);
       booking.value = result;
     } catch (e) {
+      AppServices.showApiError(e);
     } finally {
       isLoading.value = false;
     }
@@ -168,6 +170,7 @@ class MyBookingDetailsController extends GetxController {
 
       return true;
     } catch (e) {
+      AppServices.showApiError(e);
       return false;
     } finally {
       isBookingTechnician.value = false;
@@ -191,6 +194,7 @@ class MyBookingDetailsController extends GetxController {
       await fetchBooking();
       return true;
     } catch (e) {
+      AppServices.showApiError(e);
       return false;
     } finally {
       isSubmittingPayment.value = false;
@@ -209,6 +213,7 @@ class MyBookingDetailsController extends GetxController {
           snackPosition: SnackPosition.BOTTOM);
       return true;
     } catch (e) {
+      AppServices.showApiError(e);
       return false;
     } finally {
       isCancellingBid.value = false;
@@ -239,6 +244,7 @@ class MyBookingDetailsController extends GetxController {
 
       return true;
     } catch (e) {
+      AppServices.showApiError(e);
       return false;
     } finally {
       isCompletingTask.value = false;
@@ -267,6 +273,7 @@ class MyBookingDetailsController extends GetxController {
       await fetchBooking();
       return true;
     } catch (e) {
+      AppServices.showApiError(e);
       return false;
     } finally {
       isSubmittingServiceReview.value = false;
@@ -295,6 +302,7 @@ class MyBookingDetailsController extends GetxController {
       await fetchBooking();
       return true;
     } catch (e) {
+      AppServices.showApiError(e);
       return false;
     } finally {
       isSubmittingProviderRating.value = false;
@@ -322,6 +330,7 @@ class MyBookingDetailsController extends GetxController {
       );
       return true;
     } catch (e) {
+      AppServices.showApiError(e);
       return false;
     } finally {
       isSubmittingComplaint.value = false;

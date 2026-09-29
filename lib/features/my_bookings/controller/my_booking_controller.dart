@@ -1,3 +1,4 @@
+import 'package:kaj_ache/core/utils/app_services.dart';
 import 'package:get/get.dart';
 
 import '../model/my_booking_model.dart';
@@ -25,6 +26,7 @@ class MyBookingController extends GetxController {
 
       bookings.assignAll(result);
     } catch (e) {
+      AppServices.showApiError(e);
     } finally {
       isLoading.value = false;
     }

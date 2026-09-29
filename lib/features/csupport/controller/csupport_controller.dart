@@ -1,3 +1,4 @@
+import 'package:kaj_ache/core/error/api_error.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -51,7 +52,7 @@ class CustomerSupportController extends GetxController {
     } catch (e) {
       Get.snackbar(
         TKeys.error.tr,
-        e.toString().replaceFirst('Exception: ', ''),
+        apiErrorMessage(e),
         snackPosition: SnackPosition.BOTTOM,
       );
     } finally {

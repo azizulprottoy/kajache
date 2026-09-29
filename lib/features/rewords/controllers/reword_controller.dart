@@ -1,3 +1,4 @@
+import 'package:kaj_ache/core/error/api_error.dart';
 import 'package:get/get.dart';
 
 import '../../profile/repository/profile_repository.dart';
@@ -40,7 +41,7 @@ class RewardsController extends GetxController {
       rewards.assignAll(fetchedRewards);
       totalPoints.value = profile.points;
     } catch (error) {
-      errorMessage.value = error.toString().replaceFirst('Exception: ', '');
+      errorMessage.value = apiErrorMessage(error);
     } finally {
       isLoading.value = false;
     }

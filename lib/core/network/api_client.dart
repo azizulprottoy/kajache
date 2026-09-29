@@ -60,11 +60,15 @@ class _AuthInterceptor extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    if (err.response?.statusCode == 401) {
+    // A 401 from /auth/* means wrong credentials, not an expired session;
+    // let the login/register screen show the server's message instead.
+    final isAuthCall = err.requestOptions.path.startsWith('/auth/');
+    final hadToken =
+        err.requestOptions.headers['Authorization'] != null;
+    if (err.response?.statusCode == 401 && !isAuthCall && hadToken) {
       AppServices.handleUnauthorized();
-      handler.reject(err); // stop — don't propagate to controllers
-      return;
     }
+    // Callers still receive the error so their loading state resets.
     handler.next(err);
   }
 }
@@ -98,7 +102,9 @@ class _PrettyLogInterceptor extends Interceptor {
     if (options.headers.isNotEmpty) {
       _print('│ Headers:');
       options.headers.forEach((k, v) {
-        final val = k == 'Authorization' ? '${(v as String).substring(0, 20)}...' : v;
+        final val = k == 'Authorization' && v is String && v.length > 20
+            ? '${v.substring(0, 20)}...'
+            : v;
         _print('│   $k: $val');
       });
     }

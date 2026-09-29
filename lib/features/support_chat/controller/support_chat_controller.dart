@@ -1,3 +1,4 @@
+import 'package:kaj_ache/core/error/api_error.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -54,7 +55,7 @@ class SupportChatController extends GetxController {
     } catch (e) {
       Get.snackbar(
         'Error',
-        e.toString().replaceFirst('Exception: ', ''),
+        apiErrorMessage(e),
         snackPosition: SnackPosition.BOTTOM,
       );
     } finally {

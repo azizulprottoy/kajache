@@ -1,3 +1,4 @@
+import 'package:kaj_ache/core/error/api_error.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -96,7 +97,7 @@ class MyInstantServiceDetailsController extends GetxController {
     } catch (e) {
       Get.snackbar(
         TKeys.error.tr,
-        e.toString().replaceFirst('Exception: ', ''),
+        apiErrorMessage(e),
         snackPosition: SnackPosition.BOTTOM,
       );
     } finally {
@@ -135,7 +136,7 @@ class MyInstantServiceDetailsController extends GetxController {
     } catch (e) {
       Get.snackbar(
         TKeys.error.tr,
-        e.toString().replaceFirst('Exception: ', ''),
+        apiErrorMessage(e),
         snackPosition: SnackPosition.BOTTOM,
       );
       return false;
@@ -179,7 +180,7 @@ class MyInstantServiceDetailsController extends GetxController {
     } catch (e) {
       Get.snackbar(
         TKeys.error.tr,
-        e.toString().replaceFirst('Exception: ', ''),
+        apiErrorMessage(e),
         snackPosition: SnackPosition.BOTTOM,
       );
       return false;
@@ -208,7 +209,7 @@ class MyInstantServiceDetailsController extends GetxController {
     } catch (e) {
       Get.snackbar(
         TKeys.error.tr,
-        e.toString().replaceFirst('Exception: ', ''),
+        apiErrorMessage(e),
         snackPosition: SnackPosition.BOTTOM,
       );
       return false;
@@ -233,7 +234,7 @@ class MyInstantServiceDetailsController extends GetxController {
     } catch (e) {
       Get.snackbar(
         TKeys.error.tr,
-        e.toString().replaceFirst('Exception: ', ''),
+        apiErrorMessage(e),
         snackPosition: SnackPosition.BOTTOM,
       );
       return false;

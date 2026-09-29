@@ -1,3 +1,4 @@
+import 'package:kaj_ache/core/utils/app_services.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:geolocator/geolocator.dart';
@@ -119,7 +120,9 @@ class ServiceDetailsController extends GetxController {
         providerLat = pos.latitude;
         providerLng = pos.longitude;
       }
-    } catch (_) {}
+    } catch (_) {
+      // Location is optional for a bid; place it without coordinates.
+    }
 
     try {
       if (hasBid) {
@@ -149,6 +152,7 @@ class ServiceDetailsController extends GetxController {
       myBidMessage = message;
       return true;
     } catch (e) {
+      AppServices.showApiError(e);
       return false;
     } finally {
       if (!isClosed) isBidLoading.value = false;
@@ -239,6 +243,7 @@ class ServiceDetailsController extends GetxController {
         snackPosition: SnackPosition.BOTTOM,
       );
     } catch (e) {
+      AppServices.showApiError(e);
     } finally {
       if (!isClosed) isSubmittingComment.value = false;
     }
@@ -293,6 +298,7 @@ class ServiceDetailsController extends GetxController {
         snackPosition: SnackPosition.BOTTOM,
       );
     } catch (e) {
+      AppServices.showApiError(e);
     } finally {
       if (!isClosed) replySubmittingId.value = null;
     }
@@ -314,6 +320,7 @@ class ServiceDetailsController extends GetxController {
         comments[index] = updated;
       }
     } catch (e) {
+      AppServices.showApiError(e);
     }
   }
 }

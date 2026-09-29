@@ -1,3 +1,4 @@
+import 'package:kaj_ache/core/error/api_error.dart';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -204,7 +205,7 @@ class PortfolioController extends GetxController {
   }
 
   String _cleanError(Object error) {
-    return error.toString().replaceFirst('Exception: ', '');
+    return apiErrorMessage(error);
   }
 
   @override

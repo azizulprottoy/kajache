@@ -1,3 +1,4 @@
+import 'package:kaj_ache/core/error/api_error.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../app/routes/app_routes.dart';
@@ -83,7 +84,7 @@ class RegisterController extends GetxController {
         .catchError((error) {
       Get.snackbar(
         'Error',
-        error.toString().replaceFirst('Exception: ', ''),
+        apiErrorMessage(error),
         snackPosition: SnackPosition.BOTTOM,
       );
     })

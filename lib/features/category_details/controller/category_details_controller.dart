@@ -1,3 +1,4 @@
+import 'package:kaj_ache/core/error/api_error.dart';
 import 'package:get/get.dart';
 
 import '../../home/models/category_response_model.dart';
@@ -54,7 +55,7 @@ class CategoryDetailsController extends GetxController {
         .catchError((error) {
       Get.snackbar(
         'Error',
-        error.toString().replaceFirst('Exception: ', ''),
+        apiErrorMessage(error),
         snackPosition: SnackPosition.BOTTOM,
       );
     })

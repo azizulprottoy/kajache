@@ -1,3 +1,4 @@
+import 'package:kaj_ache/core/utils/app_services.dart';
 import 'package:get/get.dart';
 
 import '../home/models/available_booking_response_model.dart';
@@ -43,6 +44,7 @@ class BookingDetailsController extends GetxController {
     try {
       booking.value = await _repository.getBooking(bookingId);
     } catch (error) {
+      AppServices.showApiError(error);
     } finally {
       if (!isClosed) isLoading.value = false;
     }
@@ -83,6 +85,7 @@ class BookingDetailsController extends GetxController {
       await fetchBooking();
       return true;
     } catch (error) {
+      AppServices.showApiError(error);
       return false;
     } finally {
       if (!isClosed) isBidLoading.value = false;
@@ -99,6 +102,7 @@ class BookingDetailsController extends GetxController {
           snackPosition: SnackPosition.BOTTOM);
       return true;
     } catch (e) {
+      AppServices.showApiError(e);
       return false;
     } finally {
       if (!isClosed) isCancellingBid.value = false;
@@ -113,6 +117,7 @@ class BookingDetailsController extends GetxController {
       await fetchBooking();
       return true;
     } catch (e) {
+      AppServices.showApiError(e);
       return false;
     } finally {
       if (!isClosed) isRespondingReassignment.value = false;
@@ -128,6 +133,7 @@ class BookingDetailsController extends GetxController {
           snackPosition: SnackPosition.BOTTOM);
       return true;
     } catch (e) {
+      AppServices.showApiError(e);
       return false;
     } finally {
       if (!isClosed) isMarkingCash.value = false;

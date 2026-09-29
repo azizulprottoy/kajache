@@ -1,6 +1,11 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../error/api_error.dart';
 import '../error/failure.dart';
+import '../network/api_client.dart';
+import '../storage/local_storage_service.dart';
+import '../storage/secure_storage_service.dart';
 import '../../app/routes/app_routes.dart';
 import '../../app/theme/app_colors.dart';
 import '../../app/theme/app_text_styles.dart';
@@ -65,6 +70,21 @@ class AppServices {
     );
   }
 
+  /// Shows the server's message for a failed request. Skips 401s on
+  /// authenticated calls: the API client already reported the expired session.
+  static void showApiError(Object error, {String? fallback}) {
+    final isAuthCall = error is DioException &&
+        error.requestOptions.path.startsWith('/auth/');
+    if (error is DioException &&
+        error.response?.statusCode == 401 &&
+        !isAuthCall) {
+      return;
+    }
+    showError(fallback == null
+        ? apiErrorMessage(error)
+        : apiErrorMessage(error, fallback: fallback));
+  }
+
   // ── API Failure handler ─────────────────────────────────────────────────────
   static void showApiFailure({required Failure failure}) {
     showError(failure.message);
@@ -126,9 +146,49 @@ class AppServices {
     );
   }
 
-  // ── Unauthorized (401) ──────────────────────────────────────────────────────
-  static void handleUnauthorized() {
-    showError('Session expired. Please login again.');
+  // ── Session ─────────────────────────────────────────────────────────────────
+  /// Local-storage keys that belong to the signed-in user. App preferences
+  /// (onboarding, theme, language) are kept across logins.
+  static const _userKeys = [
+    'user_id',
+    'user_email',
+    'username',
+    'role_title',
+    'user_type',
+    'user_avatar',
+  ];
+
+  /// Removes the token and cached user data so the next launch starts
+  /// signed out and no data leaks to the next user of the device.
+  static Future<void> clearSession() async {
+    await Get.find<SecureStorageService>().clearAll();
+    final local = Get.find<LocalStorageService>();
+    for (final key in _userKeys) {
+      local.remove(key);
+    }
+    ApiClient.resetInstance();
+  }
+
+  /// User-initiated logout.
+  static Future<void> logout() async {
+    await clearSession();
     Get.offAllNamed(AppRoutes.login);
+  }
+
+  // ── Unauthorized (401) ──────────────────────────────────────────────────────
+  static bool _handlingUnauthorized = false;
+
+  /// Called by the API client when the backend rejects the token. Several
+  /// requests can fail at once; only the first one logs out and navigates.
+  static Future<void> handleUnauthorized() async {
+    if (_handlingUnauthorized) return;
+    _handlingUnauthorized = true;
+    try {
+      await clearSession();
+      showError('Session expired. Please login again.');
+      Get.offAllNamed(AppRoutes.login);
+    } finally {
+      _handlingUnauthorized = false;
+    }
   }
 }

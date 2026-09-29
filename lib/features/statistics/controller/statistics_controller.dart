@@ -1,3 +1,4 @@
+import 'package:kaj_ache/core/error/api_error.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -30,7 +31,7 @@ class StatisticsController extends GetxController {
       );
     } catch (error) {
       errorMessage.value =
-          error.toString().replaceFirst('Exception: ', '');
+          apiErrorMessage(error);
     } finally {
       if (!isClosed) isLoading.value = false;
     }
@@ -98,7 +99,7 @@ class StatisticsController extends GetxController {
     } catch (error) {
       Get.snackbar(
         TKeys.error.tr,
-        error.toString().replaceFirst('Exception: ', ''),
+        apiErrorMessage(error),
         snackPosition: SnackPosition.BOTTOM,
       );
     } finally {

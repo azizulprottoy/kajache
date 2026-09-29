@@ -1,3 +1,4 @@
+import 'package:kaj_ache/core/utils/app_services.dart';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -168,6 +169,7 @@ class ProfileController extends GetxController {
       }
       if (p.area.isNotEmpty) selectedArea.value = p.area;
     } catch (e) {
+      AppServices.showApiError(e);
     } finally {
       isLoading.value = false;
     }
@@ -225,6 +227,7 @@ class ProfileController extends GetxController {
 
       await fetchMyProfile(); // refresh with saved values
     } catch (e) {
+      AppServices.showApiError(e);
     } finally {
       isLoading.value = false;
     }
