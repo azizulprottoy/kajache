@@ -7,6 +7,8 @@ import '../../payments/models/coupon_model.dart';
 import '../../payments/models/payment_method_model.dart';
 import '../../payments/repository/payment_repository.dart';
 import '../repository/my_booking_repository.dart';
+import '../../booking/repository/booking_repository.dart';
+import '../../booking/view/widgets/system_fee_payment_dialog.dart';
 
 class MyBookingDetailsController extends GetxController {
   final MyBookingRepository repository = MyBookingRepository();
@@ -19,6 +21,7 @@ class MyBookingDetailsController extends GetxController {
   final isSubmittingProviderRating = false.obs;
   final isSubmittingComplaint = false.obs;
   final isSubmittingPayment = false.obs;
+  final isPublishingDraft = false.obs;
   final booking = Rxn<AvailableBookingModel>();
   final selectedBidder = Rxn<BookingBidModel>();
 
@@ -69,9 +72,17 @@ class MyBookingDetailsController extends GetxController {
 
   String bookingId = '';
 
+  String get _paymentStatus =>
+      booking.value?.paymentStatus.trim().toLowerCase() ?? '';
+
+  /// Payment is still owed; choosing cash counts as settled until the technician confirms receipt.
   bool get isPaymentDue =>
       booking.value?.status.trim().toLowerCase() == 'bid_selected' &&
-      booking.value?.paymentStatus.trim().toLowerCase() != 'paid';
+      _paymentStatus != 'paid' &&
+      _paymentStatus != 'cash_pending';
+
+  /// Customer chose cash and the technician hasn't confirmed receiving it yet.
+  bool get isCashPending => _paymentStatus == 'cash_pending';
 
   String? get assignedTechnicianId {
     final bids = booking.value?.bids ?? [];
@@ -198,6 +209,35 @@ class MyBookingDetailsController extends GetxController {
       return false;
     } finally {
       isSubmittingPayment.value = false;
+    }
+  }
+
+  bool get isDraft => booking.value?.status.trim().toLowerCase() == 'draft';
+
+  /// Pays the bid placement fee so a saved draft opens for technician bids.
+  Future<void> publishDraft() async {
+    final current = booking.value;
+    if (current == null || !isDraft || isPublishingDraft.value) return;
+
+    final payment = await Get.dialog<SystemFeePaymentResult>(
+      SystemFeePaymentDialog(systemFee: current.systemFee.toDouble()),
+    );
+    if (payment == null) return;
+
+    try {
+      isPublishingDraft.value = true;
+      await BookingRepository().paySystemFee(
+        bookingId,
+        paymentMethod: payment.paymentMethod,
+        transactionId: payment.transactionId,
+      );
+      await fetchBooking();
+      Get.snackbar(TKeys.success.tr, TKeys.bookingSubmittedMsg.tr,
+          snackPosition: SnackPosition.BOTTOM);
+    } catch (e) {
+      AppServices.showApiError(e);
+    } finally {
+      isPublishingDraft.value = false;
     }
   }
 

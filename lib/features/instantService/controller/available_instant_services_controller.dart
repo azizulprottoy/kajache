@@ -15,6 +15,8 @@ class AvailableInstantServicesController extends GetxController {
 
   final isLoading = false.obs;
   final instantServices = <InstantServiceModel>[].obs;
+  /// Jobs this technician was selected for (waiting for payment, ready to start, or in progress)
+  final myJobs = <InstantServiceModel>[].obs;
 
   final isLoadingDetails = false.obs;
   final isBidLoading = false.obs;
@@ -30,8 +32,12 @@ class AvailableInstantServicesController extends GetxController {
   Future<void> fetchAvailableInstantServices() async {
     try {
       isLoading.value = true;
-      final list = await repository.getAvailableInstantServices();
-      instantServices.assignAll(list);
+      final results = await Future.wait([
+        repository.getAvailableInstantServices(),
+        repository.getMyInstantJobs(),
+      ]);
+      instantServices.assignAll(results[0]);
+      myJobs.assignAll(results[1]);
     } catch (e) {
       Get.snackbar(
         TKeys.error.tr,

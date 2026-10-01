@@ -144,6 +144,7 @@ class ApiEndpoints {
   static const String instantService = '/instantService';
   static const String myInstantServices = '/instantService/me';
   static const String availableInstantServices = '/instantService/available';
+  static const String instantProviderBids = '/instantService/provider/bids';
   static String instantServiceById(String id) => '/instantService/$id';
   static String instantServiceSelectBid(String id) => '/instantService/$id/select-bid';
   static String instantServicePayment(String id) => '/instantService/$id/confirm-payment';

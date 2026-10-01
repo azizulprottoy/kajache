@@ -144,6 +144,36 @@ class InstantServiceRepository {
         .toList();
   }
 
+  /// Technician: instant jobs where the customer picked this technician's bid and
+  /// the job isn't finished yet. `/available` only lists open jobs, so these would
+  /// otherwise be unreachable after selection.
+  Future<List<InstantServiceModel>> getMyInstantJobs() async {
+    await _requireConnection();
+
+    final response = await _dio.get(ApiEndpoints.instantProviderBids);
+    final payload = Map<String, dynamic>.from(response.data);
+
+    final List list = payload['data'] ?? [];
+    return list
+        .whereType<Map>()
+        .map((raw) => Map<String, dynamic>.from(raw))
+        .where((bid) =>
+            bid['status']?.toString() == 'selected' && bid['instantService'] is Map)
+        .map((bid) => InstantServiceModel.fromJson({
+              ...Map<String, dynamic>.from(bid['instantService']),
+              'hasBid': true,
+              'myBid': {
+                '_id': bid['_id'],
+                'status': bid['status'],
+                'price': bid['price'],
+                'message': bid['message'],
+                'estimatedArrival': bid['estimatedArrival'],
+              },
+            }))
+        .where((job) => job.status == 'bid_selected' || job.status == 'in_progress')
+        .toList();
+  }
+
   Future<InstantServiceDetailsModel> getInstantService(String id) async {
     await _requireConnection();
 

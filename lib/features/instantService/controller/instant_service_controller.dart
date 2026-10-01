@@ -42,17 +42,7 @@ class InstantServiceController extends GetxController {
   /// Optional cover photo submitted alongside the post.
   final pickedImage = Rxn<File>();
 
-  RxnString selectedCity = RxnString();
   RxnString selectedTime = RxnString();
-
-  final cities = const [
-    'Dhaka',
-    'Chittagong',
-    'Sylhet',
-    'Rajshahi',
-    'Khulna',
-    'Barisal',
-  ];
 
   final timeSlots = const [
     '09:00 AM',
@@ -80,8 +70,6 @@ class InstantServiceController extends GetxController {
       });
       return;
     }
-
-    selectedCity.value = 'Dhaka';
   }
 
   @override
@@ -176,7 +164,8 @@ class InstantServiceController extends GetxController {
         priceMax: priceMax,
         location: InstantServiceLocationModel(
           address: addressController.text.trim(),
-          city: selectedCity.value ?? 'Dhaka',
+          // Empty city is omitted; the backend defaults it to Dhaka
+          city: '',
           district: districtController.text.trim(),
           lat: pickedLat.value,
           lng: pickedLng.value,

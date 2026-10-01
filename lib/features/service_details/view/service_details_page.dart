@@ -119,6 +119,41 @@ class ServiceDetailsPage extends GetView<ServiceDetailsController> {
                 ),
               ),
 
+              if (!isProviderBidFlow && service.basePrice > 0) ...[
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.sell_outlined,
+                          color: colorScheme.onPrimaryContainer),
+                      const SizedBox(width: 10),
+                      Text(
+                        TKeys.startingPrice.tr,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onPrimaryContainer,
+                        ),
+                      ),
+                      const Spacer(),
+                      Text(
+                        '৳${NumberFormat.decimalPattern().format(service.basePrice.round())}',
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: colorScheme.onPrimaryContainer,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+
+              const SizedBox(height: 16),
+
 
               Text(
                 "Description",

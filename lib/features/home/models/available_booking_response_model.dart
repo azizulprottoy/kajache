@@ -98,6 +98,9 @@ class AvailableBookingResponseModel {
 
 class AvailableBookingModel {
   final String id;
+  final String title;
+  /// Upfront bid placement fee; paid to publish a draft
+  final int systemFee;
   final String serviceId;
   final String serviceTitle;
   final String serviceSlug;
@@ -134,6 +137,8 @@ class AvailableBookingModel {
 
   AvailableBookingModel({
     required this.id,
+    this.title = '',
+    this.systemFee = 50,
     required this.serviceId,
     required this.serviceTitle,
     required this.serviceSlug,
@@ -217,6 +222,8 @@ class AvailableBookingModel {
 
     return AvailableBookingModel(
       id: json['_id']?.toString() ?? '',
+      title: json['title']?.toString() ?? '',
+      systemFee: int.tryParse(json['systemFee']?.toString() ?? '') ?? 50,
       serviceId: service['_id']?.toString() ?? '',
       serviceTitle: service['title']?.toString() ?? 'Service',
       serviceSlug: service['slug']?.toString() ?? '',

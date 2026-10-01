@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 
+import '../../../core/network/geo_repository.dart';
 import '../../../app/routes/app_routes.dart';
 import '../../main/controller/main_controller.dart';
 import '../../../core/utils/app_services.dart';
@@ -26,21 +30,25 @@ class BookingController extends GetxController {
   /// Empty when the page was opened without a valid service argument.
   String serviceId = '';
 
-  /// Step
-  /// Booking creation is now 2 steps — payment moved to after a bid is
-  /// selected (see MyBookingDetailsController.confirmBookingPayment).
-  static const int lastStep = 2;
-  final currentStep = 1.obs;
+  /// Single-page form, same fields as the website. The booking fee is paid
+  /// after a bid is selected (see MyBookingDetailsController.confirmBookingPayment).
   final isLoading = false.obs;
 
-  /// Step 1
   final selectedSubServices = <String>[].obs;
+  final titleController = TextEditingController();
   final problemDetailsController = TextEditingController();
 
-  /// Step 2
+  /// Job photos, same limit as the website and the backend upload route
+  static const int maxPhotos = 8;
+  final photos = <File>[].obs;
+  final ImagePicker _imagePicker = ImagePicker();
+
+  /// District list for the dropdown; the map pin pre-selects a matching one
+  final districts = <GeoModel>[].obs;
+  final RxnString selectedDistrict = RxnString();
+
   final dateController = TextEditingController();
   final addressController = TextEditingController();
-  final budgetController = TextEditingController();
 
   // Map-picked location
   final RxnDouble pickedLat = RxnDouble();
@@ -48,17 +56,7 @@ class BookingController extends GetxController {
   final RxnString pickedDistrict = RxnString();
   final RxnString pickedArea = RxnString();
 
-  RxnString selectedCity = RxnString();
   RxnString selectedTime = RxnString();
-
-  final cities = [
-    'Dhaka',
-    'Chittagong',
-    'Sylhet',
-    'Rajshahi',
-    'Khulna',
-    'Barisal',
-  ];
 
   final timeSlots = [
     '09:00 AM',
@@ -110,15 +108,45 @@ class BookingController extends GetxController {
     servicePrice.value = service.basePrice;
     systemFee.value = service.systemFee;
 
-    selectedCity.value = 'Dhaka';
+    _loadDistricts();
   }
+
+  Future<void> _loadDistricts() async {
+    try {
+      districts.assignAll(await GeoRepository().getDistricts());
+    } catch (_) {
+      // The dropdown stays empty; district is optional
+    }
+  }
+
+  /// Picks the district from the map result when it matches one in the list.
+  void applyPickedDistrict(String? name) {
+    final picked = name?.trim().toLowerCase() ?? '';
+    if (picked.isEmpty) return;
+    for (final district in districts) {
+      final candidate = district.name.toLowerCase();
+      if (candidate == picked || picked.contains(candidate) || candidate.contains(picked)) {
+        selectedDistrict.value = district.name;
+        return;
+      }
+    }
+  }
+
+  Future<void> pickPhotos() async {
+    final remaining = maxPhotos - photos.length;
+    if (remaining <= 0) return;
+    final picked = await _imagePicker.pickMultiImage(imageQuality: 85);
+    photos.addAll(picked.take(remaining).map((file) => File(file.path)));
+  }
+
+  void removePhoto(int index) => photos.removeAt(index);
 
   @override
   void onClose() {
+    titleController.dispose();
     problemDetailsController.dispose();
     dateController.dispose();
     addressController.dispose();
-    budgetController.dispose();
     super.onClose();
   }
 
@@ -148,78 +176,63 @@ class BookingController extends GetxController {
     }
   }
 
-  String? validateStep() {
-    if (currentStep.value == 1) {
-      if (problemDetailsController.text.trim().isEmpty) {
-        return TKeys.describeProblemError.tr;
-      }
+  /// First problem in the form, or null when it can be submitted.
+  String? validateForm() {
+    if (titleController.text.trim().isEmpty) {
+      return TKeys.titleRequired.tr;
     }
-
-    if (currentStep.value == 2) {
-      if (addressController.text.trim().isEmpty) {
-        return TKeys.addressRequired.tr;
-      }
-
-      if (dateController.text.trim().isEmpty) {
-        return TKeys.pickDateError.tr;
-      }
-
-      if (selectedTime.value == null ||
-          selectedTime.value!.isEmpty) {
-        return TKeys.selectTimeSlotError.tr;
-      }
-
-      final budget =
-          int.tryParse(budgetController.text.trim()) ?? 0;
-
-      if (budget < 100) {
-        return TKeys.budgetMinError.tr;
-      }
+    if (problemDetailsController.text.trim().isEmpty) {
+      return TKeys.describeProblemError.tr;
     }
-
+    if (addressController.text.trim().isEmpty) {
+      return TKeys.addressRequired.tr;
+    }
+    if (dateController.text.trim().isEmpty) {
+      return TKeys.pickDateError.tr;
+    }
+    if (selectedTime.value == null || selectedTime.value!.isEmpty) {
+      return TKeys.selectTimeSlotError.tr;
+    }
     return null;
   }
 
-  void nextStep(BuildContext context) {
-    final error = validateStep();
-
-    if (error != null) {
-      Get.snackbar(
-        TKeys.validation.tr,
-        error,
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.shade50,
-        colorText: Colors.red.shade700,
-        margin: const EdgeInsets.all(16),
-        borderRadius: 14,
-      );
-
-      return;
-    }
-
-    if (currentStep.value < lastStep) {
-      currentStep.value++;
-    }
+  void _showValidationError(String error) {
+    Get.snackbar(
+      TKeys.validation.tr,
+      error,
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: Colors.red.shade50,
+      colorText: Colors.red.shade700,
+      margin: const EdgeInsets.all(16),
+      borderRadius: 14,
+    );
   }
 
-  void prevStep() {
-    if (currentStep.value > 1) {
-      currentStep.value--;
-    }
-  }
-
-  Future<void> submitBooking() async {
+  /// `asDraft` saves without paying; the draft is published later from
+  /// My Bookings by paying the bid placement fee.
+  Future<void> submitBooking({bool asDraft = false}) async {
     if (serviceId.isEmpty) {
       AppServices.showError('No service selected.');
       return;
     }
 
+    // Highlight every invalid field inline, then show the first problem
+    formKey.currentState?.validate();
+    final error = validateForm();
+    if (error != null) {
+      _showValidationError(error);
+      return;
+    }
+
     /// 1. PAY SYSTEM FEE — the backend only opens bidding once it is paid.
     /// The booking fee itself is still paid after a bid is selected.
-    final payment = await Get.dialog<SystemFeePaymentResult>(
-      SystemFeePaymentDialog(systemFee: systemFee.value),
-    );
-    if (payment == null) return;
+    SystemFeePaymentResult? payment;
+    if (!asDraft) {
+      payment = await Get.dialog<SystemFeePaymentResult>(
+        SystemFeePaymentDialog(systemFee: systemFee.value),
+      );
+      if (payment == null) return;
+    }
 
     try {
       isLoading.value = true;
@@ -227,23 +240,23 @@ class BookingController extends GetxController {
       /// 2. CREATE BOOKING with the system fee payment
       final request = BookingRequestModel(
         service: serviceId,
+        title: titleController.text.trim(),
+        isDraft: asDraft,
+        photos: photos.toList(),
         details: problemDetailsController.text.trim(),
         subServices: selectedSubServices.toList(),
         location: LocationModel(
           address: addressController.text.trim(),
-          city: selectedCity.value ?? 'Dhaka',
           lat: pickedLat.value,
           lng: pickedLng.value,
-          district: pickedDistrict.value,
+          district: selectedDistrict.value ?? pickedDistrict.value,
         ),
         schedule: ScheduleModel(
           date: dateController.text.trim(),
           time: selectedTime.value ?? '',
         ),
-        maxLimit:
-        int.tryParse(budgetController.text.trim()) ?? 0,
-        paymentMethod: payment.paymentMethod,
-        transactionId: payment.transactionId,
+        paymentMethod: payment?.paymentMethod,
+        transactionId: payment?.transactionId,
       );
 
       final createRes =
@@ -253,6 +266,17 @@ class BookingController extends GetxController {
 
       if (!success) {
         throw Exception('Failed to create booking');
+      }
+
+      if (asDraft) {
+        Get.until((r) => r.settings.name == AppRoutes.main);
+        Get.toNamed(AppRoutes.myBookings);
+        Get.snackbar(
+          TKeys.success.tr,
+          TKeys.draftSaved.tr,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        return;
       }
 
       /// 3. SHOW SUCCESS MODAL

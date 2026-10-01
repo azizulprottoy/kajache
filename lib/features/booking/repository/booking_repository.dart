@@ -2,6 +2,9 @@
 /// BOOKING REPOSITORY
 /// =============================
 
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 
 import '../../../core/network/api_client.dart';
@@ -26,12 +29,38 @@ class BookingRepository {
       throw Exception('No internet connection');
     }
 
+    final json = request.toJson();
     final response = await _dio.post(
       ApiEndpoints.booking,
-      data: request.toJson(),
+      data: request.photos.isEmpty ? json : await _multipart(json, request),
     );
 
     return Map<String, dynamic>.from(response.data);
+  }
+
+  /// Nested fields go as JSON strings; the backend route parses them back.
+  Future<FormData> _multipart(
+    Map<String, dynamic> json,
+    BookingRequestModel request,
+  ) async {
+    final fields = <String, dynamic>{
+      for (final entry in json.entries)
+        entry.key: entry.value is Map || entry.value is List
+            ? jsonEncode(entry.value)
+            : entry.value.toString(),
+    };
+    final form = FormData.fromMap(fields);
+    // Each file under the same "photos" key, as multer's array('photos') expects
+    for (final photo in request.photos) {
+      form.files.add(MapEntry(
+        'photos',
+        await MultipartFile.fromFile(
+          photo.path,
+          filename: photo.path.split(Platform.pathSeparator).last,
+        ),
+      ));
+    }
+    return form;
   }
 
   /// Pays the system fee that moves a draft booking to `bidding_open`.

@@ -31,17 +31,56 @@ class AvailableInstantServicesPage extends GetView<AvailableInstantServicesContr
         showLanguageToggle: true,
       ),
       body: Obx(() {
-        if (controller.isLoading.value && controller.instantServices.isEmpty) {
+        final jobs = controller.myJobs;
+        final open = controller.instantServices;
+
+        if (controller.isLoading.value && open.isEmpty && jobs.isEmpty) {
           return const Center(child: CircularProgressIndicator());
         }
 
-        if (controller.instantServices.isEmpty) {
-          return RefreshIndicator(
-            onRefresh: controller.fetchAvailableInstantServices,
-            child: ListView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              children: [
-                SizedBox(height: MediaQuery.sizeOf(context).height * 0.3),
+        Future<void> openDetails(InstantServiceModel item) async {
+          await controller.openInstantService(item.id);
+          Get.bottomSheet(
+            _InstantServiceDetailsSheet(controller: controller),
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+          );
+        }
+
+        return RefreshIndicator(
+          onRefresh: controller.fetchAvailableInstantServices,
+          child: ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.all(16),
+            children: [
+              // Jobs this technician was selected for; "Accept Job" lives in the details sheet
+              if (jobs.isNotEmpty) ...[
+                Text(
+                  'My instant jobs',
+                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Tap a job to start it once the customer has paid.',
+                  style: theme.textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
+                ),
+                const SizedBox(height: 12),
+                for (final job in jobs) ...[
+                  GestureDetector(
+                    onTap: () => openDetails(job),
+                    child: _InstantServiceTile(item: job),
+                  ),
+                  const SizedBox(height: 12),
+                ],
+                const SizedBox(height: 12),
+                Text(
+                  TKeys.availableInstantServices.tr,
+                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+                ),
+                const SizedBox(height: 12),
+              ],
+              if (open.isEmpty) ...[
+                SizedBox(height: MediaQuery.sizeOf(context).height * (jobs.isEmpty ? 0.3 : 0.05)),
                 Icon(Icons.bolt_outlined, size: 64, color: colorScheme.outline),
                 const SizedBox(height: 16),
                 Center(
@@ -53,32 +92,15 @@ class AvailableInstantServicesPage extends GetView<AvailableInstantServicesContr
                     ),
                   ),
                 ),
-              ],
-            ),
-          );
-        }
-
-        return RefreshIndicator(
-          onRefresh: controller.fetchAvailableInstantServices,
-          child: ListView.separated(
-            physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.all(16),
-            itemCount: controller.instantServices.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 12),
-            itemBuilder: (context, index) {
-              final item = controller.instantServices[index];
-              return GestureDetector(
-                onTap: () async {
-                  await controller.openInstantService(item.id);
-                  Get.bottomSheet(
-                    _InstantServiceDetailsSheet(controller: controller),
-                    isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
-                  );
-                },
-                child: _InstantServiceTile(item: item),
-              );
-            },
+              ] else
+                for (final item in open) ...[
+                  GestureDetector(
+                    onTap: () => openDetails(item),
+                    child: _InstantServiceTile(item: item),
+                  ),
+                  const SizedBox(height: 12),
+                ],
+            ],
           ),
         );
       }),

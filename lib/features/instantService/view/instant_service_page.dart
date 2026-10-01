@@ -179,23 +179,6 @@ class InstantServicePage extends GetView<InstantServiceController> {
 
               const SizedBox(height: 14),
 
-              Obx(
-                () => DropdownButtonFormField<String>(
-                  value: controller.selectedCity.value,
-                  decoration: InputDecoration(
-                    labelText: TKeys.city.tr,
-                    prefixIcon: const Icon(Icons.location_city_outlined),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
-                  ),
-                  items: controller.cities
-                      .map((city) => DropdownMenuItem<String>(value: city, child: Text(city)))
-                      .toList(),
-                  onChanged: (value) => controller.selectedCity.value = value!,
-                ),
-              ),
-
-              const SizedBox(height: 14),
-
               TextFormField(
                 controller: controller.districtController,
                 decoration: InputDecoration(

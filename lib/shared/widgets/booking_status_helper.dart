@@ -20,6 +20,16 @@ class BookingStatusHelper {
 
   static BookingStatusInfo of(String? status) {
     switch (status) {
+      case 'draft':
+        return BookingStatusInfo(
+          label: _isBangla ? 'খসড়া' : 'Draft',
+          color: const Color(0xFF64748B), // slate
+        );
+      case 'pending_reassignment':
+        return BookingStatusInfo(
+          label: _isBangla ? 'নতুন টেকনিশিয়ান খোঁজা হচ্ছে' : 'Reassigning',
+          color: const Color(0xFFF97316), // orange
+        );
       case 'pending_payment':
         return BookingStatusInfo(
           label: _isBangla ? 'পেমেন্ট বাকি' : 'Pending Payment',

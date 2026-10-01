@@ -110,9 +110,19 @@ class MyBookingDetailsPage extends GetView<MyBookingDetailsController> {
 
               _BookingCard(booking: booking),
 
+              if (controller.isDraft) ...[
+                const SizedBox(height: 14),
+                _DraftBanner(controller: controller, fee: booking.systemFee),
+              ],
+
               if (controller.isPaymentDue) ...[
                 const SizedBox(height: 14),
                 _PaymentDueBanner(controller: controller),
+              ],
+
+              if (controller.isCashPending) ...[
+                const SizedBox(height: 14),
+                _CashPendingBanner(amount: controller.basePaymentAmount),
               ],
 
 
@@ -383,6 +393,95 @@ class _PaymentDueBanner extends StatelessWidget {
               ),
               icon: const Icon(Icons.payment_outlined),
               label: const Text('Pay Now'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Saved drafts aren't visible to technicians until the bid placement fee is paid.
+class _DraftBanner extends StatelessWidget {
+  final MyBookingDetailsController controller;
+  final int fee;
+
+  const _DraftBanner({required this.controller, required this.fee});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: colors.primary.withOpacity(0.06),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: colors.primary.withOpacity(0.25)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.edit_note_outlined, color: colors.primary, size: 20),
+              const SizedBox(width: 8),
+              Text(
+                TKeys.draftBannerTitle.tr,
+                style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            TKeys.draftBannerInfo.tr,
+            style: theme.textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: Obx(() => FilledButton.icon(
+                  onPressed: controller.isPublishingDraft.value ? null : controller.publishDraft,
+                  icon: const Icon(Icons.publish_outlined),
+                  label: Text('${TKeys.placeOnline.tr} (৳$fee)'),
+                )),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Shown after the customer chose cash, until the technician confirms receiving it.
+class _CashPendingBanner extends StatelessWidget {
+  final int amount;
+
+  const _CashPendingBanner({required this.amount});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF10B981).withOpacity(0.08),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFF10B981).withOpacity(0.3)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(Icons.payments_outlined, color: Color(0xFF059669), size: 20),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              'Cash payment: hand ৳$amount to the technician. They will confirm once received.',
+              style: theme.textTheme.bodySmall?.copyWith(color: colors.onSurface),
             ),
           ),
         ],
@@ -1210,7 +1309,7 @@ class _BookingPaymentSheetState extends State<_BookingPaymentSheet> {
                   const SizedBox(height: 16),
 
                   // ── Cash after service toggle ──────────────────────────────
-                  StatefulBuilder(builder: (_, setState) => GestureDetector(
+                  GestureDetector(
                     onTap: () => setState(() => _isCash = !_isCash),
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
@@ -1261,7 +1360,7 @@ class _BookingPaymentSheetState extends State<_BookingPaymentSheet> {
                         ),
                       ]),
                     ),
-                  )),
+                  ),
 
                   const SizedBox(height: 16),
 

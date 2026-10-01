@@ -41,9 +41,16 @@ class StatisticsRepository {
             final bookingStatus =
                 bid.bookingStatus.trim().toLowerCase();
 
-            return bidStatus == 'selected' &&
+            final isAccepted = bidStatus == 'selected' &&
                 (bookingStatus == 'bid_selected' ||
                     bookingStatus == 'in_progress');
+            // Offered to this technician after the selected one cancelled;
+            // accepted or declined from the booking details page
+            final isReassignmentOffer =
+                bidStatus == 'pending_reassignment' &&
+                    bookingStatus == 'pending_reassignment';
+
+            return isAccepted || isReassignmentOffer;
           },
         )
         .toList();

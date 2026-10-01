@@ -52,7 +52,7 @@ class StatisticsPage extends GetView<StatisticsController> {
               ),
               const SizedBox(height: 6),
               Text(
-                'Bookings where your bid was accepted, including jobs already in progress.',
+                'Bookings where your bid was accepted, jobs in progress, and jobs offered to you after another technician cancelled.',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: colorScheme.onSurfaceVariant,
                     ),
@@ -102,6 +102,12 @@ class _AcceptedBookingCard extends StatelessWidget {
       booking.scheduleTime,
     ].where((value) => value.trim().isNotEmpty).join(' • ');
     final isInProgress = controller.isInProgress(booking);
+    final isOffer = controller.isReassignmentOffer(booking);
+    final badgeColor = isOffer
+        ? Colors.orange.shade700
+        : isInProgress
+            ? colorScheme.tertiary
+            : colorScheme.primary;
 
     return Container(
       width: double.infinity,
@@ -167,17 +173,17 @@ class _AcceptedBookingCard extends StatelessWidget {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: isInProgress
-                      ? colorScheme.tertiary.withValues(alpha: 0.12)
-                      : colorScheme.primary.withValues(alpha: 0.10),
+                  color: badgeColor.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  isInProgress ? 'In Progress' : 'Accepted',
+                  isOffer
+                      ? 'Job offer'
+                      : isInProgress
+                          ? 'In Progress'
+                          : 'Accepted',
                   style: theme.textTheme.labelSmall?.copyWith(
-                    color: isInProgress
-                        ? colorScheme.tertiary
-                        : colorScheme.primary,
+                    color: badgeColor,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -206,7 +212,19 @@ class _AcceptedBookingCard extends StatelessWidget {
             ),
           ],
           const SizedBox(height: 18),
-          if (controller.canMakeInProgress(booking))
+          if (isOffer)
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                onPressed: () => Get.toNamed(
+                  AppRoutes.bookingDetails,
+                  arguments: BookingDetailsArgument(bookingId: booking.bookingId),
+                ),
+                icon: const Icon(Icons.swap_horiz_rounded),
+                label: const Text('Review offer'),
+              ),
+            )
+          else if (controller.canMakeInProgress(booking))
             SizedBox(
               width: double.infinity,
               child: Obx(() {

@@ -100,7 +100,6 @@ class HomePage extends GetView<HomeController> {
                   // ── Instant Service Requests ────────────────────────────
                   _HomeSection(
                     title: TKeys.availableInstantServices.tr,
-                    icon: Icons.bolt_outlined,
                     onSeeAll: () => Get.toNamed(AppRoutes.myInstantServices),
                     theme: theme,
                     colorScheme: colorScheme,
@@ -108,7 +107,7 @@ class HomePage extends GetView<HomeController> {
                   const SizedBox(height: 8),
                   Obx(() {
                     if (controller.instantServices.isEmpty) {
-                      return _HomeSectionEmpty(icon: Icons.bolt_outlined, colorScheme: colorScheme, theme: theme);
+                      return _HomeSectionEmpty(colorScheme: colorScheme, theme: theme);
                     }
                     return SizedBox(
                       height: 180,
@@ -120,7 +119,6 @@ class HomePage extends GetView<HomeController> {
                           return _HomeJobTile(
                             title: item.title,
                             subtitle: '৳${item.priceMin}–৳${item.priceMax}',
-                            icon: Icons.bolt_outlined,
                             image: MediaUrlHelper.resolve(item.image),
                             onTap: () => Get.toNamed(AppRoutes.myInstantServiceDetails, arguments: item.id),
                             colorScheme: colorScheme,
@@ -136,7 +134,6 @@ class HomePage extends GetView<HomeController> {
                   // ── Recruitment Requests ────────────────────────────────
                   _HomeSection(
                     title: TKeys.availableRecruitmentRequests.tr,
-                    icon: Icons.badge_outlined,
                     onSeeAll: () => Get.toNamed(AppRoutes.myRecruitmentRequests),
                     theme: theme,
                     colorScheme: colorScheme,
@@ -144,7 +141,7 @@ class HomePage extends GetView<HomeController> {
                   const SizedBox(height: 8),
                   Obx(() {
                     if (controller.recruitmentPosts.isEmpty) {
-                      return _HomeSectionEmpty(icon: Icons.badge_outlined, colorScheme: colorScheme, theme: theme);
+                      return _HomeSectionEmpty(colorScheme: colorScheme, theme: theme);
                     }
                     return SizedBox(
                       height: 180,
@@ -156,7 +153,6 @@ class HomePage extends GetView<HomeController> {
                           return _HomeJobTile(
                             title: item.title,
                             subtitle: '৳${item.salary.toInt()} • ${item.category}',
-                            icon: Icons.badge_outlined,
                             image: MediaUrlHelper.resolve(item.image),
                             onTap: () => Get.toNamed(AppRoutes.myRecruitmentRequests),
                             colorScheme: colorScheme,
@@ -207,18 +203,15 @@ class HomePage extends GetView<HomeController> {
 
 class _HomeSection extends StatelessWidget {
   final String title;
-  final IconData icon;
   final VoidCallback onSeeAll;
   final ThemeData theme;
   final ColorScheme colorScheme;
 
-  const _HomeSection({required this.title, required this.icon,
+  const _HomeSection({required this.title,
       required this.onSeeAll, required this.theme, required this.colorScheme});
 
   @override
   Widget build(BuildContext context) => Row(children: [
-    Icon(icon, size: 18, color: colorScheme.primary),
-    const SizedBox(width: 8),
     Expanded(child: Text(title, style: theme.textTheme.titleSmall?.copyWith(
         fontWeight: FontWeight.bold, color: colorScheme.onSurface))),
     TextButton(onPressed: onSeeAll, child: Text(TKeys.seeAll.tr,
@@ -229,19 +222,17 @@ class _HomeSection extends StatelessWidget {
 class _HomeJobTile extends StatelessWidget {
   final String title;
   final String subtitle;
-  final IconData icon;
   final String image;
   final VoidCallback onTap;
   final ColorScheme colorScheme;
   final ThemeData theme;
 
-  const _HomeJobTile({required this.title, required this.subtitle, required this.icon,
+  const _HomeJobTile({required this.title, required this.subtitle,
       this.image = '', required this.onTap, required this.colorScheme, required this.theme});
 
-  Widget _iconBox() => Container(
+  Widget _placeholderBox() => Container(
     width: 150, height: 100,
     decoration: BoxDecoration(color: colorScheme.primaryContainer, borderRadius: BorderRadius.circular(7)),
-    child: Icon(icon, color: colorScheme.onPrimaryContainer, size: 16),
   );
 
   @override
@@ -266,8 +257,8 @@ class _HomeJobTile extends StatelessWidget {
               borderRadius: BorderRadius.circular(7),
               child: image.isNotEmpty
                   ? AppNetworkImage(image, width: 150, height: 100, fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => _iconBox())
-                  : _iconBox(),
+                      errorBuilder: (_, __, ___) => _placeholderBox())
+                  : _placeholderBox(),
             ),
 
 
@@ -284,11 +275,10 @@ class _HomeJobTile extends StatelessWidget {
 }
 
 class _HomeSectionEmpty extends StatelessWidget {
-  final IconData icon;
   final ColorScheme colorScheme;
   final ThemeData theme;
 
-  const _HomeSectionEmpty({required this.icon, required this.colorScheme, required this.theme});
+  const _HomeSectionEmpty({required this.colorScheme, required this.theme});
 
   @override
   Widget build(BuildContext context) => Container(

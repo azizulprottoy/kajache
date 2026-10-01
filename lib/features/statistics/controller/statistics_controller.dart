@@ -43,6 +43,9 @@ class StatisticsController extends GetxController {
   bool canMakeInProgress(ProviderBidModel booking) =>
       booking.bookingStatus.trim().toLowerCase() == 'bid_selected';
 
+  bool isReassignmentOffer(ProviderBidModel booking) =>
+      booking.status.trim().toLowerCase() == 'pending_reassignment';
+
   bool isInProgress(ProviderBidModel booking) =>
       booking.bookingStatus.trim().toLowerCase() == 'in_progress';
 
