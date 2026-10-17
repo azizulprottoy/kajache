@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:kaj_ache/features/auth/controllers/register_controller.dart';
 import '../../../app/routes/app_routes.dart';
 import '../../../core/error/api_error.dart';
+import '../../../core/notifications/push_notification_service.dart';
 import '../../../core/storage/local_storage_service.dart';
 import '../../../core/storage/secure_storage_service.dart';
 import '../../../core/utils/app_services.dart';
@@ -67,6 +68,7 @@ class LoginController extends GetxController {
         AppRoutes.main,
         arguments: userType,
       );
+      PushNotificationService.to.onSignedIn();
     } catch (e) {
       AppServices.showError(apiErrorMessage(e, fallback: 'Login failed'));
     } finally {

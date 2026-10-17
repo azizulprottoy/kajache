@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../error/api_error.dart';
 import '../error/failure.dart';
 import '../network/api_client.dart';
+import '../notifications/push_notification_service.dart';
 import '../storage/local_storage_service.dart';
 import '../storage/secure_storage_service.dart';
 import '../../app/routes/app_routes.dart';
@@ -160,7 +161,10 @@ class AppServices {
 
   /// Removes the token and cached user data so the next launch starts
   /// signed out and no data leaks to the next user of the device.
-  static Future<void> clearSession() async {
+  /// [unregisterPush] is false when the backend already rejected the token.
+  static Future<void> clearSession({bool unregisterPush = true}) async {
+    // Before clearAll: unregistering the device needs the auth token.
+    await PushNotificationService.to.onSignedOut(unregister: unregisterPush);
     await Get.find<SecureStorageService>().clearAll();
     final local = Get.find<LocalStorageService>();
     for (final key in _userKeys) {
@@ -184,7 +188,7 @@ class AppServices {
     if (_handlingUnauthorized) return;
     _handlingUnauthorized = true;
     try {
-      await clearSession();
+      await clearSession(unregisterPush: false);
       showError('Session expired. Please login again.');
       Get.offAllNamed(AppRoutes.login);
     } finally {

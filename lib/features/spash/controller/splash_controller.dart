@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 
 import '../../../app/routes/app_routes.dart';
+import '../../../core/notifications/push_notification_service.dart';
 import '../../../core/storage/local_storage_service.dart';
 import '../../../core/storage/secure_storage_service.dart';
 import '../../auth/controllers/register_controller.dart';
@@ -16,6 +17,7 @@ class SplashController extends GetxController {
       Get.offAllNamed(AppRoutes.main, arguments: userType != null
           ? (userType == 'serviceProvider' ? UserType.serviceProvider : UserType.buyer)
           : UserType.buyer);
+      PushNotificationService.to.onSignedIn();
     } else {
       Get.offAllNamed(AppRoutes.login);
     }

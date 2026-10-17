@@ -105,6 +105,7 @@ class ApiEndpoints {
   // Notification
   static const String notifications = '/notification';
   static const String notification = '/notification';
+  static const String deviceToken = '/notification/device-token';
 
   // Chat
   static const String chatMessages = '/chatmessage';

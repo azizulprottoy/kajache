@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "279075178563",
+    "project_id": "kajache-82e1c",
+    "storage_bucket": "kajache-82e1c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:279075178563:android:7526896e95b8d803a1acf6",
+        "android_client_info": {
+          "package_name": "com.cloud_company_cc.kaj_ache"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBGUpo4t-LylWO3IcAiPI0LqApRWh18TQ8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
