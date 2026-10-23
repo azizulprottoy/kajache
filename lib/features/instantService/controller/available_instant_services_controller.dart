@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:kaj_ache/core/error/api_error.dart';
 import 'package:get/get.dart';
 
@@ -15,18 +16,41 @@ class AvailableInstantServicesController extends GetxController {
 
   final isLoading = false.obs;
   final instantServices = <InstantServiceModel>[].obs;
-  /// Jobs this technician was selected for (waiting for payment, ready to start, or in progress)
+  /// Jobs this technician was selected for, from waiting-for-payment through
+  /// completed/cancelled (history).
   final myJobs = <InstantServiceModel>[].obs;
 
   final isLoadingDetails = false.obs;
   final isBidLoading = false.obs;
   final isAccepting = false.obs;
+  final isSubmittingComplaint = false.obs;
   final selectedItem = Rxn<InstantServiceDetailsModel>();
+
+  /// True while a job's details are fetched / its sheet is opening, so a
+  /// double tap can't open two sheets.
+  bool isOpeningSheet = false;
+
+  /// Job to open right away, passed as `{'id': ...}` from the home page or a
+  /// notification. Read once by the page.
+  String? _initialId;
 
   @override
   void onInit() {
     super.onInit();
+    final arguments = Get.arguments;
+    if (arguments is Map) {
+      final id = arguments['id']?.toString().trim() ?? '';
+      if (id.isNotEmpty) _initialId = id;
+    } else if (arguments is String && arguments.trim().isNotEmpty) {
+      _initialId = arguments.trim();
+    }
     fetchAvailableInstantServices();
+  }
+
+  String? takeInitialId() {
+    final id = _initialId;
+    _initialId = null;
+    return id;
   }
 
   Future<void> fetchAvailableInstantServices() async {
@@ -108,6 +132,30 @@ class AvailableInstantServicesController extends GetxController {
     }
   }
 
+  Future<bool> submitComplaint({required String title, required String reason}) async {
+    final current = selectedItem.value;
+    if (current == null || isSubmittingComplaint.value) return false;
+
+    try {
+      isSubmittingComplaint.value = true;
+      await repository.submitComplaint(
+        instantServiceId: current.id,
+        title: title,
+        reason: reason,
+      );
+      return true;
+    } catch (e) {
+      Get.snackbar(
+        TKeys.error.tr,
+        apiErrorMessage(e),
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return false;
+    } finally {
+      isSubmittingComplaint.value = false;
+    }
+  }
+
   /// The selected technician locks the job once the client has paid.
   Future<bool> acceptJob() async {
     final current = selectedItem.value;
@@ -122,6 +170,8 @@ class AvailableInstantServicesController extends GetxController {
       await fetchAvailableInstantServices();
       return true;
     } catch (e) {
+      // The job changed first (e.g. cancelled): show its current state
+      if (e is DioException && e.response?.statusCode == 409) openInstantService(current.id);
       Get.snackbar(
         TKeys.error.tr,
         apiErrorMessage(e),

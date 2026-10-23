@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:get/get.dart';
 
+import '../../../core/utils/money_format.dart';
 import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/booking_status_helper.dart';
 import '../../../shared/widgets/common_app_bar.dart';
+import '../../../shared/widgets/job_feedback_sheets.dart';
 import '../controller/available_instant_services_controller.dart';
 import '../model/instant_service_model.dart';
 
@@ -16,6 +19,25 @@ import '../model/instant_service_model.dart';
 /// `lib/features/sbooking/booking_details_page.dart`), collapsed into a
 /// single page since there is no separate locked route for instant-service
 /// details on the technician side.
+///
+/// Fetches the job, then opens its details sheet. Ignores taps while a sheet
+/// is already opening.
+Future<void> _openInstantServiceSheet(AvailableInstantServicesController controller, String id) async {
+  if (id.isEmpty || controller.isOpeningSheet) return;
+  controller.isOpeningSheet = true;
+  try {
+    await controller.openInstantService(id);
+    if (controller.selectedItem.value?.id != id) return;
+    await Get.bottomSheet(
+      _InstantServiceDetailsSheet(controller: controller),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+    );
+  } finally {
+    controller.isOpeningSheet = false;
+  }
+}
+
 class AvailableInstantServicesPage extends GetView<AvailableInstantServicesController> {
   const AvailableInstantServicesPage({super.key});
 
@@ -23,6 +45,12 @@ class AvailableInstantServicesPage extends GetView<AvailableInstantServicesContr
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+
+    // A specific job was passed in (home tile / notification): open it once
+    final initialId = controller.takeInitialId();
+    if (initialId != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _openInstantServiceSheet(controller, initialId));
+    }
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
@@ -38,14 +66,7 @@ class AvailableInstantServicesPage extends GetView<AvailableInstantServicesContr
           return const Center(child: CircularProgressIndicator());
         }
 
-        Future<void> openDetails(InstantServiceModel item) async {
-          await controller.openInstantService(item.id);
-          Get.bottomSheet(
-            _InstantServiceDetailsSheet(controller: controller),
-            isScrollControlled: true,
-            backgroundColor: Colors.transparent,
-          );
-        }
+        Future<void> openDetails(InstantServiceModel item) => _openInstantServiceSheet(controller, item.id);
 
         return RefreshIndicator(
           onRefresh: controller.fetchAvailableInstantServices,
@@ -53,15 +74,19 @@ class AvailableInstantServicesPage extends GetView<AvailableInstantServicesContr
             physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.all(16),
             children: [
+              if (controller.isLoadingDetails.value) ...[
+                const LinearProgressIndicator(),
+                const SizedBox(height: 12),
+              ],
               // Jobs this technician was selected for; "Accept Job" lives in the details sheet
               if (jobs.isNotEmpty) ...[
                 Text(
-                  'My instant jobs',
+                  TKeys.myInstantJobs.tr,
                   style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Tap a job to start it once the customer has paid.',
+                  TKeys.myInstantJobsSubtitle.tr,
                   style: theme.textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
                 ),
                 const SizedBox(height: 12),
@@ -125,6 +150,7 @@ class _InstantServiceTile extends StatelessWidget {
     final iconColor = alreadyBid ? Colors.green.shade700 : colorScheme.primary;
     final statusColor = item.bidsCount > 0 ? Colors.blue : Colors.orange;
     final statusLabel = item.bidsCount > 0 ? '${item.bidsCount} ${TKeys.bids.tr}' : TKeys.noBidsYet.tr;
+    final statusInfo = BookingStatusHelper.of(item.status);
 
     return Container(
       padding: const EdgeInsets.all(14),
@@ -159,9 +185,9 @@ class _InstantServiceTile extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      [item.location.address, item.location.district.isNotEmpty ? item.location.district : item.location.city]
+                      [if (item.category.isNotEmpty) item.category, item.locationLabel]
                           .where((v) => v.trim().isNotEmpty)
-                          .join(', '),
+                          .join(' · '),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: theme.textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
@@ -183,7 +209,7 @@ class _InstantServiceTile extends StatelessWidget {
                       ),
                       if (alreadyBid && item.myBid != null)
                         Text(
-                          'My bid: ৳${item.myBid!.price}',
+                          '${TKeys.myBid.tr}: ${formatTaka(item.myBid!.price)}',
                           style: theme.textTheme.bodySmall?.copyWith(color: Colors.green.shade700, fontWeight: FontWeight.w600),
                         ),
                     ],
@@ -199,8 +225,8 @@ class _InstantServiceTile extends StatelessWidget {
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
-                  item.status.replaceAll('_', ' '),
-                  style: theme.textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
+                  statusInfo.label,
+                  style: theme.textTheme.bodySmall?.copyWith(color: statusInfo.color, fontWeight: FontWeight.w600),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -211,7 +237,9 @@ class _InstantServiceTile extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(color: Colors.green.withOpacity(0.12), borderRadius: BorderRadius.circular(20)),
                   child: Text(
-                    TKeys.bidPlaced.tr,
+                    item.myBid != null && item.myBid!.status != 'active'
+                        ? BookingStatusHelper.bid(item.myBid!.status).label
+                        : TKeys.bidPlaced.tr,
                     style: theme.textTheme.bodySmall?.copyWith(color: Colors.green.shade700, fontWeight: FontWeight.w600),
                   ),
                 )
@@ -261,16 +289,54 @@ class _InstantServiceDetailsSheet extends StatelessWidget {
 
           final item = controller.selectedItem.value;
           if (item == null) {
-            return const SizedBox(height: 120, child: Center(child: Text('Not found')));
+            return SizedBox(height: 120, child: Center(child: Text(TKeys.serviceNotFound.tr)));
           }
 
           final statusInfo = BookingStatusHelper.of(item.status);
           final myBid = item.myBid;
           final canBid = item.status.trim().toLowerCase() == 'bidding_open';
-          final isSelectedForMe = myBid != null && myBid.status.trim().toLowerCase() == 'selected';
+          final status = item.status.trim().toLowerCase();
+          final myBidStatus = myBid?.status.trim().toLowerCase() ?? '';
+          final isSelectedForMe = myBidStatus == 'selected';
           final canAccept = isSelectedForMe &&
-              item.status.trim().toLowerCase() == 'bid_selected' &&
+              status == 'bid_selected' &&
               item.paymentStatus.trim().toLowerCase() == 'paid';
+
+          // What the technician should know right now about this job
+          Widget? notice;
+          if (status == 'cancelled') {
+            final reason = item.cancellationReason?.trim() ?? '';
+            notice = JobStatusNotice(
+              icon: Icons.cancel_outlined,
+              color: Colors.red.shade700,
+              title: TKeys.jobCancelledTitle.tr,
+              message: reason.isEmpty ? TKeys.noReasonGiven.tr : '${TKeys.cancellationReasonLabel.tr}: $reason',
+            );
+          } else if (myBidStatus == 'rejected') {
+            notice = JobStatusNotice(
+              icon: Icons.info_outline,
+              color: Colors.grey.shade700,
+              message: TKeys.bidNotSelectedMsg.tr,
+            );
+          } else if (isSelectedForMe && status == 'in_progress') {
+            notice = JobStatusNotice(
+              icon: Icons.construction_rounded,
+              color: Colors.blue.shade700,
+              message: TKeys.inProgressTechnicianMsg.tr,
+            );
+          } else if (isSelectedForMe && status == 'completed') {
+            notice = JobStatusNotice(
+              icon: Icons.task_alt_rounded,
+              color: Colors.green.shade700,
+              message: TKeys.jobCompletedTechnicianMsg.tr,
+            );
+          } else if (isSelectedForMe && status == 'bid_selected' && !canAccept) {
+            notice = JobStatusNotice(
+              icon: Icons.hourglass_top_rounded,
+              color: Colors.orange.shade700,
+              message: TKeys.selectedWaitingPaymentMsg.tr,
+            );
+          }
 
           return SingleChildScrollView(
             child: Column(
@@ -310,19 +376,30 @@ class _InstantServiceDetailsSheet extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 10),
-                Text(
-                  item.details.trim().isEmpty ? TKeys.noDescription.tr : item.details,
-                  style: theme.textTheme.bodyMedium?.copyWith(height: 1.4),
-                ),
+                if (item.details.trim().isEmpty)
+                  Text(TKeys.noDescription.tr, style: theme.textTheme.bodyMedium?.copyWith(height: 1.4))
+                else
+                  Html(
+                    data: item.details,
+                    style: {
+                      'body': Style(
+                        margin: Margins.zero,
+                        padding: HtmlPaddings.zero,
+                        color: colors.onSurface,
+                        fontSize: FontSize(theme.textTheme.bodyMedium?.fontSize ?? 14),
+                        lineHeight: const LineHeight(1.4),
+                      ),
+                    },
+                  ),
                 const SizedBox(height: 14),
                 _DetailRow(icon: Icons.payments_outlined, label: TKeys.jobBudget.tr, value: item.priceRangeLabel),
-                if ([item.location.address, item.location.district, item.location.city].any((v) => v.trim().isNotEmpty))
+                if (item.category.isNotEmpty)
+                  _DetailRow(icon: Icons.category_outlined, label: TKeys.category.tr, value: item.category),
+                if (item.locationLabel.isNotEmpty)
                   _DetailRow(
                     icon: Icons.location_on_outlined,
                     label: TKeys.address.tr,
-                    value: [item.location.address, item.location.district.isNotEmpty ? item.location.district : item.location.city]
-                        .where((v) => v.trim().isNotEmpty)
-                        .join(', '),
+                    value: item.locationLabel,
                   ),
                 if (!item.schedule.isEmpty)
                   _DetailRow(
@@ -350,12 +427,25 @@ class _InstantServiceDetailsSheet extends StatelessWidget {
                           style: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 6),
-                        Text('৳${myBid.price}', style: theme.textTheme.titleMedium?.copyWith(color: colors.primary, fontWeight: FontWeight.w800)),
+                        Text(formatTaka(myBid.price), style: theme.textTheme.titleMedium?.copyWith(color: colors.primary, fontWeight: FontWeight.w800)),
                         if (myBid.estimatedArrival.isNotEmpty)
-                          Text('ETA: ${myBid.estimatedArrival}', style: theme.textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant)),
+                          Text('${TKeys.estimatedArrival.tr}: ${myBid.estimatedArrival}', style: theme.textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant)),
+                        const SizedBox(height: 4),
+                        Text(
+                          BookingStatusHelper.bid(myBid.status).label,
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            color: BookingStatusHelper.bid(myBid.status).color,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
                       ],
                     ),
                   ),
+                  const SizedBox(height: 14),
+                ],
+
+                if (notice != null) ...[
+                  notice,
                   const SizedBox(height: 14),
                 ],
 
@@ -371,17 +461,17 @@ class _InstantServiceDetailsSheet extends StatelessWidget {
                               if (Get.isBottomSheetOpen ?? false) Get.back();
                               Get.snackbar(
                                 TKeys.success.tr,
-                                'Job accepted! You can start now.',
+                                TKeys.jobAcceptedMsg.tr,
                                 snackPosition: SnackPosition.BOTTOM,
                               );
                             },
                       icon: controller.isAccepting.value
                           ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
                           : const Icon(Icons.task_alt_rounded),
-                      label: Text(controller.isAccepting.value ? 'Accepting...' : TKeys.acceptJob.tr),
+                      label: Text(controller.isAccepting.value ? TKeys.accepting.tr : TKeys.acceptJob.tr),
                     ),
                   ),
-                ] else if (canBid) ...[
+                ] else if (canBid && (myBid == null || myBidStatus == 'active')) ...[
                   SizedBox(
                     width: double.infinity,
                     child: FilledButton.icon(
@@ -402,26 +492,19 @@ class _InstantServiceDetailsSheet extends StatelessWidget {
                       label: Text(myBid != null ? TKeys.editBid.tr : TKeys.bidNow.tr),
                     ),
                   ),
-                ] else if (isSelectedForMe) ...[
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: Colors.orange.withOpacity(0.08),
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: Colors.orange.shade300),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(Icons.hourglass_top_rounded, color: Colors.orange.shade700),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            'You were selected! Waiting for the customer to pay the platform fee.',
-                            style: theme.textTheme.bodySmall?.copyWith(color: Colors.orange.shade900),
-                          ),
-                        ),
-                      ],
+                ],
+
+                // Selected technicians can raise a dispute about the job
+                if (isSelectedForMe || myBidStatus == 'cancelled') ...[
+                  const SizedBox(height: 10),
+                  JobFeedbackActions(
+                    onReport: () => Get.bottomSheet(
+                      JobComplaintSheet(
+                        isSubmitting: controller.isSubmittingComplaint,
+                        onSubmit: (title, reason) => controller.submitComplaint(title: title, reason: reason),
+                      ),
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
                     ),
                   ),
                 ],
@@ -491,41 +574,48 @@ class _InstantServiceBidSheet extends StatefulWidget {
   State<_InstantServiceBidSheet> createState() => _InstantServiceBidSheetState();
 }
 
+/// Arrival estimates offered to technicians. The English value is what the
+/// API stores (same wording as the website); the key is its label.
+const Map<String, String> _arrivalOptions = {
+  '15 mins': TKeys.eta15Mins,
+  '30 mins': TKeys.eta30Mins,
+  '45 mins': TKeys.eta45Mins,
+  '1 hour': TKeys.eta1Hour,
+  '2 hours': TKeys.eta2Hours,
+  '3 hours': TKeys.eta3Hours,
+  'Same day': TKeys.etaSameDay,
+  'Next day': TKeys.etaNextDay,
+};
+
 class _InstantServiceBidSheetState extends State<_InstantServiceBidSheet> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _price;
-  late final TextEditingController _eta;
   late final TextEditingController _message;
+  String? _eta;
 
   @override
   void initState() {
     super.initState();
     _price = TextEditingController(text: widget.initialPrice?.toString() ?? '');
-    _eta = TextEditingController(text: widget.initialEta ?? '');
     _message = TextEditingController(text: widget.initialMessage ?? '');
+    final initialEta = widget.initialEta?.trim() ?? '';
+    _eta = initialEta.isNotEmpty ? initialEta : '30 mins';
   }
 
   @override
   void dispose() {
     _price.dispose();
-    _eta.dispose();
     _message.dispose();
     super.dispose();
   }
 
-  Future<void> _pickTime() async {
-    final picked = await showTimePicker(context: context, initialTime: TimeOfDay.now());
-    if (picked != null && mounted) {
-      _eta.text = picked.format(context);
-    }
-  }
-
   Future<void> _submit() async {
+    if (widget.controller.isBidLoading.value) return;
     if (!_formKey.currentState!.validate()) return;
 
     final success = await widget.controller.submitBid(
       price: int.parse(_price.text.trim()),
-      estimatedArrival: _eta.text.trim(),
+      estimatedArrival: _eta?.trim() ?? '',
       message: _message.text.trim(),
     );
 
@@ -571,7 +661,10 @@ class _InstantServiceBidSheetState extends State<_InstantServiceBidSheet> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Price must be between ৳${widget.priceMin} and ৳${widget.priceMax}.',
+                    TKeys.bidPriceRangeMsg.trParams({
+                      'min': formatTaka(widget.priceMin),
+                      'max': formatTaka(widget.priceMax),
+                    }),
                     style: theme.textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
                   ),
                   const SizedBox(height: 18),
@@ -582,7 +675,10 @@ class _InstantServiceBidSheetState extends State<_InstantServiceBidSheet> {
                       final amount = int.tryParse(value?.trim() ?? '');
                       if (amount == null || amount <= 0) return TKeys.enterBidPriceError.tr;
                       if (amount < widget.priceMin || amount > widget.priceMax) {
-                        return 'Price must be between ৳${widget.priceMin} and ৳${widget.priceMax}';
+                        return TKeys.bidPriceRangeMsg.trParams({
+                          'min': formatTaka(widget.priceMin),
+                          'max': formatTaka(widget.priceMax),
+                        });
                       }
                       return null;
                     },
@@ -594,10 +690,17 @@ class _InstantServiceBidSheetState extends State<_InstantServiceBidSheet> {
                     ),
                   ),
                   const SizedBox(height: 14),
-                  TextFormField(
-                    controller: _eta,
-                    readOnly: true,
-                    onTap: _pickTime,
+                  DropdownButtonFormField<String>(
+                    initialValue: _eta,
+                    isExpanded: true,
+                    items: [
+                      // Keep an older free-text estimate selectable when editing
+                      if (_eta != null && !_arrivalOptions.containsKey(_eta))
+                        DropdownMenuItem(value: _eta, child: Text(_eta!, maxLines: 1, overflow: TextOverflow.ellipsis)),
+                      for (final entry in _arrivalOptions.entries)
+                        DropdownMenuItem(value: entry.key, child: Text(entry.value.tr)),
+                    ],
+                    onChanged: (value) => setState(() => _eta = value),
                     validator: (value) => value == null || value.trim().isEmpty ? TKeys.selectEstimatedTimeError.tr : null,
                     decoration: InputDecoration(
                       labelText: TKeys.estimatedArrival.tr,
@@ -609,6 +712,7 @@ class _InstantServiceBidSheetState extends State<_InstantServiceBidSheet> {
                   TextFormField(
                     controller: _message,
                     maxLines: 4,
+                    maxLength: 500,
                     decoration: InputDecoration(
                       labelText: TKeys.note.tr,
                       hintText: TKeys.noteHint.tr,

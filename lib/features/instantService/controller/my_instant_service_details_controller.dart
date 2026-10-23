@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:kaj_ache/core/error/api_error.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -25,6 +26,12 @@ class MyInstantServiceDetailsController extends GetxController {
   final isSubmittingPayment = false.obs;
   final isCompletingTask = false.obs;
   final isCancelling = false.obs;
+  final isSubmittingReview = false.obs;
+  final isSubmittingComplaint = false.obs;
+
+  /// Whether the client already rated this job's technician. Starts true so
+  /// "Rate technician" stays hidden until the check comes back.
+  final hasReviewed = true.obs;
 
   final instantService = Rxn<InstantServiceDetailsModel>();
   final selectedBidder = Rxn<InstantServiceBidModel>();
@@ -39,10 +46,21 @@ class MyInstantServiceDetailsController extends GetxController {
       instantService.value?.status.trim().toLowerCase() == 'bid_selected' &&
       instantService.value?.paymentStatus.trim().toLowerCase() != 'paid';
 
+  String get _currentUserId => Get.find<LocalStorageService>().read<String>('user_id') ?? '';
+
   bool get isOwner {
-    final currentUserId = Get.find<LocalStorageService>().read<String>('user_id') ?? '';
+    final currentUserId = _currentUserId;
     return currentUserId.isNotEmpty && currentUserId == instantService.value?.clientId;
   }
+
+  String get _status => instantService.value?.status.trim().toLowerCase() ?? '';
+
+  /// The API lets the client cancel until the technician starts the job.
+  bool get canCancel => isOwner && (_status == 'bidding_open' || _status == 'bid_selected');
+
+  bool get isFeePaid => instantService.value?.paymentStatus.trim().toLowerCase() == 'paid';
+
+  bool get canReview => isOwner && _status == 'completed' && !hasReviewed.value;
 
   int get platformFee => instantService.value?.platformFee ?? 0;
 
@@ -64,7 +82,7 @@ class MyInstantServiceDetailsController extends GetxController {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Get.snackbar(
           TKeys.error.tr,
-          'Instant service ID is missing',
+          TKeys.jobIdMissing.tr,
           snackPosition: SnackPosition.BOTTOM,
         );
       });
@@ -94,6 +112,7 @@ class MyInstantServiceDetailsController extends GetxController {
       isLoading.value = true;
       final result = await repository.getInstantService(instantServiceId);
       instantService.value = result;
+      _checkReviewed();
     } catch (e) {
       Get.snackbar(
         TKeys.error.tr,
@@ -102,6 +121,64 @@ class MyInstantServiceDetailsController extends GetxController {
       );
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  Future<void> _checkReviewed() async {
+    if (!isOwner || _status != 'completed') return;
+    try {
+      hasReviewed.value = await repository.hasReviewed(instantServiceId, _currentUserId);
+    } catch (_) {
+      // Unknown: offer the button; a repeat review gets a 409 anyway
+      hasReviewed.value = false;
+    }
+  }
+
+  Future<bool> submitReview({required int rating, required String review}) async {
+    if (isSubmittingReview.value) return false;
+
+    try {
+      isSubmittingReview.value = true;
+      await repository.submitReview(
+        instantServiceId: instantServiceId,
+        rating: rating,
+        review: review,
+      );
+      hasReviewed.value = true;
+      return true;
+    } catch (e) {
+      if (e is DioException && e.response?.statusCode == 409) hasReviewed.value = true;
+      Get.snackbar(
+        TKeys.error.tr,
+        apiErrorMessage(e),
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return false;
+    } finally {
+      isSubmittingReview.value = false;
+    }
+  }
+
+  Future<bool> submitComplaint({required String title, required String reason}) async {
+    if (isSubmittingComplaint.value) return false;
+
+    try {
+      isSubmittingComplaint.value = true;
+      await repository.submitComplaint(
+        instantServiceId: instantServiceId,
+        title: title,
+        reason: reason,
+      );
+      return true;
+    } catch (e) {
+      Get.snackbar(
+        TKeys.error.tr,
+        apiErrorMessage(e),
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return false;
+    } finally {
+      isSubmittingComplaint.value = false;
     }
   }
 
@@ -117,7 +194,7 @@ class MyInstantServiceDetailsController extends GetxController {
     if (instantServiceId.isEmpty || bid.id.isEmpty) {
       Get.snackbar(
         TKeys.error.tr,
-        'Instant service or bid ID is missing',
+        TKeys.jobIdMissing.tr,
         snackPosition: SnackPosition.BOTTOM,
       );
       return false;
@@ -134,6 +211,8 @@ class MyInstantServiceDetailsController extends GetxController {
       await fetchInstantService();
       return true;
     } catch (e) {
+      // Someone else changed the job first (409): show its current state
+      if (e is DioException && e.response?.statusCode == 409) fetchInstantService();
       Get.snackbar(
         TKeys.error.tr,
         apiErrorMessage(e),
@@ -151,7 +230,7 @@ class MyInstantServiceDetailsController extends GetxController {
     if (!isPaymentDue) {
       Get.snackbar(
         TKeys.error.tr,
-        'Payment is not due for this instant service',
+        TKeys.paymentNotDue.tr,
         snackPosition: SnackPosition.BOTTOM,
       );
       return false;
@@ -178,6 +257,8 @@ class MyInstantServiceDetailsController extends GetxController {
       await fetchInstantService();
       return true;
     } catch (e) {
+      // Someone else changed the job first (409): show its current state
+      if (e is DioException && e.response?.statusCode == 409) fetchInstantService();
       Get.snackbar(
         TKeys.error.tr,
         apiErrorMessage(e),
@@ -192,8 +273,8 @@ class MyInstantServiceDetailsController extends GetxController {
   Future<bool> completeInstantService() async {
     if (instantService.value?.status.trim().toLowerCase() != 'in_progress') {
       Get.snackbar(
-        'Unable to complete',
-        'Only an in-progress job can be marked as completed',
+        TKeys.error.tr,
+        TKeys.onlyInProgressCanComplete.tr,
         snackPosition: SnackPosition.BOTTOM,
       );
       return false;
@@ -207,6 +288,8 @@ class MyInstantServiceDetailsController extends GetxController {
       await fetchInstantService();
       return true;
     } catch (e) {
+      // Someone else changed the job first (409): show its current state
+      if (e is DioException && e.response?.statusCode == 409) fetchInstantService();
       Get.snackbar(
         TKeys.error.tr,
         apiErrorMessage(e),
@@ -227,11 +310,13 @@ class MyInstantServiceDetailsController extends GetxController {
       await fetchInstantService();
       Get.snackbar(
         TKeys.success.tr,
-        'Instant service cancelled.',
+        TKeys.instantServiceCancelled.tr,
         snackPosition: SnackPosition.BOTTOM,
       );
       return true;
     } catch (e) {
+      // Someone else changed the job first (409): show its current state
+      if (e is DioException && e.response?.statusCode == 409) fetchInstantService();
       Get.snackbar(
         TKeys.error.tr,
         apiErrorMessage(e),

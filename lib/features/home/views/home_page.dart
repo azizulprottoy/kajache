@@ -11,6 +11,7 @@ import '../../services/views/popular_services_list.dart';
 import '../../../app/theme/context_extension.dart';
 import '../controllers/home_controller.dart';
 import '../../../core/utils/media_url_helper.dart';
+import '../../../core/utils/money_format.dart';
 import 'package:kaj_ache/shared/widgets/app_network_image.dart';
 
 class HomePage extends GetView<HomeController> {
@@ -101,7 +102,7 @@ class HomePage extends GetView<HomeController> {
 
                   // ── Instant Service Requests ────────────────────────────
                   _HomeSection(
-                    title: TKeys.availableInstantServices.tr,
+                    title: TKeys.myInstantRequests.tr,
                     onSeeAll: () => Get.toNamed(AppRoutes.myInstantServices),
                     theme: theme,
                     colorScheme: colorScheme,
@@ -120,7 +121,7 @@ class HomePage extends GetView<HomeController> {
                           final item = controller.instantServices[i];
                           return _HomeJobTile(
                             title: item.title,
-                            subtitle: '৳${item.priceMin}–৳${item.priceMax}',
+                            subtitle: item.priceRangeLabel,
                             image: MediaUrlHelper.resolve(item.image),
                             onTap: () => Get.toNamed(AppRoutes.myInstantServiceDetails, arguments: item.id),
                             colorScheme: colorScheme,
@@ -135,7 +136,7 @@ class HomePage extends GetView<HomeController> {
 
                   // ── Recruitment Requests ────────────────────────────────
                   _HomeSection(
-                    title: TKeys.availableRecruitmentRequests.tr,
+                    title: TKeys.myActiveJobPosts.tr,
                     onSeeAll: () => Get.toNamed(AppRoutes.myRecruitmentRequests),
                     theme: theme,
                     colorScheme: colorScheme,
@@ -154,9 +155,10 @@ class HomePage extends GetView<HomeController> {
                           final item = controller.recruitmentPosts[i];
                           return _HomeJobTile(
                             title: item.title,
-                            subtitle: '৳${item.salary.toInt()} • ${item.category}',
+                            subtitle: [formatTaka(item.salary), if (item.category.isNotEmpty) item.category]
+                                .join(' • '),
                             image: MediaUrlHelper.resolve(item.image),
-                            onTap: () => Get.toNamed(AppRoutes.myRecruitmentRequests),
+                            onTap: () => Get.toNamed(AppRoutes.myRecruitmentRequestDetails, arguments: item.id),
                             colorScheme: colorScheme,
                             theme: theme,
                           );
@@ -290,7 +292,7 @@ class _HomeSectionEmpty extends StatelessWidget {
     width: double.infinity,
     padding: const EdgeInsets.symmetric(vertical: 16),
     child: Center(
-      child: Text('No posts yet', style: theme.textTheme.bodySmall?.copyWith(
+      child: Text(TKeys.noPostsYet.tr, style: theme.textTheme.bodySmall?.copyWith(
           color: colorScheme.onSurfaceVariant)),
     ),
   );

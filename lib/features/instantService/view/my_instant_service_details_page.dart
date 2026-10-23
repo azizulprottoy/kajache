@@ -3,11 +3,15 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:get/get.dart';
 
 import '../../../core/utils/media_url_helper.dart';
+import '../../../core/utils/money_format.dart';
 import '../../../core/utils/translation_keys.dart';
+import '../../../shared/widgets/booking_status_helper.dart';
 import '../../../shared/widgets/common_app_bar.dart';
+import '../../../shared/widgets/job_feedback_sheets.dart';
 import '../controller/my_instant_service_details_controller.dart';
 import '../model/instant_service_model.dart';
 import 'package:kaj_ache/shared/widgets/app_network_image.dart';
+import '../../../shared/widgets/technician_portfolio_section.dart';
 
 class MyInstantServiceDetailsPage extends GetView<MyInstantServiceDetailsController> {
   const MyInstantServiceDetailsPage({super.key});
@@ -31,6 +35,8 @@ class MyInstantServiceDetailsPage extends GetView<MyInstantServiceDetailsControl
           return _ErrorState(onRetry: controller.fetchInstantService);
         }
 
+        final status = item.status.trim().toLowerCase();
+
         return RefreshIndicator(
           onRefresh: controller.fetchInstantService,
           child: ListView(
@@ -39,12 +45,14 @@ class MyInstantServiceDetailsPage extends GetView<MyInstantServiceDetailsControl
             children: [
               _JobCard(item: item),
 
-              if (controller.isPaymentDue) ...[
+              ..._statusNotices(item, status),
+
+              if (controller.isPaymentDue && controller.isOwner) ...[
                 const SizedBox(height: 14),
                 _PaymentDueBanner(controller: controller),
               ],
 
-              if (controller.isOwner && item.status.trim().toLowerCase() == 'bidding_open') ...[
+              if (controller.canCancel) ...[
                 const SizedBox(height: 14),
                 Obx(() => SizedBox(
                       width: double.infinity,
@@ -52,10 +60,12 @@ class MyInstantServiceDetailsPage extends GetView<MyInstantServiceDetailsControl
                         onPressed: controller.isCancelling.value
                             ? null
                             : () async {
-                                final reason = await _promptReason(
+                                final reason = await promptJobCancelReason(
                                   context,
-                                  TKeys.cancelInstantService.tr,
-                                  'Why are you cancelling?',
+                                  title: TKeys.cancelInstantService.tr,
+                                  message: controller.isFeePaid
+                                      ? TKeys.cancelInstantPaidMsg.tr
+                                      : TKeys.cancelInstantMsg.tr,
                                 );
                                 if (reason == null) return;
                                 await controller.cancelInstantService(reason: reason);
@@ -78,7 +88,7 @@ class MyInstantServiceDetailsPage extends GetView<MyInstantServiceDetailsControl
                     )),
               ],
 
-              if (item.status.trim().toLowerCase() == 'in_progress') ...[
+              if (controller.isOwner && status == 'in_progress') ...[
                 const SizedBox(height: 14),
                 Obx(
                   () => SizedBox(
@@ -87,7 +97,11 @@ class MyInstantServiceDetailsPage extends GetView<MyInstantServiceDetailsControl
                       onPressed: controller.isCompletingTask.value
                           ? null
                           : () async {
-                              final confirmed = await _confirmTaskCompletion(context);
+                              final confirmed = await showJobConfirmDialog(
+                                context,
+                                title: TKeys.markTaskComplete.tr,
+                                message: TKeys.confirmTechnicianFinished.tr,
+                              );
                               if (!confirmed) return;
 
                               final success = await controller.completeInstantService();
@@ -107,16 +121,43 @@ class MyInstantServiceDetailsPage extends GetView<MyInstantServiceDetailsControl
                             )
                           : const Icon(Icons.task_alt_rounded),
                       label: Text(
-                        controller.isCompletingTask.value ? 'Completing...' : TKeys.markTaskComplete.tr,
+                        controller.isCompletingTask.value ? TKeys.completing.tr : TKeys.markTaskComplete.tr,
                       ),
                     ),
                   ),
                 ),
               ],
 
+              if (controller.isOwner) ...[
+                const SizedBox(height: 14),
+                Obx(() => JobFeedbackActions(
+                      onRate: controller.canReview
+                          ? () => Get.bottomSheet(
+                                JobReviewSheet(
+                                  isSubmitting: controller.isSubmittingReview,
+                                  onSubmit: (rating, review) =>
+                                      controller.submitReview(rating: rating, review: review),
+                                ),
+                                isScrollControlled: true,
+                                backgroundColor: Colors.transparent,
+                              )
+                          : null,
+                      onReport: () => Get.bottomSheet(
+                        JobComplaintSheet(
+                          isSubmitting: controller.isSubmittingComplaint,
+                          onSubmit: (title, reason) =>
+                              controller.submitComplaint(title: title, reason: reason),
+                        ),
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                      ),
+                    )),
+              ],
+
+              const SizedBox(height: 14),
               _SectionTitle(
                 icon: Icons.gavel_outlined,
-                title: 'Submitted bids',
+                title: TKeys.submittedBids.tr,
                 count: item.bids.length,
               ),
               const SizedBox(height: 10),
@@ -145,52 +186,53 @@ class MyInstantServiceDetailsPage extends GetView<MyInstantServiceDetailsControl
     );
   }
 
-  Future<String?> _promptReason(BuildContext context, String title, String hint) async {
-    final ctrl = TextEditingController();
-    return showDialog<String>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(title),
-        content: TextField(
-          controller: ctrl,
-          maxLines: 3,
-          decoration: InputDecoration(
-            hintText: hint,
-            border: const OutlineInputBorder(),
-          ),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(TKeys.cancel.tr)),
-          FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.error),
-            onPressed: () => Navigator.pop(ctx, ctrl.text.trim()),
-            child: Text(TKeys.confirm.tr),
-          ),
-        ],
-      ),
-    );
-  }
+  /// State banners for the client: waiting on the technician, work in
+  /// progress, cancellation reason, refund state.
+  List<Widget> _statusNotices(InstantServiceDetailsModel item, String status) {
+    final paymentStatus = item.paymentStatus.trim().toLowerCase();
+    final notices = <Widget>[];
 
-  Future<bool> _confirmTaskCompletion(BuildContext context) async {
-    final result = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(TKeys.markTaskComplete.tr),
-        content: const Text('Confirm that the technician has finished this job.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: Text(TKeys.cancel.tr),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: Text(TKeys.confirm.tr),
-          ),
-        ],
-      ),
-    );
+    if (status == 'bid_selected' && paymentStatus == 'paid') {
+      notices.add(JobStatusNotice(
+        icon: Icons.hourglass_top_rounded,
+        color: Colors.orange.shade700,
+        message: TKeys.paidWaitingTechnicianAccept.tr,
+      ));
+    } else if (status == 'in_progress') {
+      notices.add(JobStatusNotice(
+        icon: Icons.construction_rounded,
+        color: Colors.blue.shade700,
+        message: controller.isOwner ? TKeys.inProgressClientMsg.tr : TKeys.inProgressTechnicianMsg.tr,
+      ));
+    } else if (status == 'cancelled') {
+      final reason = item.cancellationReason?.trim() ?? '';
+      notices.add(JobStatusNotice(
+        icon: Icons.cancel_outlined,
+        color: Colors.red.shade700,
+        title: TKeys.jobCancelledTitle.tr,
+        message: reason.isEmpty
+            ? TKeys.noReasonGiven.tr
+            : '${TKeys.cancellationReasonLabel.tr}: $reason',
+      ));
+    }
 
-    return result ?? false;
+    if (paymentStatus == 'refund_pending') {
+      notices.add(JobStatusNotice(
+        icon: Icons.currency_exchange_rounded,
+        color: Colors.orange.shade700,
+        message: TKeys.refundPendingMsg.tr,
+      ));
+    } else if (paymentStatus == 'refunded') {
+      notices.add(JobStatusNotice(
+        icon: Icons.check_circle_outline,
+        color: Colors.green.shade700,
+        message: TKeys.refundedMsg.tr,
+      ));
+    }
+
+    return [
+      for (final notice in notices) ...[const SizedBox(height: 14), notice],
+    ];
   }
 }
 
@@ -220,14 +262,14 @@ class _PaymentDueBanner extends StatelessWidget {
               Icon(Icons.payments_outlined, color: colors.primary, size: 20),
               const SizedBox(width: 8),
               Text(
-                'Payment required',
+                TKeys.paymentRequired.tr,
                 style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
               ),
             ],
           ),
           const SizedBox(height: 4),
           Text(
-            'You selected a technician for this job. Pay the platform fee to let them start.',
+            TKeys.instantPayFeeToStart.tr,
             style: theme.textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
           ),
           const SizedBox(height: 12),
@@ -282,7 +324,7 @@ class _InstantServicePaymentSheetState extends State<_InstantServicePaymentSheet
     Navigator.of(context).pop();
     Get.snackbar(
       TKeys.success.tr,
-      'Payment confirmed. The technician can now start the job.',
+      TKeys.instantPaymentConfirmedMsg.tr,
       snackPosition: SnackPosition.BOTTOM,
     );
   }
@@ -292,9 +334,10 @@ class _InstantServicePaymentSheetState extends State<_InstantServicePaymentSheet
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     final controller = widget.controller;
+    // Only the platform fee is paid here; the bid amount goes to the
+    // technician directly.
     final fee = controller.platformFee;
     final bidPrice = controller.selectedBid?.price ?? 0;
-    final total = fee + bidPrice;
 
     return SafeArea(
       top: false,
@@ -327,7 +370,7 @@ class _InstantServicePaymentSheetState extends State<_InstantServicePaymentSheet
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'A technician has been selected. Pay the platform fee + bid amount to confirm.',
+                    TKeys.instantPaySheetSubtitle.tr,
                     textAlign: TextAlign.center,
                     style: theme.textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
                   ),
@@ -351,20 +394,7 @@ class _InstantServicePaymentSheetState extends State<_InstantServicePaymentSheet
                                 style: theme.textTheme.bodyMedium?.copyWith(color: colors.onSurfaceVariant),
                               ),
                             ),
-                            Text('৳$fee', style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                TKeys.jobBudget.tr,
-                                style: theme.textTheme.bodyMedium?.copyWith(color: colors.onSurfaceVariant),
-                              ),
-                            ),
-                            Text('৳$bidPrice',
-                                style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+                            Text(formatTaka(fee), style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
                           ],
                         ),
                         const Divider(height: 20),
@@ -377,7 +407,7 @@ class _InstantServicePaymentSheetState extends State<_InstantServicePaymentSheet
                               ),
                             ),
                             Text(
-                              '৳$total',
+                              formatTaka(fee),
                               style: theme.textTheme.titleLarge?.copyWith(
                                 fontWeight: FontWeight.bold,
                                 color: colors.primary,
@@ -388,6 +418,15 @@ class _InstantServicePaymentSheetState extends State<_InstantServicePaymentSheet
                       ],
                     ),
                   ),
+
+                  if (bidPrice > 0) ...[
+                    const SizedBox(height: 10),
+                    JobStatusNotice(
+                      icon: Icons.handshake_outlined,
+                      color: colors.primary,
+                      message: TKeys.bidPaidToTechnicianDirectly.trParams({'amount': formatTaka(bidPrice)}),
+                    ),
+                  ],
 
                   const SizedBox(height: 16),
 
@@ -513,7 +552,7 @@ class _InstantServicePaymentSheetState extends State<_InstantServicePaymentSheet
                                 height: 20,
                                 child: CircularProgressIndicator(strokeWidth: 2),
                               )
-                            : Text('${TKeys.payNow.tr} ৳$total'),
+                            : Text('${TKeys.payNow.tr} ${formatTaka(fee)}'),
                       ),
                     );
                   }),
@@ -557,11 +596,15 @@ class _BidderProfileSheet extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Container(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.9,
+        ),
         padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
         decoration: BoxDecoration(
           color: colors.surface,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(26)),
         ),
+        child: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -620,7 +663,7 @@ class _BidderProfileSheet extends StatelessWidget {
                 Expanded(
                   child: _ProfileStat(
                     icon: Icons.star_rounded,
-                    label: 'Rating',
+                    label: TKeys.rating.tr,
                     value: bid.provider.rating.toStringAsFixed(1),
                     color: Colors.amber.shade700,
                   ),
@@ -629,7 +672,7 @@ class _BidderProfileSheet extends StatelessWidget {
                 Expanded(
                   child: _ProfileStat(
                     icon: Icons.task_alt_rounded,
-                    label: 'Jobs completed',
+                    label: TKeys.completedJobs.tr,
                     value: '${bid.provider.totalJobsCompleted}',
                     color: Colors.green,
                   ),
@@ -643,27 +686,29 @@ class _BidderProfileSheet extends StatelessWidget {
 
             _ProfileInformationRow(
               icon: Icons.payments_outlined,
-              label: 'Bid amount',
-              value: '৳${bid.price}',
+              label: TKeys.bidAmount.tr,
+              value: formatTaka(bid.price),
             ),
             if (bid.estimatedArrival.isNotEmpty)
               _ProfileInformationRow(
                 icon: Icons.access_time_outlined,
-                label: 'Estimated arrival',
+                label: TKeys.estimatedArrival.tr,
                 value: bid.estimatedArrival,
               ),
             if (bid.message.isNotEmpty)
               _ProfileInformationRow(
                 icon: Icons.message_outlined,
-                label: 'Bid message',
+                label: TKeys.bidMessage.tr,
                 value: bid.message,
               ),
 
             const SizedBox(height: 18),
+            TechnicianPortfolioSection(technicianId: bid.provider.id),
+            const SizedBox(height: 18),
 
             Obx(() {
               final status = controller.instantService.value?.status.trim().toLowerCase() ?? '';
-              final canSelect = status == 'bidding_open';
+              final canSelect = status == 'bidding_open' && controller.isOwner;
 
               if (!canSelect) return const SizedBox.shrink();
 
@@ -680,7 +725,7 @@ class _BidderProfileSheet extends StatelessWidget {
 
                           Get.snackbar(
                             TKeys.success.tr,
-                            'Bidder selected. Pay the platform fee to let them start.',
+                            TKeys.bidderSelectedPayMsg.tr,
                             snackPosition: SnackPosition.BOTTOM,
                           );
 
@@ -699,11 +744,12 @@ class _BidderProfileSheet extends StatelessWidget {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : const Icon(Icons.check_circle_outline),
-                  label: Text(controller.isSelectingBid.value ? 'Selecting...' : TKeys.selectBidder.tr),
+                  label: Text(controller.isSelectingBid.value ? TKeys.selecting.tr : TKeys.selectBidder.tr),
                 ),
               );
             }),
           ],
+        ),
         ),
       ),
     );
@@ -795,9 +841,7 @@ class _JobCard extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     final imageUrl = MediaUrlHelper.resolve(item.image);
-    final location = [item.location.address, item.location.district.isNotEmpty ? item.location.district : item.location.city]
-        .where((part) => part.trim().isNotEmpty)
-        .join(', ');
+    final location = item.locationLabel;
 
     return Container(
       padding: const EdgeInsets.all(8),
@@ -837,12 +881,23 @@ class _JobCard extends StatelessWidget {
                         fontWeight: FontWeight.w700,
                       ),
                     ),
+                    const SizedBox(height: 6),
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 6,
+                      children: [
+                        _Chip(info: BookingStatusHelper.of(item.status)),
+                        if (item.paymentStatus.trim().toLowerCase() != 'unpaid')
+                          _Chip(info: BookingStatusHelper.payment(item.paymentStatus)),
+                      ],
+                    ),
                   ],
                 ),
               ),
             ],
           ),
 
+          const SizedBox(height: 12),
           if (item.details.trim().isEmpty)
             Text(
               TKeys.noDescription.tr,
@@ -862,15 +917,17 @@ class _JobCard extends StatelessWidget {
               },
             ),
 
+          const SizedBox(height: 12),
+          if (item.category.isNotEmpty) ...[
+            _InfoRow(icon: Icons.category_outlined, text: item.category),
+            const SizedBox(height: 12),
+          ],
           if (location.isNotEmpty) ...[
             _InfoRow(icon: Icons.location_on_outlined, text: location),
             const SizedBox(height: 12),
           ],
-          if (!item.schedule.isEmpty) ...[
+          if (!item.schedule.isEmpty)
             _InfoRow(icon: Icons.event_outlined, text: '${item.schedule.date}  ${item.schedule.time}'.trim()),
-            const SizedBox(height: 12),
-          ],
-          _InfoRow(icon: Icons.pending_actions_outlined, text: item.status.replaceAll('_', ' ')),
         ],
       ),
     );
@@ -972,14 +1029,14 @@ class _BidCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 3),
                         Text(
-                          'Tap to view profile',
+                          TKeys.tapToViewProfile.tr,
                           style: theme.textTheme.bodySmall?.copyWith(color: colors.primary),
                         ),
                       ],
                     ),
                   ),
                   Text(
-                    '৳${bid.price}',
+                    formatTaka(bid.price),
                     style: theme.textTheme.titleMedium?.copyWith(color: colors.primary, fontWeight: FontWeight.w800),
                   ),
                   const SizedBox(width: 4),
@@ -988,7 +1045,7 @@ class _BidCard extends StatelessWidget {
               ),
               if (bid.estimatedArrival.isNotEmpty) ...[
                 const SizedBox(height: 10),
-                _InfoRow(icon: Icons.access_time_outlined, text: 'Estimated arrival: ${bid.estimatedArrival}'),
+                _InfoRow(icon: Icons.access_time_outlined, text: '${TKeys.estimatedArrival.tr}: ${bid.estimatedArrival}'),
               ],
               if (bid.message.isNotEmpty) ...[
                 const SizedBox(height: 8),
@@ -997,6 +1054,27 @@ class _BidCard extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _Chip extends StatelessWidget {
+  final BookingStatusInfo info;
+
+  const _Chip({required this.info});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: info.color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(30),
+      ),
+      child: Text(
+        info.label,
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(color: info.color, fontWeight: FontWeight.w700),
       ),
     );
   }

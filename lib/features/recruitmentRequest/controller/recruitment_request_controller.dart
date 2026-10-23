@@ -36,6 +36,13 @@ class RecruitmentRequestController extends GetxController {
   final durationController = TextEditingController();
   final salaryController = TextEditingController();
   final salaryValue = 0.0.obs;
+  final durationValue = ''.obs;
+
+  /// API limits (see API_Server src/utils/jobRequest.js TEXT_LIMITS).
+  static const int titleMaxLength = 150;
+  static const int durationMaxLength = 100;
+  static const int detailsMaxLength = 5000;
+  static const int maxSalary = 10000000;
 
   /// Optional cover photo submitted alongside the post.
   final pickedImage = Rxn<File>();
@@ -95,18 +102,20 @@ class RecruitmentRequestController extends GetxController {
     }
   }
 
+  /// First problem with the job details, or null when they're valid.
+  String? _detailsError() {
+    if (titleController.text.trim().isEmpty) return TKeys.jobTitleRequired.tr;
+    if (durationController.text.trim().isEmpty) return TKeys.durationRequired.tr;
+    final salary = num.tryParse(salaryController.text.trim());
+    if (salary == null || salary <= 0) return TKeys.salaryInvalid.tr;
+    if (salary > maxSalary) return TKeys.amountTooLarge.tr;
+    return null;
+  }
+
   String? validateStep() {
     if (currentStep.value == 1) {
-      if (titleController.text.trim().isEmpty) {
-        return TKeys.recruitmentDetailsHint.tr;
-      }
-      if (durationController.text.trim().isEmpty) {
-        return TKeys.durationHint.tr;
-      }
-      final salary = num.tryParse(salaryController.text.trim());
-      if (salary == null || salary <= 0) {
-        return TKeys.salaryHint.tr;
-      }
+      final error = _detailsError();
+      if (error != null) return error;
     }
 
     if (currentStep.value == 2) {
@@ -146,18 +155,13 @@ class RecruitmentRequestController extends GetxController {
   }
 
   Future<void> submitRequest() async {
+    // A second tap while creating/paying would post the job twice
+    if (isLoading.value) return;
+
     // Validate all fields regardless of step
-    if (titleController.text.trim().isEmpty) {
-      Get.snackbar(TKeys.validation.tr, TKeys.recruitmentDetailsHint.tr, snackPosition: SnackPosition.BOTTOM);
-      return;
-    }
-    if (durationController.text.trim().isEmpty) {
-      Get.snackbar(TKeys.validation.tr, TKeys.durationHint.tr, snackPosition: SnackPosition.BOTTOM);
-      return;
-    }
-    final salary = num.tryParse(salaryController.text.trim());
-    if (salary == null || salary <= 0) {
-      Get.snackbar(TKeys.validation.tr, TKeys.salaryHint.tr, snackPosition: SnackPosition.BOTTOM);
+    final detailsError = _detailsError();
+    if (detailsError != null) {
+      Get.snackbar(TKeys.validation.tr, detailsError, snackPosition: SnackPosition.BOTTOM);
       return;
     }
     if (transactionIdController.text.trim().isEmpty) {
@@ -169,6 +173,14 @@ class RecruitmentRequestController extends GetxController {
       isLoading.value = true;
 
       final detailsHtml = (await detailsEditorController.getText()).trim();
+      if (detailsHtml.length > detailsMaxLength) {
+        Get.snackbar(
+          TKeys.validation.tr,
+          TKeys.detailsTooLong.trParams({'max': '$detailsMaxLength'}),
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        return;
+      }
 
       /// 1. CREATE the job posting — starts as `pending_payment`, bidding
       /// is not open yet.

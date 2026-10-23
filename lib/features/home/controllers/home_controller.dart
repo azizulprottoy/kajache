@@ -46,7 +46,7 @@ class HomeController extends GetxController {
   Future<void> fetchHomeData() async {
     isLoading.value = true;
 
-    _fetchPublicLists();
+    _fetchMyActiveLists();
 
     // Each section loads independently so one failing endpoint doesn't
     // hide the others; only the first error is shown.
@@ -94,14 +94,23 @@ class HomeController extends GetxController {
     });
   }
 
-  // Background lists: failures stay silent, but each loads on its own.
-  Future<void> _fetchPublicLists() async {
+  // The customer's own active instant requests and job posts (/available is
+  // technicians only). Failures stay silent, but each loads on its own.
+  Future<void> _fetchMyActiveLists() async {
     await Future.wait([
-      _instantRepo.getAvailableInstantServices().then((list) {
-        if (!isClosed) instantServices.assignAll(list);
+      _instantRepo.getMyInstantServices().then((list) {
+        if (!isClosed) {
+          instantServices.assignAll(list.where(
+            (item) => item.status != 'completed' && item.status != 'cancelled',
+          ));
+        }
       }).catchError((_) {}),
-      _recruitRepo.getAvailableRecruitmentRequests().then((list) {
-        if (!isClosed) recruitmentPosts.assignAll(list);
+      _recruitRepo.getMyRecruitmentRequests().then((list) {
+        if (!isClosed) {
+          recruitmentPosts.assignAll(list.where(
+            (item) => item.status != 'ended' && item.status != 'cancelled',
+          ));
+        }
       }).catchError((_) {}),
     ]);
   }

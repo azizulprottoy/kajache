@@ -4,11 +4,15 @@ import 'package:get/get.dart';
 
 import '../../../app/theme/context_extension.dart';
 import '../../../core/utils/media_url_helper.dart';
+import '../../../core/utils/money_format.dart';
 import '../../../core/utils/translation_keys.dart';
+import '../../../shared/widgets/booking_status_helper.dart';
 import '../../../shared/widgets/common_app_bar.dart';
+import '../../../shared/widgets/job_feedback_sheets.dart';
 import '../controller/my_recruitment_request_details_controller.dart';
 import '../model/recruitment_request_model.dart';
 import 'package:kaj_ache/shared/widgets/app_network_image.dart';
+import '../../../shared/widgets/technician_portfolio_section.dart';
 
 class MyRecruitmentRequestDetailsPage extends GetView<MyRecruitmentRequestDetailsController> {
   const MyRecruitmentRequestDetailsPage({super.key});
@@ -42,12 +46,14 @@ class MyRecruitmentRequestDetailsPage extends GetView<MyRecruitmentRequestDetail
             children: [
               _JobCard(request: req),
 
-              if (controller.isPaymentDue) ...[
+              ..._statusNotices(req, status),
+
+              if (controller.isPaymentDue && controller.isOwner) ...[
                 const SizedBox(height: 14),
                 _PayToPostBanner(controller: controller),
               ],
 
-              if (status == 'hired') ...[
+              if (controller.isOwner && status == 'hired') ...[
                 const SizedBox(height: 14),
                 Obx(() => SizedBox(
                       width: double.infinity,
@@ -55,7 +61,11 @@ class MyRecruitmentRequestDetailsPage extends GetView<MyRecruitmentRequestDetail
                         onPressed: controller.isEnding.value
                             ? null
                             : () async {
-                                final confirmed = await _confirmEnd(context);
+                                final confirmed = await showJobConfirmDialog(
+                                  context,
+                                  title: TKeys.endEngagement.tr,
+                                  message: TKeys.confirmEndEngagement.tr,
+                                );
                                 if (!confirmed) return;
                                 final success = await controller.endEngagement();
                                 if (!success) return;
@@ -77,7 +87,7 @@ class MyRecruitmentRequestDetailsPage extends GetView<MyRecruitmentRequestDetail
                     )),
               ],
 
-              if (status != 'ended' && status != 'cancelled' && status != 'hired') ...[
+              if (controller.canCancel) ...[
                 const SizedBox(height: 14),
                 Obx(() => SizedBox(
                       width: double.infinity,
@@ -85,10 +95,14 @@ class MyRecruitmentRequestDetailsPage extends GetView<MyRecruitmentRequestDetail
                         onPressed: controller.isCancelling.value
                             ? null
                             : () async {
-                                final reason = await _promptReason(
+                                final reason = await promptJobCancelReason(
                                   context,
-                                  TKeys.cancelJobPost.tr,
-                                  'Why are you cancelling this job post?',
+                                  title: TKeys.cancelJobPost.tr,
+                                  message: switch (status) {
+                                    'hired' => TKeys.cancelHiredFeeKeptMsg.tr,
+                                    'hiring_open' => TKeys.cancelHiringOpenRefundMsg.tr,
+                                    _ => TKeys.cancelJobPostMsg.tr,
+                                  },
                                 );
                                 if (reason == null) return;
                                 final success =
@@ -115,6 +129,32 @@ class MyRecruitmentRequestDetailsPage extends GetView<MyRecruitmentRequestDetail
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(14)),
                         ),
+                      ),
+                    )),
+              ],
+
+              if (controller.isOwner) ...[
+                const SizedBox(height: 14),
+                Obx(() => JobFeedbackActions(
+                      onRate: controller.canReview
+                          ? () => Get.bottomSheet(
+                                JobReviewSheet(
+                                  isSubmitting: controller.isSubmittingReview,
+                                  onSubmit: (rating, review) =>
+                                      controller.submitReview(rating: rating, review: review),
+                                ),
+                                isScrollControlled: true,
+                                backgroundColor: Colors.transparent,
+                              )
+                          : null,
+                      onReport: () => Get.bottomSheet(
+                        JobComplaintSheet(
+                          isSubmitting: controller.isSubmittingComplaint,
+                          onSubmit: (title, reason) =>
+                              controller.submitComplaint(title: title, reason: reason),
+                        ),
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
                       ),
                     )),
               ],
@@ -151,48 +191,46 @@ class MyRecruitmentRequestDetailsPage extends GetView<MyRecruitmentRequestDetail
     );
   }
 
-  Future<String?> _promptReason(BuildContext context, String title, String hint) async {
-    final ctrl = TextEditingController();
-    return showDialog<String>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(title),
-        content: TextField(
-          controller: ctrl,
-          maxLines: 3,
-          decoration: InputDecoration(hintText: hint, border: const OutlineInputBorder()),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(TKeys.cancel.tr)),
-          FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.error),
-            onPressed: () => Navigator.pop(ctx, ctrl.text.trim()),
-            child: Text(TKeys.confirm.tr),
-          ),
-        ],
-      ),
-    );
-  }
+  /// Cancellation reason and fee refund/forfeit state.
+  List<Widget> _statusNotices(RecruitmentRequestDetailsModel req, String status) {
+    final paymentStatus = req.paymentStatus.trim().toLowerCase();
+    final notices = <Widget>[];
 
-  Future<bool> _confirmEnd(BuildContext context) async {
-    final result = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(TKeys.endEngagement.tr),
-        content: const Text('End this engagement with the hired technician?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: Text(TKeys.cancel.tr),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: Text(TKeys.confirm.tr),
-          ),
-        ],
-      ),
-    );
-    return result ?? false;
+    if (status == 'cancelled') {
+      final reason = req.cancellationReason?.trim() ?? '';
+      notices.add(JobStatusNotice(
+        icon: Icons.cancel_outlined,
+        color: Colors.red.shade700,
+        title: TKeys.jobCancelledTitle.tr,
+        message: reason.isEmpty
+            ? TKeys.noReasonGiven.tr
+            : '${TKeys.cancellationReasonLabel.tr}: $reason',
+      ));
+    }
+
+    if (paymentStatus == 'refund_pending') {
+      notices.add(JobStatusNotice(
+        icon: Icons.currency_exchange_rounded,
+        color: Colors.orange.shade700,
+        message: TKeys.refundPendingMsg.tr,
+      ));
+    } else if (paymentStatus == 'refunded') {
+      notices.add(JobStatusNotice(
+        icon: Icons.check_circle_outline,
+        color: Colors.green.shade700,
+        message: TKeys.refundedMsg.tr,
+      ));
+    } else if (paymentStatus == 'forfeited') {
+      notices.add(JobStatusNotice(
+        icon: Icons.money_off_rounded,
+        color: Colors.red.shade700,
+        message: TKeys.feeForfeitedMsg.tr,
+      ));
+    }
+
+    return [
+      for (final notice in notices) ...[const SizedBox(height: 14), notice],
+    ];
   }
 }
 
@@ -238,15 +276,25 @@ class _JobCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      request.title.isEmpty ? 'Job Post' : request.title,
+                      request.title.isEmpty ? TKeys.jobPost.tr : request.title,
                       style: theme.textTheme.titleMedium
                           ?.copyWith(fontWeight: FontWeight.w800),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      request.duration.isEmpty ? 'Duration not specified' : request.duration,
+                      request.duration.isEmpty ? TKeys.durationNotSpecified.tr : request.duration,
                       style: theme.textTheme.bodySmall
                           ?.copyWith(color: colors.onSurfaceVariant),
+                    ),
+                    const SizedBox(height: 6),
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 6,
+                      children: [
+                        _StatusChip(info: BookingStatusHelper.of(request.status)),
+                        if (request.paymentStatus.trim().toLowerCase() != 'unpaid')
+                          _StatusChip(info: BookingStatusHelper.payment(request.paymentStatus)),
+                      ],
                     ),
                   ],
                 ),
@@ -278,6 +326,11 @@ class _JobCard extends StatelessWidget {
           Divider(height: 1, color: colors.outlineVariant),
           const SizedBox(height: 14),
 
+          if (request.category.isNotEmpty) ...[
+            _InfoRow(icon: Icons.category_outlined, text: request.category),
+            const SizedBox(height: 10),
+          ],
+
           if (request.locationText.isNotEmpty) ...[
             _InfoRow(icon: Icons.location_on_outlined, text: request.locationText),
             const SizedBox(height: 10),
@@ -296,7 +349,7 @@ class _JobCard extends StatelessWidget {
               Expanded(
                 child: _StatItem(
                   label: TKeys.platformFee.tr,
-                  value: '৳${request.platformFee}',
+                  value: formatTaka(request.platformFee),
                   icon: Icons.account_balance_wallet_outlined,
                 ),
               ),
@@ -311,6 +364,30 @@ class _JobCard extends StatelessWidget {
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _StatusChip extends StatelessWidget {
+  final BookingStatusInfo info;
+
+  const _StatusChip({required this.info});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: info.color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(30),
+      ),
+      child: Text(
+        info.label,
+        style: Theme.of(context)
+            .textTheme
+            .labelSmall
+            ?.copyWith(color: info.color, fontWeight: FontWeight.w700),
       ),
     );
   }
@@ -407,7 +484,7 @@ class _PayToPostBanner extends StatelessWidget {
               Icon(Icons.payments_outlined, color: colors.primary, size: 20),
               const SizedBox(width: 8),
               Text(
-                'Payment required',
+                TKeys.paymentRequired.tr,
                 style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
               ),
             ],
@@ -512,7 +589,7 @@ class _PayToPostSheetState extends State<_PayToPostSheet> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    '${TKeys.platformFee.tr}: ৳$fee',
+                    '${TKeys.platformFee.tr}: ${formatTaka(fee)}',
                     style: theme.textTheme.titleMedium
                         ?.copyWith(fontWeight: FontWeight.bold, color: colors.primary),
                   ),
@@ -597,7 +674,7 @@ class _PayToPostSheetState extends State<_PayToPostSheet> {
                                 height: 20,
                                 child: CircularProgressIndicator(strokeWidth: 2),
                               )
-                            : Text('${TKeys.payNow.tr} ৳$fee'),
+                            : Text('${TKeys.payNow.tr} ${formatTaka(fee)}'),
                       ),
                     );
                   }),
@@ -652,8 +729,8 @@ class _EmptyApplicants extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     final message = status == 'pending_payment'
-        ? 'Applications will appear once your job post is live.'
-        : 'No applications yet.';
+        ? TKeys.applicationsAfterLive.tr
+        : TKeys.noApplicationsYet.tr;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 24),
       child: Center(
@@ -736,6 +813,8 @@ class _ApplicantCard extends StatelessWidget {
                           ?.copyWith(color: Colors.green.shade700, fontWeight: FontWeight.w700),
                     ),
                   )
+                else if (bid.status != 'active')
+                  _StatusChip(info: BookingStatusHelper.bid(bid.status))
                 else
                   Icon(Icons.chevron_right_rounded, color: colors.onSurfaceVariant),
               ],
@@ -762,11 +841,15 @@ class _ApplicantProfileSheet extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Container(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.9,
+        ),
         padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
         decoration: BoxDecoration(
           color: colors.surface,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(26)),
         ),
+        child: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -821,7 +904,7 @@ class _ApplicantProfileSheet extends StatelessWidget {
                 Expanded(
                   child: _ProfileStat(
                     icon: Icons.star_rounded,
-                    label: 'Rating',
+                    label: TKeys.rating.tr,
                     value: bid.applicantRating.toStringAsFixed(1),
                     color: Colors.amber.shade700,
                   ),
@@ -830,7 +913,7 @@ class _ApplicantProfileSheet extends StatelessWidget {
                 Expanded(
                   child: _ProfileStat(
                     icon: Icons.task_alt_rounded,
-                    label: 'Jobs completed',
+                    label: TKeys.completedJobs.tr,
                     value: '${bid.applicantTotalJobsCompleted}',
                     color: Colors.green,
                   ),
@@ -851,16 +934,20 @@ class _ApplicantProfileSheet extends StatelessWidget {
             if (bid.message.isNotEmpty)
               _ProfileInfoRow(
                 icon: Icons.message_outlined,
-                label: 'Message',
+                label: TKeys.applicationMessageLabel.tr,
                 value: bid.message,
               ),
 
+            const SizedBox(height: 18),
+            TechnicianPortfolioSection(technicianId: bid.applicantId),
             const SizedBox(height: 18),
 
             Obx(() {
               final currentStatus =
                   controller.request.value?.status.trim().toLowerCase() ?? '';
-              final canHire = currentStatus == 'hiring_open';
+              final canHire = currentStatus == 'hiring_open' &&
+                  controller.isOwner &&
+                  bid.status == 'active';
 
               if (!canHire) return const SizedBox.shrink();
 
@@ -870,6 +957,12 @@ class _ApplicantProfileSheet extends StatelessWidget {
                   onPressed: controller.isSelectingBid.value
                       ? null
                       : () async {
+                          final confirmed = await showJobConfirmDialog(
+                            context,
+                            title: TKeys.hireApplicant.tr,
+                            message: TKeys.confirmHireMsg.trParams({'name': bid.applicantName}),
+                          );
+                          if (!confirmed) return;
                           final success = await controller.hireApplicant(bid);
                           if (!success) return;
 
@@ -897,6 +990,7 @@ class _ApplicantProfileSheet extends StatelessWidget {
               );
             }),
           ],
+        ),
         ),
       ),
     );

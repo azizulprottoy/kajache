@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../app/routes/app_routes.dart';
+import '../../../core/utils/html_text.dart';
 import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/booking_status_helper.dart';
 import '../../../shared/widgets/common_app_bar.dart';
@@ -31,7 +32,7 @@ class MyInstantServicesPage extends GetView<MyInstantServicesController> {
         label: Text(TKeys.postInstantService.tr),
       ),
       body: Obx(() {
-        if (controller.isLoading.value) {
+        if (controller.isLoading.value && controller.instantServices.isEmpty) {
           return const Center(child: CircularProgressIndicator());
         }
 
@@ -80,10 +81,14 @@ class MyInstantServicesPage extends GetView<MyInstantServicesController> {
                 borderRadius: BorderRadius.circular(20),
                 clipBehavior: Clip.antiAlias,
                 child: InkWell(
-                  onTap: () => Get.toNamed(
-                    AppRoutes.myInstantServiceDetails,
-                    arguments: item.id,
-                  ),
+                  onTap: () async {
+                    await Get.toNamed(
+                      AppRoutes.myInstantServiceDetails,
+                      arguments: item.id,
+                    );
+                    // Status may have changed on the details page
+                    controller.fetchInstantServices();
+                  },
                   child: Container(
                     decoration: BoxDecoration(
                       border: Border.all(
@@ -164,7 +169,7 @@ class MyInstantServicesPage extends GetView<MyInstantServicesController> {
                               if (item.details.trim().isNotEmpty) ...[
                                 const SizedBox(height: 14),
                                 Text(
-                                  item.details,
+                                  htmlToPlainText(item.details),
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                   style: theme.textTheme.bodyMedium?.copyWith(
@@ -226,7 +231,7 @@ class MyInstantServicesPage extends GetView<MyInstantServicesController> {
   }
 
   static String _locationText(InstantServiceLocationModel location) {
-    return [location.address, location.city]
+    return [location.address, location.area, location.district.isNotEmpty ? location.district : location.city]
         .where((value) => value.trim().isNotEmpty)
         .join(', ');
   }
@@ -257,7 +262,7 @@ class _InformationRow extends StatelessWidget {
         const SizedBox(width: 10),
         Expanded(
           child: Text(
-            text.isEmpty ? 'Not specified' : text,
+            text.isEmpty ? TKeys.notSpecified.tr : text,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: theme.textTheme.bodyMedium?.copyWith(

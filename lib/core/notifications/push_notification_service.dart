@@ -178,14 +178,17 @@ class PushNotificationService extends GetxService {
       case 'instant_service':
         final serviceId = id('instantServiceId');
         if (isProvider) {
-          Get.toNamed(AppRoutes.availableInstantServices);
+          // Opens that job's sheet (selected / paid / completed / cancelled state)
+          Get.toNamed(AppRoutes.availableInstantServices,
+              arguments: serviceId == null ? null : {'id': serviceId});
         } else if (serviceId != null) {
           Get.toNamed(AppRoutes.myInstantServiceDetails, arguments: serviceId);
         }
       case 'recruitment':
         final requestId = id('recruitmentRequestId');
         if (isProvider) {
-          Get.toNamed(AppRoutes.availableRecruitmentRequests);
+          // Hired / not selected / ended / cancelled: the technician's applications
+          Get.toNamed(AppRoutes.myRecruitmentApplications);
         } else if (requestId != null) {
           Get.toNamed(AppRoutes.myRecruitmentRequestDetails, arguments: requestId);
         }

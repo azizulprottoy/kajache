@@ -90,6 +90,14 @@ class MenuPage extends StatelessWidget {
                       Get.toNamed(AppRoutes.availableRecruitmentRequests);
                     },
                   ),
+                  _MenuDivider(),
+                  _MenuTile(
+                    icon: Icons.assignment_turned_in_outlined,
+                    title: TKeys.myApplications.tr,
+                    onTap: () {
+                      Get.toNamed(AppRoutes.myRecruitmentApplications);
+                    },
+                  ),
                 ],
                 _MenuDivider(),
                 _MenuTile(

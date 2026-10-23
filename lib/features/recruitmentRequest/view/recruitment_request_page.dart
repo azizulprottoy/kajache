@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:html_editor_enhanced/html_editor.dart';
 
 import '../../../app/theme/context_extension.dart';
+import '../../../core/utils/money_format.dart';
 import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/common_app_bar.dart';
 import '../controller/recruitment_request_controller.dart';
@@ -74,20 +75,21 @@ class RecruitmentRequestPage extends GetView<RecruitmentRequestController> {
                   children: [
                     _SectionHeader(
                       icon: Icons.badge_outlined,
-                      label: 'Job Details',
+                      label: TKeys.jobDetails.tr,
                       colorScheme: colorScheme,
                       theme: theme,
                     ),
                     const SizedBox(height: 16),
 
-                    _FieldLabel('Job Title', theme),
+                    _FieldLabel(TKeys.jobTitle.tr, theme),
                     const SizedBox(height: 6),
                     TextFormField(
                       controller: controller.titleController,
+                      maxLength: RecruitmentRequestController.titleMaxLength,
                       validator: (v) =>
-                          v == null || v.trim().isEmpty ? 'Please enter a job title' : null,
+                          v == null || v.trim().isEmpty ? TKeys.jobTitleRequired.tr : null,
                       decoration: InputDecoration(
-                        hintText: 'e.g. Full-time AC Technician',
+                        hintText: TKeys.jobTitleHint.tr,
                         prefixIcon: const Icon(Icons.title_rounded),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                       ),
@@ -129,57 +131,72 @@ class RecruitmentRequestPage extends GetView<RecruitmentRequestController> {
                     ),
                     const SizedBox(height: 16),
 
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _FieldLabel(TKeys.durationLabel.tr, theme),
-                              const SizedBox(height: 6),
-                              TextFormField(
-                                controller: controller.durationController,
-                                validator: (v) =>
-                                    v == null || v.trim().isEmpty ? TKeys.durationHint.tr : null,
-                                decoration: InputDecoration(
-                                  hintText: TKeys.durationHint.tr,
-                                  prefixIcon: const Icon(Icons.schedule_outlined),
-                                  border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12)),
-                                ),
+                    // Side by side on wider screens, stacked below 360dp
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        final durationField = Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _FieldLabel(TKeys.durationLabel.tr, theme),
+                            const SizedBox(height: 6),
+                            TextFormField(
+                              controller: controller.durationController,
+                              maxLength: RecruitmentRequestController.durationMaxLength,
+                              onChanged: (v) => controller.durationValue.value = v.trim(),
+                              validator: (v) =>
+                                  v == null || v.trim().isEmpty ? TKeys.durationRequired.tr : null,
+                              decoration: InputDecoration(
+                                hintText: TKeys.durationHint.tr,
+                                prefixIcon: const Icon(Icons.schedule_outlined),
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12)),
                               ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _FieldLabel(TKeys.salaryLabel.tr, theme),
-                              const SizedBox(height: 6),
-                              TextFormField(
-                                controller: controller.salaryController,
-                                keyboardType: TextInputType.number,
-                                onChanged: (v) =>
-                                    controller.salaryValue.value =
-                                        double.tryParse(v.trim()) ?? 0,
-                                validator: (v) {
-                                  final n = num.tryParse(v?.trim() ?? '');
-                                  if (n == null || n <= 0) return 'Enter a valid salary';
-                                  return null;
-                                },
-                                decoration: InputDecoration(
-                                  hintText: TKeys.salaryHint.tr,
-                                  prefixIcon: const Icon(Icons.payments_outlined),
-                                  border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12)),
-                                ),
+                            ),
+                          ],
+                        );
+                        final salaryField = Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _FieldLabel(TKeys.salaryLabel.tr, theme),
+                            const SizedBox(height: 6),
+                            TextFormField(
+                              controller: controller.salaryController,
+                              keyboardType: TextInputType.number,
+                              onChanged: (v) =>
+                                  controller.salaryValue.value =
+                                      double.tryParse(v.trim()) ?? 0,
+                              validator: (v) {
+                                final n = num.tryParse(v?.trim() ?? '');
+                                if (n == null || n <= 0) return TKeys.salaryInvalid.tr;
+                                if (n > RecruitmentRequestController.maxSalary) {
+                                  return TKeys.amountTooLarge.tr;
+                                }
+                                return null;
+                              },
+                              decoration: InputDecoration(
+                                hintText: TKeys.salaryHint.tr,
+                                prefixIcon: const Icon(Icons.payments_outlined),
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12)),
                               ),
-                            ],
-                          ),
-                        ),
-                      ],
+                            ),
+                          ],
+                        );
+
+                        if (MediaQuery.sizeOf(context).width < 360) {
+                          return Column(
+                            children: [durationField, const SizedBox(height: 12), salaryField],
+                          );
+                        }
+                        return Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(child: durationField),
+                            const SizedBox(width: 12),
+                            Expanded(child: salaryField),
+                          ],
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -210,6 +227,7 @@ class RecruitmentRequestPage extends GetView<RecruitmentRequestController> {
                     // Fee summary
                     Obx(() {
                       final salary = controller.salaryValue.value;
+                      final duration = controller.durationValue.value;
                       return Container(
                         width: double.infinity,
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -221,15 +239,20 @@ class RecruitmentRequestPage extends GetView<RecruitmentRequestController> {
                         child: Column(
                           children: [
                             Row(children: [
+                              Text(TKeys.salaryLabel.tr,
+                                  style: theme.textTheme.bodyMedium
+                                      ?.copyWith(color: colorScheme.onSurfaceVariant)),
+                              const SizedBox(width: 12),
                               Expanded(
-                                child: Text(TKeys.jobBudget.tr,
-                                    style: theme.textTheme.bodyMedium
-                                        ?.copyWith(color: colorScheme.onSurfaceVariant)),
-                              ),
-                              Text(
-                                '৳${salary.toInt()} / ${controller.durationController.text}',
-                                style: theme.textTheme.bodyMedium
-                                    ?.copyWith(fontWeight: FontWeight.w600),
+                                child: Text(
+                                  [formatTaka(salary), if (duration.isNotEmpty) duration]
+                                      .join(' · '),
+                                  textAlign: TextAlign.end,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: theme.textTheme.bodyMedium
+                                      ?.copyWith(fontWeight: FontWeight.w600),
+                                ),
                               ),
                             ]),
                             const Divider(height: 18),

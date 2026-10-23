@@ -3,33 +3,12 @@ import 'package:get/get.dart';
 
 import '../../../app/routes/app_routes.dart';
 import '../../../core/utils/media_url_helper.dart';
+import '../../../core/utils/html_text.dart';
 import '../../../core/utils/translation_keys.dart';
+import '../../../shared/widgets/booking_status_helper.dart';
 import '../../../shared/widgets/common_app_bar.dart';
 import '../controller/my_recruitment_requests_controller.dart';
 import 'package:kaj_ache/shared/widgets/app_network_image.dart';
-
-class _StatusInfo {
-  final String label;
-  final Color color;
-  const _StatusInfo(this.label, this.color);
-}
-
-_StatusInfo _statusInfoFor(String status) {
-  switch (status.trim().toLowerCase()) {
-    case 'pending_payment':
-      return const _StatusInfo('Payment Pending', Colors.orange);
-    case 'hiring_open':
-      return const _StatusInfo('Hiring Open', Colors.blue);
-    case 'hired':
-      return const _StatusInfo('Hired', Colors.green);
-    case 'ended':
-      return _StatusInfo('Ended', Colors.grey.shade600);
-    case 'cancelled':
-      return const _StatusInfo('Cancelled', Colors.red);
-    default:
-      return _StatusInfo(status, Colors.grey);
-  }
-}
 
 class MyRecruitmentRequestsPage extends GetView<MyRecruitmentRequestsController> {
   const MyRecruitmentRequestsPage({super.key});
@@ -52,7 +31,7 @@ class MyRecruitmentRequestsPage extends GetView<MyRecruitmentRequestsController>
         label: Text(TKeys.postRecruitmentRequest.tr),
       ),
       body: Obx(() {
-        if (controller.isLoading.value) {
+        if (controller.isLoading.value && controller.requests.isEmpty) {
           return const Center(child: CircularProgressIndicator());
         }
 
@@ -88,7 +67,7 @@ class MyRecruitmentRequestsPage extends GetView<MyRecruitmentRequestsController>
             separatorBuilder: (_, __) => const SizedBox(height: 14),
             itemBuilder: (context, index) {
               final item = controller.requests[index];
-              final statusInfo = _statusInfoFor(item.status);
+              final statusInfo = BookingStatusHelper.of(item.status);
 
               return Material(
                 color: colorScheme.surface,
@@ -97,10 +76,14 @@ class MyRecruitmentRequestsPage extends GetView<MyRecruitmentRequestsController>
                 borderRadius: BorderRadius.circular(20),
                 clipBehavior: Clip.antiAlias,
                 child: InkWell(
-                  onTap: () => Get.toNamed(
-                    AppRoutes.myRecruitmentRequestDetails,
-                    arguments: item.id,
-                  ),
+                  onTap: () async {
+                    await Get.toNamed(
+                      AppRoutes.myRecruitmentRequestDetails,
+                      arguments: item.id,
+                    );
+                    // Hire / end / cancel on the details page changes the status
+                    controller.fetchRequests();
+                  },
                   child: Container(
                     decoration: BoxDecoration(
                       border: Border.all(
@@ -158,7 +141,7 @@ class MyRecruitmentRequestsPage extends GetView<MyRecruitmentRequestsController>
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          item.title.isEmpty ? 'Job Post' : item.title,
+                                          item.title.isEmpty ? TKeys.jobPost.tr : item.title,
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                           style: theme.textTheme.titleMedium
@@ -167,7 +150,7 @@ class MyRecruitmentRequestsPage extends GetView<MyRecruitmentRequestsController>
                                         const SizedBox(height: 5),
                                         Text(
                                           item.duration.isEmpty
-                                              ? 'Duration not specified'
+                                              ? TKeys.durationNotSpecified.tr
                                               : item.duration,
                                           style: theme.textTheme.bodySmall?.copyWith(
                                             color: colorScheme.onSurfaceVariant,
@@ -198,7 +181,7 @@ class MyRecruitmentRequestsPage extends GetView<MyRecruitmentRequestsController>
                               if (item.details.trim().isNotEmpty) ...[
                                 const SizedBox(height: 14),
                                 Text(
-                                  item.details.replaceAll(RegExp(r'<[^>]*>'), '').trim(),
+                                  htmlToPlainText(item.details),
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                   style: theme.textTheme.bodyMedium?.copyWith(

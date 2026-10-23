@@ -7,6 +7,18 @@
 // start applying/bidding. There is no separate "technician accepts" step —
 // picking an applicant ("select-bid") immediately transitions to `hired`.
 
+import '../../../core/utils/localized_text.dart';
+import '../../../core/utils/money_format.dart';
+
+/// Readable category name; a bare (unpopulated) ObjectId gives ''.
+String _categoryName(dynamic category) {
+  if (category is! Map) return '';
+  return LocalizedText.pick(
+    (category['name'] ?? category['title'] ?? '').toString(),
+    category['nameBn']?.toString(),
+  );
+}
+
 /// Summary/list item — used for `GET /recruitmentRequest/me`.
 class RecruitmentRequestModel {
   final String id;
@@ -23,6 +35,7 @@ class RecruitmentRequestModel {
   final String address;
   final String city;
   final String district;
+  final String area;
 
   final int bidsCount;
   final int platformFee;
@@ -34,6 +47,10 @@ class RecruitmentRequestModel {
   final String? endedAt;
   final String? paymentMethod;
   final String? transactionId;
+
+  /// Only on `/available`: whether this technician already applied.
+  final bool hasBid;
+  final RecruitmentBidModel? myBid;
 
   final DateTime? createdAt;
   final DateTime? updatedAt;
@@ -50,6 +67,7 @@ class RecruitmentRequestModel {
     required this.address,
     required this.city,
     required this.district,
+    this.area = '',
     required this.bidsCount,
     required this.platformFee,
     required this.paymentStatus,
@@ -58,6 +76,8 @@ class RecruitmentRequestModel {
     this.endedAt,
     this.paymentMethod,
     this.transactionId,
+    this.hasBid = false,
+    this.myBid,
     this.createdAt,
     this.updatedAt,
   });
@@ -80,14 +100,13 @@ class RecruitmentRequestModel {
       title: json['title']?.toString() ?? '',
       image: json['image']?.toString() ?? '',
       details: json['details']?.toString() ?? '',
-      category: json['category'] is Map
-          ? (json['category']['_id']?.toString() ?? '')
-          : json['category']?.toString() ?? '',
+      category: _categoryName(json['category']),
       duration: json['duration']?.toString() ?? '',
       salary: num.tryParse(json['salary']?.toString() ?? '0') ?? 0,
       address: location['address']?.toString() ?? '',
       city: location['city']?.toString() ?? '',
       district: location['district']?.toString() ?? '',
+      area: location['area']?.toString() ?? '',
       bidsCount: int.tryParse(json['bidsCount']?.toString() ?? '0') ?? 0,
       platformFee: int.tryParse(json['platformFee']?.toString() ?? '300') ?? 300,
       paymentStatus: json['paymentStatus']?.toString() ?? 'unpaid',
@@ -96,15 +115,19 @@ class RecruitmentRequestModel {
       endedAt: json['endedAt']?.toString(),
       paymentMethod: json['paymentMethod']?.toString(),
       transactionId: json['transactionId']?.toString(),
+      hasBid: json['hasBid'] == true || json['myBid'] is Map,
+      myBid: json['myBid'] is Map
+          ? RecruitmentBidModel.fromJson(Map<String, dynamic>.from(json['myBid'] as Map))
+          : null,
       createdAt: DateTime.tryParse(json['createdAt']?.toString() ?? ''),
       updatedAt: DateTime.tryParse(json['updatedAt']?.toString() ?? ''),
     );
   }
 
   String get locationText =>
-      [address, city, district].where((v) => v.trim().isNotEmpty).join(', ');
+      [address, area, district, city].where((v) => v.trim().isNotEmpty).join(', ');
 
-  String get salaryLabel => '৳${salary.toInt()}';
+  String get salaryLabel => formatTaka(salary);
 }
 
 /// Full details payload — used for `GET /recruitmentRequest/:id`.
@@ -125,6 +148,7 @@ class RecruitmentRequestDetailsModel {
   final String address;
   final String city;
   final String district;
+  final String area;
 
   final int bidsCount;
   final int platformFee;
@@ -157,6 +181,7 @@ class RecruitmentRequestDetailsModel {
     required this.address,
     required this.city,
     required this.district,
+    this.area = '',
     required this.bidsCount,
     required this.platformFee,
     required this.paymentStatus,
@@ -200,14 +225,13 @@ class RecruitmentRequestDetailsModel {
       title: json['title']?.toString() ?? '',
       image: json['image']?.toString() ?? '',
       details: json['details']?.toString() ?? '',
-      category: json['category'] is Map
-          ? (json['category']['_id']?.toString() ?? '')
-          : json['category']?.toString() ?? '',
+      category: _categoryName(json['category']),
       duration: json['duration']?.toString() ?? '',
       salary: num.tryParse(json['salary']?.toString() ?? '0') ?? 0,
       address: location['address']?.toString() ?? '',
       city: location['city']?.toString() ?? '',
       district: location['district']?.toString() ?? '',
+      area: location['area']?.toString() ?? '',
       bidsCount: int.tryParse(json['bidsCount']?.toString() ?? '0') ??
           (json['bids'] is List ? (json['bids'] as List).length : 0),
       platformFee: int.tryParse(json['platformFee']?.toString() ?? '300') ?? 300,
@@ -236,9 +260,9 @@ class RecruitmentRequestDetailsModel {
   }
 
   String get locationText =>
-      [address, city, district].where((v) => v.trim().isNotEmpty).join(', ');
+      [address, area, district, city].where((v) => v.trim().isNotEmpty).join(', ');
 
-  String get salaryLabel => '৳${salary.toInt()}';
+  String get salaryLabel => formatTaka(salary);
 
   bool get isPaymentDue =>
       status.trim().toLowerCase() == 'pending_payment' &&
@@ -311,5 +335,25 @@ class RecruitmentBidModel {
     );
   }
 
-  String get proposedSalaryLabel => '৳${proposedSalary.toInt()}';
+  String get proposedSalaryLabel => formatTaka(proposedSalary);
+}
+
+/// One of the technician's own applications, from
+/// `GET /recruitmentRequest/provider/bids`, with a summary of the job post.
+class RecruitmentApplicationModel {
+  final RecruitmentBidModel bid;
+  final RecruitmentRequestModel request;
+
+  const RecruitmentApplicationModel({required this.bid, required this.request});
+
+  factory RecruitmentApplicationModel.fromJson(Map<String, dynamic> json) {
+    final request = json['recruitmentRequest'] is Map
+        ? Map<String, dynamic>.from(json['recruitmentRequest'] as Map)
+        : <String, dynamic>{'_id': json['recruitmentRequest']?.toString() ?? ''};
+
+    return RecruitmentApplicationModel(
+      bid: RecruitmentBidModel.fromJson(json),
+      request: RecruitmentRequestModel.fromJson(request),
+    );
+  }
 }

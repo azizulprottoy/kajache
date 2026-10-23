@@ -1,11 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:get/get.dart';
 
 import '../../../app/theme/context_extension.dart';
+import '../../../core/utils/html_text.dart';
 import '../../../core/utils/translation_keys.dart';
+import '../../../shared/widgets/booking_status_helper.dart';
 import '../../../shared/widgets/common_app_bar.dart';
+import '../../../shared/widgets/job_feedback_sheets.dart';
 import '../controller/available_recruitment_requests_controller.dart';
 import '../model/recruitment_request_model.dart';
+
+/// Fetches the post, then opens the apply sheet. Ignores taps while a sheet
+/// is already opening.
+Future<void> _openApplySheet(AvailableRecruitmentRequestsController controller, String id) async {
+  if (id.isEmpty || controller.isOpeningSheet) return;
+  controller.isOpeningSheet = true;
+  try {
+    await controller.openRequest(id);
+    if (controller.selectedRequest.value == null) return;
+    await Get.bottomSheet(
+      _ApplySheet(controller: controller),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+    );
+    controller.clearSelectedRequest();
+  } finally {
+    controller.isOpeningSheet = false;
+  }
+}
 
 class AvailableRecruitmentRequestsPage
     extends GetView<AvailableRecruitmentRequestsController> {
@@ -16,6 +39,12 @@ class AvailableRecruitmentRequestsPage
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
+    // A specific post was passed in (home tile / notification): open it once
+    final initialId = controller.takeInitialId();
+    if (initialId != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _openApplySheet(controller, initialId));
+    }
+
     return Scaffold(
       backgroundColor: colorScheme.surfaceContainerLowest,
       appBar: CommonAppBar(
@@ -24,7 +53,7 @@ class AvailableRecruitmentRequestsPage
         showLanguageToggle: true,
       ),
       body: Obx(() {
-        if (controller.isLoading.value) {
+        if (controller.isLoading.value && controller.availableRequests.isEmpty) {
           return const Center(child: CircularProgressIndicator());
         }
 
@@ -53,26 +82,25 @@ class AvailableRecruitmentRequestsPage
 
         return RefreshIndicator(
           onRefresh: controller.fetchAvailableRequests,
-          child: ListView.separated(
-            physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-            itemCount: controller.availableRequests.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 14),
-            itemBuilder: (context, index) {
-              final item = controller.availableRequests[index];
-              return _JobOpeningCard(
-                item: item,
-                onTap: () async {
-                  await controller.openRequest(item.id);
-                  if (controller.selectedRequest.value == null) return;
-                  Get.bottomSheet(
-                    _ApplySheet(controller: controller),
-                    isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
-                  ).whenComplete(controller.clearSelectedRequest);
-                },
-              );
-            },
+          child: Column(
+            children: [
+              if (controller.isLoadingDetails.value) const LinearProgressIndicator(),
+              Expanded(
+                child: ListView.separated(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+                  itemCount: controller.availableRequests.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 14),
+                  itemBuilder: (context, index) {
+                    final item = controller.availableRequests[index];
+                    return _JobOpeningCard(
+                      item: item,
+                      onTap: () => _openApplySheet(controller, item.id),
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
         );
       }),
@@ -126,7 +154,7 @@ class _JobOpeningCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          item.title.isEmpty ? 'Job Opening' : item.title,
+                          item.title.isEmpty ? TKeys.jobOpening.tr : item.title,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style:
@@ -134,7 +162,12 @@ class _JobOpeningCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          item.duration.isEmpty ? 'Duration not specified' : item.duration,
+                          [
+                            item.duration.isEmpty ? TKeys.durationNotSpecified.tr : item.duration,
+                            if (item.category.isNotEmpty) item.category,
+                          ].join(' · '),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: theme.textTheme.bodySmall
                               ?.copyWith(color: colorScheme.onSurfaceVariant),
                         ),
@@ -161,7 +194,7 @@ class _JobOpeningCard extends StatelessWidget {
               if (item.details.trim().isNotEmpty) ...[
                 const SizedBox(height: 12),
                 Text(
-                  item.details.replaceAll(RegExp(r'<[^>]*>'), '').trim(),
+                  htmlToPlainText(item.details),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.bodySmall
@@ -189,6 +222,23 @@ class _JobOpeningCard extends StatelessWidget {
                     ),
                   ] else
                     const Spacer(),
+                  if (item.hasBid) ...[
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: Colors.green.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        item.myBid != null
+                            ? '${TKeys.applied.tr}: ${item.myBid!.proposedSalaryLabel}'
+                            : TKeys.applied.tr,
+                        style: theme.textTheme.labelSmall
+                            ?.copyWith(color: Colors.green.shade700, fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                  ],
                   Icon(Icons.people_alt_outlined, size: 16, color: colorScheme.onSurfaceVariant),
                   const SizedBox(width: 4),
                   Text(
@@ -239,7 +289,11 @@ class _ApplySheetState extends State<_ApplySheet> {
   }
 
   Future<void> _submit() async {
+    if (widget.controller.isSubmittingBid.value) return;
     if (!_formKey.currentState!.validate()) return;
+
+    // Read before submitting: afterwards the refreshed post always has a bid
+    final wasUpdate = widget.controller.selectedRequest.value?.hasBid ?? false;
 
     final success = await widget.controller.submitBid(
       proposedSalary: num.tryParse(_salaryController.text.trim()) ?? 0,
@@ -248,7 +302,6 @@ class _ApplySheetState extends State<_ApplySheet> {
 
     if (!success || !mounted) return;
 
-    final wasUpdate = widget.controller.selectedRequest.value?.hasBid ?? false;
     Navigator.of(context).pop();
     Get.snackbar(
       wasUpdate ? TKeys.applicationUpdated.tr : TKeys.applicationSubmitted.tr,
@@ -280,6 +333,11 @@ class _ApplySheetState extends State<_ApplySheet> {
 
       _prefillIfNeeded(detail);
       final isUpdate = detail.hasBid;
+      final myBid = detail.myBid;
+      final myBidStatus = myBid?.status.trim().toLowerCase() ?? '';
+      // Only an open post takes new applications; only an active one can be edited
+      final canApply = detail.status.trim().toLowerCase() == 'hiring_open' &&
+          (myBid == null || myBidStatus == 'active');
 
       return SafeArea(
         top: false,
@@ -310,21 +368,35 @@ class _ApplySheetState extends State<_ApplySheet> {
                     ),
                     const SizedBox(height: 18),
                     Text(
-                      detail.title.isEmpty ? 'Job Opening' : detail.title,
+                      detail.title.isEmpty ? TKeys.jobOpening.tr : detail.title,
                       style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      detail.duration.isEmpty ? 'Duration not specified' : detail.duration,
+                      [
+                        detail.duration.isEmpty ? TKeys.durationNotSpecified.tr : detail.duration,
+                        if (detail.category.isNotEmpty) detail.category,
+                        if (detail.locationText.isNotEmpty) detail.locationText,
+                      ].join(' · '),
                       style:
                           theme.textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
                     ),
                     if (detail.details.trim().isNotEmpty) ...[
                       const SizedBox(height: 10),
-                      Text(
-                        detail.details,
-                        style: theme.textTheme.bodyMedium
-                            ?.copyWith(color: colors.onSurfaceVariant, height: 1.4),
+                      Html(
+                        data: detail.details,
+                        style: {
+                          'body': Style(
+                            margin: Margins.zero,
+                            padding: HtmlPaddings.zero,
+                            color: colors.onSurfaceVariant,
+                            fontSize: FontSize(theme.textTheme.bodyMedium?.fontSize ?? 14),
+                            lineHeight: const LineHeight(1.4),
+                          ),
+                          'p': Style(margin: Margins.only(bottom: 4), padding: HtmlPaddings.zero),
+                          'ol': Style(margin: Margins.only(left: 16, top: 4, bottom: 4), padding: HtmlPaddings.zero),
+                          'ul': Style(margin: Margins.only(left: 16, top: 4, bottom: 4), padding: HtmlPaddings.zero),
+                        },
                       ),
                     ],
                     const SizedBox(height: 12),
@@ -336,7 +408,7 @@ class _ApplySheetState extends State<_ApplySheet> {
                       ),
                       child: Row(children: [
                         Expanded(
-                          child: Text(TKeys.jobBudget.tr,
+                          child: Text(TKeys.salaryLabel.tr,
                               style: theme.textTheme.bodyMedium
                                   ?.copyWith(color: colors.onSurfaceVariant)),
                         ),
@@ -346,6 +418,42 @@ class _ApplySheetState extends State<_ApplySheet> {
                       ]),
                     ),
 
+                    if (myBid != null) ...[
+                      const SizedBox(height: 12),
+                      JobStatusNotice(
+                        icon: Icons.assignment_turned_in_outlined,
+                        color: BookingStatusHelper.bid(myBid.status).color,
+                        title: '${TKeys.myApplication.tr}: ${BookingStatusHelper.bid(myBid.status).label}',
+                        message: '${TKeys.proposedSalaryLabel.tr}: ${myBid.proposedSalaryLabel}',
+                      ),
+                    ],
+                    if (detail.status.trim().toLowerCase() == 'cancelled') ...[
+                      const SizedBox(height: 12),
+                      JobStatusNotice(
+                        icon: Icons.cancel_outlined,
+                        color: Colors.red.shade700,
+                        title: TKeys.jobCancelledTitle.tr,
+                        message: (detail.cancellationReason?.trim() ?? '').isEmpty
+                            ? TKeys.noReasonGiven.tr
+                            : '${TKeys.cancellationReasonLabel.tr}: ${detail.cancellationReason!.trim()}',
+                      ),
+                    ],
+                    if (myBidStatus == 'selected' || myBidStatus == 'cancelled') ...[
+                      const SizedBox(height: 10),
+                      JobFeedbackActions(
+                        onReport: () => Get.bottomSheet(
+                          JobComplaintSheet(
+                            isSubmitting: controller.isSubmittingComplaint,
+                            onSubmit: (title, reason) =>
+                                controller.submitComplaint(title: title, reason: reason),
+                          ),
+                          isScrollControlled: true,
+                          backgroundColor: Colors.transparent,
+                        ),
+                      ),
+                    ],
+
+                    if (canApply) ...[
                     const SizedBox(height: 18),
                     const Divider(height: 1),
                     const SizedBox(height: 16),
@@ -361,7 +469,8 @@ class _ApplySheetState extends State<_ApplySheet> {
                       keyboardType: TextInputType.number,
                       validator: (v) {
                         final n = num.tryParse(v?.trim() ?? '');
-                        if (n == null || n <= 0) return 'Please enter a valid salary';
+                        if (n == null || n <= 0) return TKeys.salaryInvalid.tr;
+                        if (n > 10000000) return TKeys.amountTooLarge.tr;
                         return null;
                       },
                       decoration: InputDecoration(
@@ -376,6 +485,7 @@ class _ApplySheetState extends State<_ApplySheet> {
                       controller: _messageController,
                       minLines: 2,
                       maxLines: 4,
+                      maxLength: 500,
                       decoration: InputDecoration(
                         labelText: TKeys.applicationMessageLabel.tr,
                         hintText: TKeys.applicationMessageHint.tr,
@@ -401,6 +511,7 @@ class _ApplySheetState extends State<_ApplySheet> {
                         ),
                       );
                     }),
+                    ],
                   ],
                 ),
               ),

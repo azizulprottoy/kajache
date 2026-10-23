@@ -9,6 +9,8 @@ import 'package:image_picker/image_picker.dart';
 import '../../../app/routes/app_routes.dart';
 import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/success_model.dart';
+import '../../home/models/category_response_model.dart';
+import '../../home/repository/home_repository.dart';
 import '../../main/controller/main_controller.dart';
 import '../model/instant_service_model.dart';
 import '../repository/instant_service_repository.dart';
@@ -27,6 +29,16 @@ class InstantServiceController extends GetxController {
   final ImagePicker _imagePicker = ImagePicker();
 
   final isLoading = false.obs;
+
+  /// API limits (see API_Server src/utils/jobRequest.js TEXT_LIMITS).
+  static const int titleMaxLength = 150;
+  static const int detailsMaxLength = 5000;
+  static const int addressMaxLength = 300;
+  static const int maxAmount = 10000000;
+
+  /// Optional category, like the website's post form.
+  final categories = <CategoryModel>[].obs;
+  final selectedCategoryId = RxnString();
 
   final titleController = TextEditingController();
   final detailsEditorController = HtmlEditorController();
@@ -64,11 +76,21 @@ class InstantServiceController extends GetxController {
         Get.back();
         Get.snackbar(
           TKeys.error.tr,
-          'Technicians cannot post instant services.',
+          TKeys.techniciansCannotPost.tr,
           snackPosition: SnackPosition.BOTTOM,
         );
       });
       return;
+    }
+
+    _fetchCategories();
+  }
+
+  Future<void> _fetchCategories() async {
+    try {
+      categories.assignAll(await HomeRepository().getCategories());
+    } catch (_) {
+      // Non-fatal: the category is optional
     }
   }
 
@@ -120,12 +142,13 @@ class InstantServiceController extends GetxController {
   }
 
   Future<void> submitInstantService() async {
+    if (isLoading.value) return;
     if (!(formKey.currentState?.validate() ?? false)) return;
 
     final priceMin = int.tryParse(priceMinController.text.trim()) ?? 0;
     final priceMax = int.tryParse(priceMaxController.text.trim()) ?? 0;
 
-    if (priceMax <= priceMin) {
+    if (priceMin > priceMax) {
       Get.snackbar(
         TKeys.validation.tr,
         TKeys.invalidPriceRangeError.tr,
@@ -138,11 +161,18 @@ class InstantServiceController extends GetxController {
       return;
     }
 
+    isLoading.value = true;
     final detailsHtml = (await detailsEditorController.getText()).trim();
-    if (_isDetailsHtmlEmpty(detailsHtml)) {
+    final detailsError = _isDetailsHtmlEmpty(detailsHtml)
+        ? TKeys.describeProblemError.tr
+        : detailsHtml.length > detailsMaxLength
+            ? TKeys.detailsTooLong.trParams({'max': '$detailsMaxLength'})
+            : null;
+    if (detailsError != null) {
+      isLoading.value = false;
       Get.snackbar(
         TKeys.validation.tr,
-        TKeys.describeProblemError.tr,
+        detailsError,
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red.shade50,
         colorText: Colors.red.shade700,
@@ -153,13 +183,13 @@ class InstantServiceController extends GetxController {
     }
 
     try {
-      isLoading.value = true;
 
       /// CREATE INSTANT SERVICE (no payment yet — bidding opens right away;
       /// payment happens after the client selects a winning bid).
       await repository.createInstantService(
         title: titleController.text.trim(),
         details: detailsHtml,
+        category: selectedCategoryId.value,
         priceMin: priceMin,
         priceMax: priceMax,
         location: InstantServiceLocationModel(

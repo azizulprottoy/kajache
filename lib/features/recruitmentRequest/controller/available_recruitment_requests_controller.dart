@@ -7,8 +7,8 @@ import '../repository/recruitment_request_repository.dart';
 
 /// Controller for the technician-facing "Job Openings" browse screen.
 ///
-/// Tapping a posting fetches its full details (so we know `hasBid`/`myBid`
-/// — the `available` list endpoint doesn't include those) and opens a
+/// Tapping a posting fetches its full details (bids, own application) and
+/// opens a
 /// bottom sheet that doubles as the "view" and "apply/update application"
 /// UI, mirroring the sbooking `_BidSheet` pattern.
 class AvailableRecruitmentRequestsController extends GetxController {
@@ -19,12 +19,54 @@ class AvailableRecruitmentRequestsController extends GetxController {
 
   final isLoadingDetails = false.obs;
   final isSubmittingBid = false.obs;
+  final isSubmittingComplaint = false.obs;
   final selectedRequest = Rxn<RecruitmentRequestDetailsModel>();
+
+  /// True while a post's details are fetched / its sheet is opening, so a
+  /// double tap can't open two sheets.
+  bool isOpeningSheet = false;
+
+  /// Post to open right away, passed as `{'id': ...}` (home tile,
+  /// notification, My applications). Read once by the page.
+  String? _initialId;
 
   @override
   void onInit() {
     super.onInit();
+    final arguments = Get.arguments;
+    if (arguments is Map) {
+      final id = arguments['id']?.toString().trim() ?? '';
+      if (id.isNotEmpty) _initialId = id;
+    } else if (arguments is String && arguments.trim().isNotEmpty) {
+      _initialId = arguments.trim();
+    }
     fetchAvailableRequests();
+  }
+
+  String? takeInitialId() {
+    final id = _initialId;
+    _initialId = null;
+    return id;
+  }
+
+  Future<bool> submitComplaint({required String title, required String reason}) async {
+    final current = selectedRequest.value;
+    if (current == null || isSubmittingComplaint.value) return false;
+
+    try {
+      isSubmittingComplaint.value = true;
+      await repository.submitComplaint(current.id, title: title, reason: reason);
+      return true;
+    } catch (e) {
+      Get.snackbar(
+        TKeys.error.tr,
+        apiErrorMessage(e),
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return false;
+    } finally {
+      isSubmittingComplaint.value = false;
+    }
   }
 
   Future<void> fetchAvailableRequests() async {

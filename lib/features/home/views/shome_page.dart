@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../app/theme/context_extension.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../app/routes/app_routes.dart';
+import '../../../core/utils/money_format.dart';
 import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/common_app_bar.dart';
 import '../../../shared/shimmers/shome_shimmer.dart';
@@ -133,14 +133,14 @@ class SHomePage extends GetView<SHomeController> {
                 ),
                 const SizedBox(height: 10),
                 if (controller.instantServices.isEmpty)
-                  _EmptyState(message: 'No instant service requests right now.')
+                  _EmptyState(message: TKeys.noInstantRequestsNow.tr)
                 else
                   ...controller.instantServices.take(3).map((item) =>
                     _QuickJobTile(
                       title: item.title,
-                      subtitle: '৳${item.priceMin}–৳${item.priceMax}',
+                      subtitle: item.priceRangeLabel,
                       icon: Icons.bolt_outlined,
-                      onTap: () => Get.toNamed(AppRoutes.availableInstantServices),
+                      onTap: () => Get.toNamed(AppRoutes.availableInstantServices, arguments: {'id': item.id}),
                       colorScheme: colorScheme,
                       theme: theme,
                     ),
@@ -158,14 +158,15 @@ class SHomePage extends GetView<SHomeController> {
                 ),
                 const SizedBox(height: 10),
                 if (controller.recruitmentRequests.isEmpty)
-                  _EmptyState(message: 'No recruitment posts right now.')
+                  _EmptyState(message: TKeys.noRecruitmentPostsNow.tr)
                 else
                   ...controller.recruitmentRequests.take(3).map((item) =>
                     _QuickJobTile(
                       title: item.title,
-                      subtitle: '৳${item.salary.toInt()} • ${item.category}',
+                      subtitle: [formatTaka(item.salary), if (item.category.isNotEmpty) item.category]
+                          .join(' • '),
                       icon: Icons.badge_outlined,
-                      onTap: () => Get.toNamed(AppRoutes.availableRecruitmentRequests),
+                      onTap: () => Get.toNamed(AppRoutes.availableRecruitmentRequests, arguments: {'id': item.id}),
                       colorScheme: colorScheme,
                       theme: theme,
                     ),

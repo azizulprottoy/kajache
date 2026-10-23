@@ -71,6 +71,8 @@ import '../../features/recruitmentRequest/bindings/my_recruitment_request_detail
 import '../../features/recruitmentRequest/view/my_recruitment_request_details_page.dart';
 import '../../features/recruitmentRequest/bindings/available_recruitment_requests_binding.dart';
 import '../../features/recruitmentRequest/view/available_recruitment_requests_page.dart';
+import '../../features/recruitmentRequest/bindings/my_applications_binding.dart';
+import '../../features/recruitmentRequest/view/my_applications_page.dart';
 import 'app_routes.dart';
 
 class AppPages {
@@ -267,6 +269,11 @@ class AppPages {
       name: AppRoutes.availableRecruitmentRequests,
       page: () => const AvailableRecruitmentRequestsPage(),
       binding: AvailableRecruitmentRequestsBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.myRecruitmentApplications,
+      page: () => const MyApplicationsPage(),
+      binding: MyApplicationsBinding(),
     ),
   ];
 }

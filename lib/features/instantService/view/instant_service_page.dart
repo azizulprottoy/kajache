@@ -46,7 +46,7 @@ class InstantServicePage extends GetView<InstantServiceController> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      'Post a job and get instant bids from nearby technicians.',
+                      TKeys.instantServiceIntro.tr,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                       ),
@@ -74,12 +74,40 @@ class InstantServicePage extends GetView<InstantServiceController> {
               const SizedBox(height: 8),
               TextFormField(
                 controller: controller.titleController,
+                maxLength: InstantServiceController.titleMaxLength,
                 validator: (v) => v == null || v.trim().isEmpty
-                    ? TKeys.describeProblemError.tr
+                    ? TKeys.titleRequired.tr
                     : null,
                 decoration: InputDecoration(
                   hintText: TKeys.instantServiceTitleHint.tr,
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              Text('${TKeys.category.tr} ${TKeys.optionalSuffix.tr}',
+                  style: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              Obx(
+                () => DropdownButtonFormField<String>(
+                  initialValue: controller.selectedCategoryId.value,
+                  isExpanded: true,
+                  hint: Text(TKeys.selectCategory.tr, maxLines: 1, overflow: TextOverflow.ellipsis),
+                  decoration: InputDecoration(
+                    prefixIcon: const Icon(Icons.category_outlined),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                  ),
+                  items: [
+                    DropdownMenuItem<String>(value: null, child: Text(TKeys.noCategory.tr)),
+                    ...controller.categories.map(
+                      (category) => DropdownMenuItem<String>(
+                        value: category.id,
+                        child: Text(category.localizedName, maxLines: 1, overflow: TextOverflow.ellipsis),
+                      ),
+                    ),
+                  ],
+                  onChanged: (value) => controller.selectedCategoryId.value = value,
                 ),
               ),
 
@@ -130,7 +158,9 @@ class InstantServicePage extends GetView<InstantServiceController> {
                       keyboardType: TextInputType.number,
                       validator: (v) {
                         final n = int.tryParse(v?.trim() ?? '');
-                        return n == null || n <= 0 ? TKeys.enterPrice.tr : null;
+                        if (n == null || n < 0) return TKeys.enterPrice.tr;
+                        if (n > InstantServiceController.maxAmount) return TKeys.amountTooLarge.tr;
+                        return null;
                       },
                       decoration: InputDecoration(
                         labelText: TKeys.priceMin.tr,
@@ -148,7 +178,9 @@ class InstantServicePage extends GetView<InstantServiceController> {
                       keyboardType: TextInputType.number,
                       validator: (v) {
                         final n = int.tryParse(v?.trim() ?? '');
-                        return n == null || n <= 0 ? TKeys.enterPrice.tr : null;
+                        if (n == null || n <= 0) return TKeys.enterPrice.tr;
+                        if (n > InstantServiceController.maxAmount) return TKeys.amountTooLarge.tr;
+                        return null;
                       },
                       decoration: InputDecoration(
                         labelText: TKeys.priceMax.tr,
@@ -166,6 +198,7 @@ class InstantServicePage extends GetView<InstantServiceController> {
 
               TextFormField(
                 controller: controller.addressController,
+                maxLength: InstantServiceController.addressMaxLength,
                 validator: (v) => v == null || v.trim().isEmpty
                     ? TKeys.addressRequired.tr
                     : null,
@@ -181,8 +214,9 @@ class InstantServicePage extends GetView<InstantServiceController> {
 
               TextFormField(
                 controller: controller.districtController,
+                maxLength: 100,
                 decoration: InputDecoration(
-                  labelText: '${TKeys.district.tr} (optional)',
+                  labelText: '${TKeys.district.tr} ${TKeys.optionalSuffix.tr}',
                   prefixIcon: const Icon(Icons.map_outlined),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
                 ),
@@ -190,7 +224,7 @@ class InstantServicePage extends GetView<InstantServiceController> {
 
               const SizedBox(height: 18),
 
-              Text('Schedule (optional)',
+              Text('${TKeys.scheduleLabel.tr} ${TKeys.optionalSuffix.tr}',
                   style: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
               Row(

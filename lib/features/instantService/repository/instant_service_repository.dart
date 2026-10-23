@@ -144,9 +144,10 @@ class InstantServiceRepository {
         .toList();
   }
 
-  /// Technician: instant jobs where the customer picked this technician's bid and
-  /// the job isn't finished yet. `/available` only lists open jobs, so these would
-  /// otherwise be unreachable after selection.
+  /// Technician: instant jobs where the customer picked this technician's bid,
+  /// including finished and cancelled ones (history). `/available` only lists
+  /// open jobs, so these would otherwise be unreachable after selection.
+  /// A selected bid becomes `cancelled` when the customer cancels the job.
   Future<List<InstantServiceModel>> getMyInstantJobs() async {
     await _requireConnection();
 
@@ -158,7 +159,9 @@ class InstantServiceRepository {
         .whereType<Map>()
         .map((raw) => Map<String, dynamic>.from(raw))
         .where((bid) =>
-            bid['status']?.toString() == 'selected' && bid['instantService'] is Map)
+            (bid['status']?.toString() == 'selected' ||
+                bid['status']?.toString() == 'cancelled') &&
+            bid['instantService'] is Map)
         .map((bid) => InstantServiceModel.fromJson({
               ...Map<String, dynamic>.from(bid['instantService']),
               'hasBid': true,
@@ -170,7 +173,7 @@ class InstantServiceRepository {
                 'estimatedArrival': bid['estimatedArrival'],
               },
             }))
-        .where((job) => job.status == 'bid_selected' || job.status == 'in_progress')
+        .where((job) => job.status != 'bidding_open')
         .toList();
   }
 
@@ -303,6 +306,60 @@ class InstantServiceRepository {
     await _requireConnection();
 
     await _dio.post(ApiEndpoints.instantServiceComplete(instantServiceId));
+  }
+
+  /// Client rates the selected technician of a completed instant service.
+  /// The API answers 409 when this job was already reviewed.
+  Future<void> submitReview({
+    required String instantServiceId,
+    required int rating,
+    String? review,
+  }) async {
+    await _requireConnection();
+
+    await _dio.post(
+      ApiEndpoints.review,
+      data: {
+        "instantService": instantServiceId,
+        "rating": rating,
+        if (review != null && review.trim().isNotEmpty) "review": review.trim(),
+      },
+    );
+  }
+
+  /// Whether [userId] already reviewed this instant service.
+  Future<bool> hasReviewed(String instantServiceId, String userId) async {
+    await _requireConnection();
+
+    final response = await _dio.get(
+      ApiEndpoints.review,
+      queryParameters: {"instantServiceId": instantServiceId},
+    );
+    final payload = Map<String, dynamic>.from(response.data);
+    final List list = payload['data'] ?? [];
+    return list.whereType<Map>().any((review) {
+      final employer = review['employer'];
+      final employerId = employer is Map ? employer['_id']?.toString() : employer?.toString();
+      return employerId == userId;
+    });
+  }
+
+  /// Complaint about this job, sent to support.
+  Future<void> submitComplaint({
+    required String instantServiceId,
+    required String title,
+    required String reason,
+  }) async {
+    await _requireConnection();
+
+    await _dio.post(
+      ApiEndpoints.complain,
+      data: {
+        "instantService": instantServiceId,
+        "title": title.trim(),
+        "reason": reason.trim(),
+      },
+    );
   }
 
   Future<void> cancelInstantService(

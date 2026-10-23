@@ -185,6 +185,23 @@ class RecruitmentRequestRepository {
         .toList();
   }
 
+  /// Technician: their own applications (any status, newest first), each
+  /// with a summary of the job post.
+  Future<List<RecruitmentApplicationModel>> getMyApplications() async {
+    await _requireConnection();
+
+    final response = await _dio.get(ApiEndpoints.recruitmentProviderBids);
+    final json = Map<String, dynamic>.from(response.data);
+    final List list = json['data'] ?? [];
+
+    return list
+        .whereType<Map>()
+        .map((e) => RecruitmentApplicationModel.fromJson(
+              Map<String, dynamic>.from(e),
+            ))
+        .toList();
+  }
+
   /// Full details for one posting — includes `bids`, `bidsCount`, `hasBid`,
   /// `myBid`.
   Future<RecruitmentRequestDetailsModel> getRecruitmentRequest(String id) async {
@@ -291,7 +308,54 @@ class RecruitmentRequestRepository {
     await _dio.post(ApiEndpoints.recruitmentRequestEnd(id));
   }
 
-  /// Client cancels. Not allowed once `ended`/`cancelled`.
+  /// Client rates the hired technician once the engagement has ended.
+  /// The API answers 409 when this post was already reviewed.
+  Future<void> submitReview(String id, {required int rating, String? review}) async {
+    await _requireConnection();
+
+    await _dio.post(
+      ApiEndpoints.review,
+      data: {
+        'recruitmentRequest': id,
+        'rating': rating,
+        if (review != null && review.trim().isNotEmpty) 'review': review.trim(),
+      },
+    );
+  }
+
+  /// Whether [userId] already reviewed this recruitment request.
+  Future<bool> hasReviewed(String id, String userId) async {
+    await _requireConnection();
+
+    final response = await _dio.get(
+      ApiEndpoints.review,
+      queryParameters: {'recruitmentRequestId': id},
+    );
+    final json = Map<String, dynamic>.from(response.data);
+    final List list = json['data'] ?? [];
+    return list.whereType<Map>().any((review) {
+      final employer = review['employer'];
+      final employerId = employer is Map ? employer['_id']?.toString() : employer?.toString();
+      return employerId == userId;
+    });
+  }
+
+  /// Complaint about this job post, sent to support.
+  Future<void> submitComplaint(String id, {required String title, required String reason}) async {
+    await _requireConnection();
+
+    await _dio.post(
+      ApiEndpoints.complain,
+      data: {
+        'recruitmentRequest': id,
+        'title': title.trim(),
+        'reason': reason.trim(),
+      },
+    );
+  }
+
+  /// Client cancels. Allowed while `pending_payment` (nothing paid),
+  /// `hiring_open` (fee refund requested) and `hired` (fee forfeited).
   Future<void> cancelRecruitmentRequest(String id, {String? reason}) async {
     await _requireConnection();
 

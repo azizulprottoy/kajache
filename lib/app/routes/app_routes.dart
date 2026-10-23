@@ -44,6 +44,7 @@ class AppRoutes {
   static const myRecruitmentRequests = '/myRecruitmentRequests';
   static const myRecruitmentRequestDetails = '/myRecruitmentRequestDetails';
   static const availableRecruitmentRequests = '/availableRecruitmentRequests';
+  static const myRecruitmentApplications = '/myRecruitmentApplications';
 }
 //   static const onboarding = '/onboarding';
 //   // Main

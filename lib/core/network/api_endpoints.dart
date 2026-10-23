@@ -165,6 +165,7 @@ class ApiEndpoints {
   static const String recruitmentRequest = '/recruitmentRequest';
   static const String myRecruitmentRequests = '/recruitmentRequest/me';
   static const String availableRecruitmentRequests = '/recruitmentRequest/available';
+  static const String recruitmentProviderBids = '/recruitmentRequest/provider/bids';
   static String recruitmentRequestById(String id) => '/recruitmentRequest/$id';
   static String recruitmentRequestSelectBid(String id) => '/recruitmentRequest/$id/select-bid';
   static String recruitmentRequestPayment(String id) => '/recruitmentRequest/$id/confirm-payment';

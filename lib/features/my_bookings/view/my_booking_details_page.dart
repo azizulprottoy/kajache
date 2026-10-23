@@ -11,6 +11,7 @@ import '../../home/models/available_booking_response_model.dart';
 import '../controller/my_booking_details_controller.dart';
 import '../../tracking/live_tracking_map.dart';
 import 'package:kaj_ache/shared/widgets/app_network_image.dart';
+import '../../../shared/widgets/technician_portfolio_section.dart';
 
 class MyBookingDetailsPage extends GetView<MyBookingDetailsController> {
   const MyBookingDetailsPage({super.key});
@@ -1659,6 +1660,9 @@ class _BidderProfileSheet extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Container(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.9,
+        ),
         padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
         decoration: BoxDecoration(
           color: colors.surface,
@@ -1666,6 +1670,7 @@ class _BidderProfileSheet extends StatelessWidget {
             top: Radius.circular(26),
           ),
         ),
+        child: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -1795,6 +1800,8 @@ class _BidderProfileSheet extends StatelessWidget {
             ),
 
             const SizedBox(height: 18),
+            TechnicianPortfolioSection(technicianId: bid.providerId),
+            const SizedBox(height: 18),
 
             Obx(() {
               final bookingStatus =
@@ -1850,6 +1857,7 @@ class _BidderProfileSheet extends StatelessWidget {
               );
             }),
           ],
+        ),
         ),
       ),
     );

@@ -11,10 +11,14 @@
 // own field names (title/details/priceMin-priceMax instead of
 // service/minLimit, no required schedule, etc).
 
+import '../../../core/utils/localized_text.dart';
+import '../../../core/utils/money_format.dart';
+
 class InstantServiceLocationModel {
   final String address;
   final String city;
   final String district;
+  final String area;
   final double? lat;
   final double? lng;
 
@@ -22,6 +26,7 @@ class InstantServiceLocationModel {
     required this.address,
     required this.city,
     required this.district,
+    this.area = '',
     this.lat,
     this.lng,
   });
@@ -35,6 +40,7 @@ class InstantServiceLocationModel {
       address: json['address']?.toString() ?? '',
       city: json['city']?.toString() ?? '',
       district: json['district']?.toString() ?? '',
+      area: json['area']?.toString() ?? '',
       lat: (coordinates['lat'] as num?)?.toDouble(),
       lng: (coordinates['lng'] as num?)?.toDouble(),
     );
@@ -45,6 +51,7 @@ class InstantServiceLocationModel {
       "address": address,
       if (city.isNotEmpty) "city": city,
       if (district.isNotEmpty) "district": district,
+      if (area.isNotEmpty) "area": area,
       if (lat != null && lng != null) "coordinates": {"lat": lat, "lng": lng},
     };
   }
@@ -222,11 +229,15 @@ class InstantServiceModel {
         ? Map<String, dynamic>.from(json['myBid'])
         : null;
 
+    // Only a populated category has a readable name; a bare ObjectId is
+    // never shown to the user.
     final category = json['category'];
     final categoryLabel = category is Map
-        ? (category['title'] ?? category['name'] ?? category['_id'])
-            ?.toString()
-        : category?.toString();
+        ? LocalizedText.pick(
+            (category['name'] ?? category['title'] ?? '').toString(),
+            category['nameBn']?.toString(),
+          )
+        : '';
 
     return InstantServiceModel(
       id: json['_id']?.toString() ?? '',
@@ -236,7 +247,7 @@ class InstantServiceModel {
       title: json['title']?.toString() ?? '',
       image: json['image']?.toString() ?? '',
       details: json['details']?.toString() ?? '',
-      category: categoryLabel ?? '',
+      category: categoryLabel,
       priceMin: int.tryParse(json['priceMin']?.toString() ?? '0') ?? 0,
       priceMax: int.tryParse(json['priceMax']?.toString() ?? '0') ?? 0,
       location: InstantServiceLocationModel.fromJson(location),
@@ -256,8 +267,15 @@ class InstantServiceModel {
     );
   }
 
-  /// Human-facing price range label, e.g. "৳500 - ৳1000".
-  String get priceRangeLabel => '৳$priceMin - ৳$priceMax';
+  /// Human-facing price range label, e.g. "৳500 - ৳1,000".
+  String get priceRangeLabel => '${formatTaka(priceMin)} - ${formatTaka(priceMax)}';
+
+  /// Address when visible to this viewer, else the general area.
+  String get locationLabel => [
+        location.address,
+        location.area,
+        location.district.isNotEmpty ? location.district : location.city,
+      ].where((part) => part.trim().isNotEmpty).join(', ');
 }
 
 /// Full details shape returned by `/instantService/:id` — includes the bids
