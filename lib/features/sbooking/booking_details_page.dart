@@ -239,10 +239,12 @@ class BookingDetailsPage extends GetView<BookingDetailsController> {
                     Icon(Icons.check_circle_rounded,
                         color: Colors.green.shade700),
                     const SizedBox(width: 10),
-                    Text(TKeys.cashReceivedConfirmed.tr,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Colors.green.shade700,
-                            fontWeight: FontWeight.w600)),
+                    Expanded(
+                      child: Text(TKeys.cashReceivedConfirmed.tr,
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Colors.green.shade700,
+                              fontWeight: FontWeight.w600)),
+                    ),
                   ]),
                 ),
               ],

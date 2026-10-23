@@ -70,15 +70,17 @@ class HomePage extends GetView<HomeController> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        TKeys.categories.tr,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: colorScheme.onSurface,
+                      Expanded(
+                        child: Text(
+                          TKeys.categories.tr,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: colorScheme.onSurface,
+                          ),
                         ),
                       ),
                       TextButton(
-                        onPressed: () {},
+                        onPressed: controller.openAllServices,
                         child: Text(
                           TKeys.seeAll.tr,
                           style: TextStyle(color: colorScheme.primary),
@@ -168,15 +170,17 @@ class HomePage extends GetView<HomeController> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        TKeys.popularServices.tr,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: colorScheme.onSurface,
+                      Expanded(
+                        child: Text(
+                          TKeys.popularServices.tr,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: colorScheme.onSurface,
+                          ),
                         ),
                       ),
                       TextButton(
-                        onPressed: () {},
+                        onPressed: controller.openAllServices,
                         child: Text(
                           TKeys.seeAll.tr,
                           style: TextStyle(color: colorScheme.primary),
@@ -231,7 +235,7 @@ class _HomeJobTile extends StatelessWidget {
       this.image = '', required this.onTap, required this.colorScheme, required this.theme});
 
   Widget _placeholderBox() => Container(
-    width: 150, height: 100,
+    width: 148, height: 92,
     decoration: BoxDecoration(color: colorScheme.primaryContainer, borderRadius: BorderRadius.circular(7)),
   );
 
@@ -253,10 +257,11 @@ class _HomeJobTile extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
 
+            // Fills the tile's inner width (160 - 2x6 padding) at ~16:10
             ClipRRect(
               borderRadius: BorderRadius.circular(7),
               child: image.isNotEmpty
-                  ? AppNetworkImage(image, width: 150, height: 100, fit: BoxFit.cover,
+                  ? AppNetworkImage(image, width: 148, height: 92, fit: BoxFit.cover,
                       errorBuilder: (_, __, ___) => _placeholderBox())
                   : _placeholderBox(),
             ),

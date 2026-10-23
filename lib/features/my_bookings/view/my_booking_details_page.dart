@@ -830,6 +830,8 @@ class _CouponTicket extends StatelessWidget {
                         fontWeight: FontWeight.w900,
                         color: colors.primary,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     if (coupon.type == 'percentage')
                       Text(
@@ -837,6 +839,8 @@ class _CouponTicket extends StatelessWidget {
                         style: theme.textTheme.labelSmall?.copyWith(
                           color: colors.onSurfaceVariant,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     const SizedBox(height: 4),
                     Text(
@@ -845,6 +849,8 @@ class _CouponTicket extends StatelessWidget {
                         color: colors.primary,
                         fontWeight: FontWeight.w600,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
@@ -1410,7 +1416,7 @@ class _BookingPaymentSheetState extends State<_BookingPaymentSheet> {
                                   fontWeight: FontWeight.bold)),
                           const SizedBox(height: 8),
                           SizedBox(
-                            height: 80,
+                            height: 96,
                             child: ListView.separated(
                               scrollDirection: Axis.horizontal,
                               itemCount: controller.coupons.length,
@@ -1873,8 +1879,8 @@ class _ProfileInformationRow extends StatelessWidget {
         children: [
           Icon(icon, size: 20, color: colors.primary),
           const SizedBox(width: 10),
-          SizedBox(
-            width: 115,
+          Expanded(
+            flex: 2,
             child: Text(
               label,
               style: theme.textTheme.bodyMedium?.copyWith(
@@ -1882,7 +1888,9 @@ class _ProfileInformationRow extends StatelessWidget {
               ),
             ),
           ),
+          const SizedBox(width: 8),
           Expanded(
+            flex: 3,
             child: Text(
               value,
               style: theme.textTheme.bodyMedium?.copyWith(

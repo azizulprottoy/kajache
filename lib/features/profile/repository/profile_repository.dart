@@ -23,6 +23,14 @@ class ProfileRepository {
     return ProfileModel.fromJson(Map<String, dynamic>.from(data));
   }
 
+  /// Schedules the account for deletion (60 days). The API signs it out
+  /// everywhere; signing in again before the date cancels it.
+  Future<void> deleteMyAccount() async {
+    final isConnected = await _networkInfo.isConnected;
+    if (!isConnected) throw Exception('No internet connection.');
+    await _dio.delete(ApiEndpoints.profileDelete);
+  }
+
   Future<List<String>> getCategoryNames() async {
     final isConnected = await _networkInfo.isConnected;
     if (!isConnected) throw Exception('No internet connection.');

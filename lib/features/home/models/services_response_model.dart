@@ -41,6 +41,8 @@ class ServiceModel {
   final String createdAt;
   final String updatedAt;
   final String image;
+  // Category id; the list API sends it unpopulated, details may populate it
+  final String categoryId;
 
   /// Fee the customer pays to publish a booking for bidding. Mirrors the
   /// backend: bidPlacementFee, else bookingFee, else 50.
@@ -60,6 +62,7 @@ class ServiceModel {
     required this.createdAt,
     required this.updatedAt,
     required this.image,
+    this.categoryId = '',
     this.systemFee = 50,
   });
 
@@ -86,6 +89,9 @@ class ServiceModel {
       image: MediaUrlHelper.resolve(
         (json['image'] ?? json['image'])?.toString(),
       ),
+      categoryId: json['category'] is Map
+          ? (json['category']['_id']?.toString() ?? '')
+          : (json['category']?.toString() ?? ''),
       systemFee: double.tryParse(
             (json['bidPlacementFee'] ?? json['bookingFee'])?.toString() ?? '',
           ) ??

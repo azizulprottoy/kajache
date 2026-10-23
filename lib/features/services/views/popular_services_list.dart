@@ -9,6 +9,7 @@ import '../../../app/routes/app_routes.dart';
 import '../../../core/utils/media_url_helper.dart';
 import '../../home/models/services_response_model.dart';
 import 'package:kaj_ache/shared/widgets/app_network_image.dart';
+import '../../../core/utils/html_text.dart';
 
 class PopularServicesList extends StatelessWidget {
   final List<ServiceModel> services;
@@ -107,9 +108,7 @@ class PopularServicesList extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        service.localizedDescription
-                            .replaceAll(RegExp(r'<[^>]*>'), '')
-                            .trim(),
+                        htmlToPlainText(service.localizedDescription),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: theme.textTheme.labelSmall?.copyWith(

@@ -343,11 +343,13 @@ class _ChecklistItem extends StatelessWidget {
                                       size: 15,
                                       color: colorScheme.primary),
                                   const SizedBox(width: 4),
-                                  Text(
-                                    TKeys.rewardUnlocked.tr,
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                      color: colorScheme.primary,
-                                      fontWeight: FontWeight.w600,
+                                  Flexible(
+                                    child: Text(
+                                      TKeys.rewardUnlocked.tr,
+                                      style: theme.textTheme.bodySmall?.copyWith(
+                                        color: colorScheme.primary,
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -360,11 +362,13 @@ class _ChecklistItem extends StatelessWidget {
                                       size: 15,
                                       color: colorScheme.onSurfaceVariant),
                                   const SizedBox(width: 4),
-                                  Text(
-                                    '$pointsRemaining ${TKeys.pts.tr} ${TKeys.rewardPointsToUnlock.tr}',
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                      color: colorScheme.onSurfaceVariant,
-                                      fontWeight: FontWeight.w600,
+                                  Flexible(
+                                    child: Text(
+                                      '$pointsRemaining ${TKeys.pts.tr} ${TKeys.rewardPointsToUnlock.tr}',
+                                      style: theme.textTheme.bodySmall?.copyWith(
+                                        color: colorScheme.onSurfaceVariant,
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -488,7 +492,7 @@ class _HowToEarnSheet extends StatelessWidget {
         ),
         child: SafeArea(
           top: false,
-          child: Padding(
+          child: SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
             child: Column(
               mainAxisSize: MainAxisSize.min,

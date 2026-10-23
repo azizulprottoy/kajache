@@ -169,19 +169,26 @@ class _InstantServiceTile extends StatelessWidget {
                   ],
                 ),
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    item.priceRangeLabel,
-                    style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold, color: colorScheme.primary),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 110),
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerRight,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        item.priceRangeLabel,
+                        style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold, color: colorScheme.primary),
+                      ),
+                      if (alreadyBid && item.myBid != null)
+                        Text(
+                          'My bid: ৳${item.myBid!.price}',
+                          style: theme.textTheme.bodySmall?.copyWith(color: Colors.green.shade700, fontWeight: FontWeight.w600),
+                        ),
+                    ],
                   ),
-                  if (alreadyBid && item.myBid != null)
-                    Text(
-                      'My bid: ৳${item.myBid!.price}',
-                      style: theme.textTheme.bodySmall?.copyWith(color: Colors.green.shade700, fontWeight: FontWeight.w600),
-                    ),
-                ],
+                ),
               ),
             ],
           ),
@@ -190,11 +197,15 @@ class _InstantServiceTile extends StatelessWidget {
             children: [
               Icon(Icons.pending_actions_outlined, size: 15, color: colorScheme.onSurfaceVariant),
               const SizedBox(width: 6),
-              Text(
-                item.status.replaceAll('_', ' '),
-                style: theme.textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
+              Expanded(
+                child: Text(
+                  item.status.replaceAll('_', ' '),
+                  style: theme.textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-              const Spacer(),
+              const SizedBox(width: 8),
               if (alreadyBid)
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -442,11 +453,13 @@ class _DetailRow extends StatelessWidget {
         children: [
           Icon(icon, size: 18, color: colors.primary),
           const SizedBox(width: 8),
-          SizedBox(
-            width: 100,
+          Expanded(
+            flex: 2,
             child: Text(label, style: theme.textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant)),
           ),
+          const SizedBox(width: 8),
           Expanded(
+            flex: 3,
             child: Text(value, style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
           ),
         ],

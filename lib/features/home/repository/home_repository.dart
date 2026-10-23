@@ -49,14 +49,18 @@ class HomeRepository {
     return result.data;
   }
 
-  Future<List<ServiceModel>> getServices() async {
+  /// Services for the home page; [limit] caps how many the API sends.
+  Future<List<ServiceModel>> getServices({int? limit}) async {
     final isConnected = await _networkInfo.isConnected;
 
     if (!isConnected) {
       throw Exception('No internet connection.');
     }
 
-    final response = await _dio.get(ApiEndpoints.services);
+    final response = await _dio.get(
+      ApiEndpoints.services,
+      queryParameters: limit != null ? {'limit': limit} : null,
+    );
 
     final result = ServiceResponseModel.fromJson(
       Map<String, dynamic>.from(response.data),

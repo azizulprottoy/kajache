@@ -4,6 +4,7 @@ import 'package:kaj_ache/features/about_us/view/about_us_page.dart';
 import 'package:kaj_ache/features/support_chat/binding/support_chat_binding.dart';
 import 'package:kaj_ache/features/support_chat/view/support_chat_page.dart';
 import 'package:kaj_ache/features/auth/views/forgot_password.dart';
+import 'package:kaj_ache/features/auth/views/forgot_password_email_page.dart';
 import 'package:kaj_ache/features/auth/views/otp_page.dart';
 import 'package:kaj_ache/features/category_details/binding/category_details_binding.dart';
 import 'package:kaj_ache/features/category_details/view/category_details_page.dart';
@@ -95,6 +96,10 @@ class AppPages {
       name: AppRoutes.register,
       page: () => RegisterPage(),
       binding: RegisterBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.forgotPasswordEmail,
+      page: () => const ForgotPasswordEmailPage(),
     ),
     GetPage(
       name: AppRoutes.forgotPassword,

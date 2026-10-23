@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_endpoints.dart';
 import '../../../core/network/network_info.dart';
+import '../../home/models/category_response_model.dart';
 import '../../home/models/services_response_model.dart';
 
 class AllServicesRepository {
@@ -29,5 +30,16 @@ class AllServicesRepository {
     );
 
     return result.data;
+  }
+
+  Future<List<CategoryModel>> getCategories() async {
+    if (!await _networkInfo.isConnected) {
+      throw Exception('No internet connection.');
+    }
+
+    final response = await _dio.get(ApiEndpoints.categories);
+    return CategoryResponseModel.fromJson(
+      Map<String, dynamic>.from(response.data),
+    ).data;
   }
 }

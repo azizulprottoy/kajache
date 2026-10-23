@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kaj_ache/core/utils/translation_keys.dart';
-import '../arguments/otp_argument.dart';
 import '../controllers/login_controller.dart';
 import '../../../app/routes/app_routes.dart';
 
@@ -113,12 +112,30 @@ class _LoginPageState extends State<LoginPage> {
               ),
 
               Row(
-                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
+                  Obx(
+                    () => Checkbox(
+                      value: controller.rememberMe.value,
+                      onChanged: (v) => controller.rememberMe.value = v ?? false,
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                  ),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => controller.rememberMe.toggle(),
+                      child: Text(
+                        TKeys.rememberMe.tr,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: colorScheme.onSurface.withOpacity(0.8),
+                        ),
+                      ),
+                    ),
+                  ),
                   TextButton(
                     onPressed: () => Get.toNamed(
-                      AppRoutes.otpPage,
-                      arguments: OtpArgument(isReset: true),
+                      AppRoutes.forgotPasswordEmail,
+                      arguments: controller.inputController.text.trim(),
                     ),
                     child: Text(
                       TKeys.forgotPassword.tr,

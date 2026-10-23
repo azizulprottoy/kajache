@@ -62,6 +62,8 @@ class TKeys {
   static const whatService    = 'what_service';
   static const popularServices = 'popular_services';
   static const allCategories  = 'all_categories';
+  static const allServices    = 'all_services';
+  static const searchServices = 'search_services';
 
   // ── Technician Dashboard ──────────────────────────────────────────────────────
   static const dashboardSubtitle = 'dashboard_subtitle';
@@ -215,6 +217,8 @@ class TKeys {
   static const payConfirm               = 'pay_confirm';
   static const minimumPrice             = 'minimum_price';
   static const startingPrice            = 'starting_price';
+  static const aboutService             = 'about_service';
+  static const comments                 = 'comments';
   static const bidsStartFrom            = 'bids_start_from';
   static const pinOnMap                 = 'pin_on_map';
   static const bookingTitle             = 'booking_title';
@@ -455,4 +459,12 @@ class TKeys {
   static const earnByReview             = 'earn_by_review';
   static const earnByRating             = 'earn_by_rating';
   static const pts                      = 'pts';
+  static const rememberMe               = 'remember_me';
+  static const forgotPasswordInfo       = 'forgot_password_info';
+  static const sendCode                 = 'send_code';
+  static const resetCodeSent            = 'reset_code_sent';
+  static const invalidEmail             = 'invalid_email';
+  static const deleteAccount            = 'delete_account';
+  static const deleteAccountConfirm     = 'delete_account_confirm';
+  static const deleteAccountScheduled   = 'delete_account_scheduled';
 }

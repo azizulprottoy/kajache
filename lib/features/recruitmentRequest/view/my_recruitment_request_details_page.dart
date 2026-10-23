@@ -963,12 +963,14 @@ class _ProfileInfoRow extends StatelessWidget {
         children: [
           Icon(icon, size: 20, color: colors.primary),
           const SizedBox(width: 10),
-          SizedBox(
-            width: 115,
+          Expanded(
+            flex: 2,
             child: Text(label,
                 style: theme.textTheme.bodyMedium?.copyWith(color: colors.onSurfaceVariant)),
           ),
+          const SizedBox(width: 8),
           Expanded(
+            flex: 3,
             child: Text(value,
                 style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
           ),

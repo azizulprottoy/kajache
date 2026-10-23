@@ -11,6 +11,7 @@ import '../../service_details/arguments/service_details_arguments.dart';
 import '../controller/category_details_controller.dart';
 import '../model/category_services_response_model.dart';
 import 'package:kaj_ache/shared/widgets/app_network_image.dart';
+import '../../../core/utils/html_text.dart';
 
 class CategoryDetailsPage extends GetView<CategoryDetailsController> {
   const CategoryDetailsPage({super.key});
@@ -49,9 +50,9 @@ class CategoryDetailsPage extends GetView<CategoryDetailsController> {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(16),
-                child: category.imageLink.isNotEmpty
+                child: category.bannerImage.isNotEmpty
                     ? AppNetworkImage(
-                  category.imageLink,
+                  category.bannerImage,
                   height: 190,
                   width: double.infinity,
                   fit: BoxFit.cover,
@@ -208,9 +209,7 @@ class _ServiceCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    service.localizedDescription
-                        .replaceAll(RegExp(r'<[^>]*>'), '')
-                        .trim(),
+                    htmlToPlainText(service.localizedDescription),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.labelSmall?.copyWith(
@@ -223,11 +222,15 @@ class _ServiceCard extends StatelessWidget {
 
             const SizedBox(width: 8),
 
-            Text(
-              '৳${service.basePrice ?? 0}',
-              style: theme.textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: colorScheme.primary,
+            SizedBox(
+              width: 90,
+              child: Text(
+                '৳${service.basePrice ?? 0}',
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.primary,
+                ),
+                textAlign: TextAlign.end,
               ),
             ),
           ],

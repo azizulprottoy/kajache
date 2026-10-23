@@ -3,10 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import '../../../app/routes/app_routes.dart';
+import '../../../core/error/api_error.dart';
 import '../../../core/utils/translation_keys.dart';
 import '../../../core/utils/app_services.dart';
 import '../../../shared/widgets/success_model.dart';
 import '../arguments/otp_argument.dart';
+import '../repository/auth_repository.dart';
 
 class OtpPage extends StatefulWidget {
   const OtpPage({super.key});
@@ -23,6 +25,8 @@ class _OtpPageState extends State<OtpPage> {
   List.generate(6, (_) => FocusNode());
 
   OtpArgument? otpArgument;
+  final _repository = AuthRepository();
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -64,6 +68,32 @@ class _OtpPageState extends State<OtpPage> {
     }
   }
 
+  Future<void> _verifyResetCode(String email) async {
+    setState(() => isLoading = true);
+    try {
+      await _repository.verifyResetCode(email, otp);
+      Get.offNamed(
+        AppRoutes.forgotPassword,
+        arguments: ResetPasswordArgument(email: email, code: otp),
+      );
+    } catch (e) {
+      AppServices.showError(apiErrorMessage(e, fallback: 'Invalid or expired code'));
+    } finally {
+      if (mounted) setState(() => isLoading = false);
+    }
+  }
+
+  Future<void> _resend() async {
+    final email = otpArgument?.email;
+    if (otpArgument?.isReset != true || email == null) return;
+    try {
+      await _repository.forgotPassword(email);
+      AppServices.showSuccess(TKeys.resetCodeSent.tr);
+    } catch (e) {
+      AppServices.showError(apiErrorMessage(e, fallback: 'Could not send the code'));
+    }
+  }
+
   void _verifyOtp() {
     if (otp.length != 6) {
       Get.snackbar(
@@ -77,7 +107,12 @@ class _OtpPageState extends State<OtpPage> {
     final isReset = otpArgument?.isReset ?? false;
 
     if (isReset) {
-      Get.offNamed(AppRoutes.forgotPassword);
+      final email = otpArgument?.email;
+      if (email == null) {
+        Get.offNamed(AppRoutes.forgotPasswordEmail);
+        return;
+      }
+      _verifyResetCode(email);
       return;
     }
 
@@ -138,7 +173,10 @@ class _OtpPageState extends State<OtpPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: List.generate(
                   6,
-                      (index) => SizedBox(
+                      (index) => Flexible(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 2),
+                      child: SizedBox(
                     width: 48,
                     height: 56,
                     child: TextFormField(
@@ -187,6 +225,8 @@ class _OtpPageState extends State<OtpPage> {
                       ),
                     ),
                   ),
+                  ),
+                  ),
                 ),
               ),
               const SizedBox(height: 28),
@@ -194,7 +234,7 @@ class _OtpPageState extends State<OtpPage> {
                 width: double.infinity,
                 height: 52,
                 child: FilledButton(
-                  onPressed: _verifyOtp,
+                  onPressed: isLoading ? null : _verifyOtp,
                   style: FilledButton.styleFrom(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
@@ -211,7 +251,7 @@ class _OtpPageState extends State<OtpPage> {
               const SizedBox(height: 20),
               Center(
                 child: TextButton(
-                  onPressed: () {},
+                  onPressed: _resend,
                   child: Text(
                     TKeys.resendOtp.tr,
                     style: TextStyle(

@@ -12,6 +12,8 @@ import '../repository/auth_repository.dart';
 
 
 
+const rememberMeKey = 'remember_me';
+
 class LoginController extends GetxController {
   final _secureStorage = Get.find<SecureStorageService>();
   final _localStorage = Get.find<LocalStorageService>();
@@ -23,6 +25,7 @@ class LoginController extends GetxController {
   final passwordController = TextEditingController();
 
   final RxBool obscurePassword = true.obs;
+  final RxBool rememberMe = false.obs;
 
   void toggleObscurePassword() {
     obscurePassword.value = !obscurePassword.value;
@@ -39,6 +42,7 @@ class LoginController extends GetxController {
       final request = LoginRequestModel(
         email: inputController.text.trim().toLowerCase(),
         password: passwordController.text,
+        rememberMe: rememberMe.value,
       );
 
       final response = await _authRepository.login(request);
@@ -63,6 +67,8 @@ class LoginController extends GetxController {
       _localStorage.write('username', response.user.username);
       _localStorage.write('role_title', roleTitle);
       _localStorage.write('user_type', userType.name);
+      // Without "remember me" the session ends on the next app launch
+      _localStorage.write(rememberMeKey, rememberMe.value);
 
       Get.offAllNamed(
         AppRoutes.main,

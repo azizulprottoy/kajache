@@ -12,6 +12,7 @@ class AppRoutes {
   static const main = '/mainpage';
   static const register = '/register';
   static const otpPage = '/otpPage';
+  static const forgotPasswordEmail = '/forgotPasswordEmail';
   static const forgotPassword = '/forgotPassword';
   static const myProfile = '/myProfile';
   static const editProfile = '/editProfile';

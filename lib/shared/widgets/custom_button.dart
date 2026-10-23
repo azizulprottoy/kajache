@@ -140,13 +140,17 @@ class _CustomButtonState extends State<CustomButton>
                 ),
                 const SizedBox(width: 8),
               ],
-              Text(
-                widget.label.tr,
-                style: theme.textTheme.labelLarge?.copyWith(
-                  fontSize:   fontSize,
-                  fontWeight: FontWeight.w600,
-                  color:      effectiveFg,
-                  letterSpacing: 0.3,
+              Flexible(
+                child: Text(
+                  widget.label.tr,
+                  style: theme.textTheme.labelLarge?.copyWith(
+                    fontSize:   fontSize,
+                    fontWeight: FontWeight.w600,
+                    color:      effectiveFg,
+                    letterSpacing: 0.3,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
               if (widget.suffixIcon != null && !widget.isLoading) ...[

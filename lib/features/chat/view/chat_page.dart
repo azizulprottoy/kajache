@@ -61,6 +61,9 @@ class ChatPage extends GetView<ChatController> {
                   return Align(
                     alignment: isMine ? Alignment.centerRight : Alignment.centerLeft,
                     child: Container(
+                      constraints: BoxConstraints(
+                        maxWidth: MediaQuery.sizeOf(context).width * 0.75,
+                      ),
                       margin: const EdgeInsets.only(bottom: 10),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 14,

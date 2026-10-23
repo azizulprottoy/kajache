@@ -412,7 +412,12 @@ class _BookingFormBody extends GetView<BookingController> {
               child: Obx(
                 () => DropdownButtonFormField<String>(
                   value: controller.selectedTime.value,
-                  hint: Text(TKeys.pickTime.tr),
+                  isExpanded: true,
+                  hint: Text(
+                    TKeys.pickTime.tr,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                   decoration: InputDecoration(
                     labelText: TKeys.timeSlot.tr,
                     prefixIcon: const Icon(Icons.access_time_outlined),
@@ -424,7 +429,11 @@ class _BookingFormBody extends GetView<BookingController> {
                       .map(
                         (time) => DropdownMenuItem<String>(
                           value: time,
-                          child: Text(time),
+                          child: Text(
+                            time,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       )
                       .toList(),

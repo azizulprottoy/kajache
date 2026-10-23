@@ -37,15 +37,21 @@ class CategoryGrid extends StatelessWidget {
       );
     }
 
+    // Image (60) + padding/gap, plus room for two label lines at the
+    // current text scale so long (e.g. Bangla) names never overflow.
+    final labelLineHeight = MediaQuery.textScalerOf(context)
+            .scale(theme.textTheme.labelSmall?.fontSize ?? 11) *
+        1.2;
+
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: categories.length,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 4,
         mainAxisSpacing: 3,
         crossAxisSpacing: 15,
-        childAspectRatio: 0.90,
+        mainAxisExtent: 68 + labelLineHeight * 2,
       ),
       itemBuilder: (context, index) {
         final category = categories[index];

@@ -36,39 +36,75 @@ class ServiceDetailsPage extends GetView<ServiceDetailsController> {
         title: TKeys.serviceDetails.tr,
         showLanguageToggle: true,
       ),
-      bottomNavigationBar: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-          child: isProviderBidFlow
-              ? CustomButton(
-            label: controller.hasBid
-                ? TKeys.editBid.tr
-                : TKeys.bidNow.tr,
-            variant: ButtonVariant.primary,
-            isFullWidth: true,
-            onPressed: () => _showBidingBottomSheet(context),
-          )
-              : isBooking
-              ? CustomButton(
-            label: TKeys.viewProviderBids.tr,
-            variant: ButtonVariant.primary,
-            isFullWidth: true,
-            onPressed: () => _showBidsBottomSheet(context),
-          )
-              : CustomButton(
-            label: TKeys.bookNow.tr,
-            variant: ButtonVariant.primary,
-            isFullWidth: true,
-            onPressed: () {
-              final service = controller.service.value;
-              if (service == null) return;
-
-              Get.toNamed(
-                AppRoutes.bookingPage,
-                arguments: ServiceBookingArgument(serviceDetails: service),
-              );
-            },
+      // Action bar: in the normal booking flow it also shows the price, so
+      // the cost is visible next to "Book Now" while scrolling
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
+          border: Border(top: BorderSide(color: colorScheme.outlineVariant)),
+        ),
+        child: SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+            child: isProviderBidFlow
+                ? CustomButton(
+                    label: controller.hasBid ? TKeys.editBid.tr : TKeys.bidNow.tr,
+                    variant: ButtonVariant.primary,
+                    isFullWidth: true,
+                    onPressed: () => _showBidingBottomSheet(context),
+                  )
+                : isBooking
+                    ? CustomButton(
+                        label: TKeys.viewProviderBids.tr,
+                        variant: ButtonVariant.primary,
+                        isFullWidth: true,
+                        onPressed: () => _showBidsBottomSheet(context),
+                      )
+                    : Obx(() {
+                        final service = controller.service.value;
+                        final price = service?.basePrice ?? 0;
+                        return Row(
+                          children: [
+                            if (price > 0) ...[
+                              Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    TKeys.startingPrice.tr,
+                                    style: theme.textTheme.labelSmall?.copyWith(
+                                      color: colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                  Text(
+                                    _formatPrice(price),
+                                    style: theme.textTheme.titleLarge?.copyWith(
+                                      fontWeight: FontWeight.w800,
+                                      color: colorScheme.primary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(width: 16),
+                            ],
+                            Expanded(
+                              child: CustomButton(
+                                label: TKeys.bookNow.tr,
+                                variant: ButtonVariant.primary,
+                                isFullWidth: true,
+                                onPressed: service == null
+                                    ? null
+                                    : () => Get.toNamed(
+                                          AppRoutes.bookingPage,
+                                          arguments: ServiceBookingArgument(
+                                              serviceDetails: service),
+                                        ),
+                              ),
+                            ),
+                          ],
+                        );
+                      }),
           ),
         ),
       ),
@@ -91,77 +127,58 @@ class ServiceDetailsPage extends GetView<ServiceDetailsController> {
         return RefreshIndicator(
           onRefresh: controller.fetchServiceDetails,
           child: ListView(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
             children: [
+              // 16:10, the same shape the website uses for service images
               ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: service.image.isNotEmpty
-                    ? AppNetworkImage(
-                  MediaUrlHelper.resolve(service.image),
-                  height: 190,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) =>
-                      _ImageFallback(colorScheme: colorScheme),
-                )
-                    : _ImageFallback(colorScheme: colorScheme),
-              ),
-
-              const SizedBox(height: 20),
-
-              AdBanner(position: 'service_top',  padding: EdgeInsets.only(bottom: 16)),
-
-              Text(
-                service.localizedTitle,
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: colorScheme.onSurface,
+                borderRadius: BorderRadius.circular(20),
+                child: AspectRatio(
+                  aspectRatio: 16 / 10,
+                  child: service.image.isNotEmpty
+                      ? AppNetworkImage(
+                    MediaUrlHelper.resolve(service.image),
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) =>
+                        _ImageFallback(colorScheme: colorScheme),
+                  )
+                      : _ImageFallback(colorScheme: colorScheme),
                 ),
               ),
 
+              const SizedBox(height: 18),
+
+              // Title + price
+              Text(
+                service.localizedTitle,
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.w800,
+                  color: colorScheme.onSurface,
+                  height: 1.2,
+                ),
+              ),
               if (!isProviderBidFlow && service.basePrice > 0) ...[
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 12),
-                  decoration: BoxDecoration(
-                    color: colorScheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Row(
+                const SizedBox(height: 8),
+                Text.rich(
+                  TextSpan(
                     children: [
-                      Icon(Icons.sell_outlined,
-                          color: colorScheme.onPrimaryContainer),
-                      const SizedBox(width: 10),
-                      Text(
-                        TKeys.startingPrice.tr,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onPrimaryContainer,
-                        ),
-                      ),
-                      const Spacer(),
-                      Text(
-                        '৳${NumberFormat.decimalPattern().format(service.basePrice.round())}',
+                      TextSpan(
+                        text: _formatPrice(service.basePrice),
                         style: theme.textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.w800,
-                          color: colorScheme.onPrimaryContainer,
+                          color: colorScheme.primary,
+                        ),
+                      ),
+                      TextSpan(
+                        text: '  ·  ${TKeys.startingPrice.tr}',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ],
                   ),
                 ),
               ],
-
-              const SizedBox(height: 16),
-
-
-              Text(
-                "Description",
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: colorScheme.onSurface,
-                ),
-              ),
 
               if (isProviderBidFlow && controller.minLimit > 0) ...[
                 const SizedBox(height: 16),
@@ -177,13 +194,17 @@ class ServiceDetailsPage extends GetView<ServiceDetailsController> {
                       Icon(Icons.account_balance_wallet_outlined,
                           color: colorScheme.onPrimaryContainer),
                       const SizedBox(width: 10),
-                      Text(
-                        TKeys.customerBudget.tr,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onPrimaryContainer,
+                      Expanded(
+                        child: Text(
+                          TKeys.customerBudget.tr,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onPrimaryContainer,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      const Spacer(),
+                      const SizedBox(width: 8),
                       Text(
                         '৳${controller.minLimit}',
                         style: theme.textTheme.titleMedium?.copyWith(
@@ -244,34 +265,44 @@ class ServiceDetailsPage extends GetView<ServiceDetailsController> {
                 ),
               ],
 
+              AdBanner(position: 'service_top', padding: EdgeInsets.only(top: 16)),
 
-              AdBanner(position: 'service_middle',  padding: EdgeInsets.symmetric(vertical: 12)),
+              const SizedBox(height: 20),
 
-              service.localizedDescription.isNotEmpty
-                  ? Html(
-                data: service.localizedDescription,
-                style: {
-                  'body': Style(
-                    margin: Margins.zero,
-                    padding: HtmlPaddings.zero,
-                    fontSize: FontSize(
-                        theme.textTheme.bodyMedium?.fontSize ?? 14),
-                    color: colorScheme.onSurface,
-                    lineHeight: const LineHeight(1.2),
-                  ),
-                },
-              )
-                  : Text(
-                TKeys.noDescription.tr,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                  height: 1.5,
-                ),
+              // About this service
+              _SectionCard(
+                title: TKeys.aboutService.tr,
+                child: service.localizedDescription.isNotEmpty
+                    ? Html(
+                        data: service.localizedDescription,
+                        style: {
+                          'body': Style(
+                            margin: Margins.zero,
+                            padding: HtmlPaddings.zero,
+                            fontSize: FontSize(
+                                theme.textTheme.bodyMedium?.fontSize ?? 14),
+                            color: colorScheme.onSurfaceVariant,
+                            lineHeight: const LineHeight(1.5),
+                          ),
+                          'p': Style(margin: Margins.only(bottom: 8)),
+                        },
+                      )
+                    : Text(
+                        TKeys.noDescription.tr,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                          height: 1.5,
+                        ),
+                      ),
               ),
 
+              AdBanner(position: 'service_middle', padding: EdgeInsets.only(top: 16)),
 
+              const SizedBox(height: 24),
 
               _RatingSection(controller: controller),
+
+              const SizedBox(height: 24),
 
               _CommentsSection(controller: controller),
             ],
@@ -329,6 +360,7 @@ class ServiceDetailsPage extends GetView<ServiceDetailsController> {
 
                 Text(
                   TKeys.serviceProviderBids.tr,
+                  textAlign: TextAlign.center,
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: colorScheme.onSurface,
@@ -524,6 +556,46 @@ class _PosterStat extends StatelessWidget {
   }
 }
 
+String _formatPrice(num price) =>
+    '৳${NumberFormat.decimalPattern().format(price.round())}';
+
+// ── Titled card for a page section ──────────────────────────────────────────
+class _SectionCard extends StatelessWidget {
+  final String title;
+  final Widget child;
+
+  const _SectionCard({required this.title, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: colorScheme.outlineVariant),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: colorScheme.onSurface,
+            ),
+          ),
+          const SizedBox(height: 10),
+          child,
+        ],
+      ),
+    );
+  }
+}
+
 // ── Image fallback ─────────────────────────────────────────────────────────
 class _ImageFallback extends StatelessWidget {
   final ColorScheme colorScheme;
@@ -532,8 +604,8 @@ class _ImageFallback extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Fills the 16:10 frame around it
     return Container(
-      height: 190,
       width: double.infinity,
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerLowest,
@@ -686,6 +758,7 @@ class _BiddingBottomSheetState extends State<BiddingBottomSheet> {
                     widget.isEditMode
                         ? TKeys.editYourBid.tr
                         : TKeys.placeYourBid.tr,
+                    textAlign: TextAlign.center,
                     style: theme.textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: colorScheme.onSurface,
@@ -1142,7 +1215,7 @@ class _CommentsSection extends StatelessWidget {
         Row(
           children: [
             Text(
-              'Comments',
+              TKeys.comments.tr,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: colorScheme.onSurface,

@@ -11,6 +11,8 @@ import '../models/banner_response_model.dart';
 import '../models/category_response_model.dart';
 import '../models/services_response_model.dart';
 import '../repository/home_repository.dart';
+import '../../main/controller/main_controller.dart';
+import '../../services/controllers/all_services_controller.dart';
 import '../../instantService/model/instant_service_model.dart';
 import '../../instantService/repository/instant_service_repository.dart';
 import '../../recruitmentRequest/model/recruitment_request_model.dart';
@@ -104,8 +106,11 @@ class HomeController extends GetxController {
     ]);
   }
 
+  // The home page shows a short list; "See all" opens the full one
+  static const homeServiceLimit = 8;
+
   Future<void> fetchPopularServices() {
-    return _homeRepository.getServices().then((data) {
+    return _homeRepository.getServices(limit: homeServiceLimit).then((data) {
       popularServices.assignAll(data);
     });
   }
@@ -143,6 +148,15 @@ class HomeController extends GetxController {
     _bannerTimer?.cancel();
     bannerPageController.dispose();
     super.onClose();
+  }
+
+  /// "See all" on Categories / Popular services: switch to the Services tab
+  /// (first bottom-nav tab for customers) with the "All services" chip on.
+  void openAllServices() {
+    if (Get.isRegistered<AllServicesController>()) {
+      Get.find<AllServicesController>().selectCategory(null);
+    }
+    Get.find<MainController>().changeNavIndex(0);
   }
 
   onCategoryTap(CategoryModel category) {

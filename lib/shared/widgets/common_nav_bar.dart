@@ -15,14 +15,16 @@ class CommonBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bottomInset = MediaQuery.viewPaddingOf(context).bottom;
     return SizedBox(
-      height: 60,
+      height: 60 + bottomInset,
       child: Stack(
         clipBehavior: Clip.none,
         alignment: Alignment.bottomCenter,
         children: [
           Container(
-            height: 60,
+            height: 60 + bottomInset,
+            padding: EdgeInsets.only(bottom: bottomInset),
             decoration: BoxDecoration(
               color: context.colors.surface,
               border: Border(

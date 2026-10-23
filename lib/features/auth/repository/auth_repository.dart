@@ -51,4 +51,37 @@ class AuthRepository {
       Map<String, dynamic>.from(response.data),
     );
   }
+
+  // The API answers the same for unknown emails, so this only fails on
+  // network/validation/rate-limit errors (thrown as DioException).
+  Future<void> forgotPassword(String email) async {
+    await _ensureConnected();
+    await _dio.post(ApiEndpoints.forgotPassword, data: {'email': email});
+  }
+
+  Future<void> verifyResetCode(String email, String code) async {
+    await _ensureConnected();
+    await _dio.post(
+      ApiEndpoints.verifyResetCode,
+      data: {'email': email, 'code': code},
+    );
+  }
+
+  Future<void> resetPassword(
+    String email,
+    String code,
+    String newPassword,
+  ) async {
+    await _ensureConnected();
+    await _dio.post(
+      ApiEndpoints.resetPassword,
+      data: {'email': email, 'code': code, 'newPassword': newPassword},
+    );
+  }
+
+  Future<void> _ensureConnected() async {
+    if (!await _networkInfo.isConnected) {
+      throw Exception('No internet connection.');
+    }
+  }
 }

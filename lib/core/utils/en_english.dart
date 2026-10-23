@@ -62,6 +62,8 @@ const Map<String, String> enUS = {
   TKeys.whatService:       'What service do you need?',
   TKeys.popularServices:   'Popular Services',
   TKeys.allCategories:     'All Categories',
+  TKeys.allServices:       'All services',
+  TKeys.searchServices:    'Search services (e.g. plumbing, AC)',
 
   // Technician Dashboard
   TKeys.dashboardSubtitle: 'Manage your services and track your performance.',
@@ -215,6 +217,8 @@ const Map<String, String> enUS = {
   TKeys.payConfirm:             'Pay & Confirm',
   TKeys.minimumPrice:           'Minimum Price',
   TKeys.startingPrice:          'Starting price',
+  TKeys.aboutService:           'About this service',
+  TKeys.comments:               'Comments',
   TKeys.bidsStartFrom:          'Technician bids start from',
   TKeys.pinOnMap:               'Pin location on map',
   TKeys.bookingTitle:          'Request title *',
@@ -453,4 +457,12 @@ const Map<String, String> enUS = {
   TKeys.earnByReview:           'Write a service review',
   TKeys.earnByRating:           'Rate a technician',
   TKeys.pts:                    'pts',
+  TKeys.rememberMe:             'Remember me',
+  TKeys.forgotPasswordInfo:     'Enter your account email and we will send you a 6-digit code.',
+  TKeys.sendCode:               'Send Code',
+  TKeys.resetCodeSent:          'If that email is registered, a code is on its way.',
+  TKeys.invalidEmail:           'Enter a valid email',
+  TKeys.deleteAccount:          'Delete my account',
+  TKeys.deleteAccountConfirm:   'Your account and profile will be permanently deleted in 60 days and you will be signed out now. Sign in again before then to cancel.',
+  TKeys.deleteAccountScheduled: 'Account scheduled for deletion. Sign in within 60 days to cancel.',
 };

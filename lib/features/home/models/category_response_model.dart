@@ -35,6 +35,8 @@ class CategoryModel {
   final String description;
   final String descriptionBn;
   final String imageLink;
+  // Wide banner for the details page; empty when not uploaded
+  final String coverImageLink;
   final int clicks;
   final String createdAt;
   final String updatedAt;
@@ -47,6 +49,7 @@ class CategoryModel {
     required this.description,
     required this.descriptionBn,
     required this.imageLink,
+    this.coverImageLink = '',
     required this.clicks,
     required this.createdAt,
     required this.updatedAt,
@@ -61,11 +64,15 @@ class CategoryModel {
       description: json['description']?.toString() ?? '',
       descriptionBn: json['descriptionBn']?.toString() ?? '',
       imageLink: MediaUrlHelper.resolve(json['imageLink']?.toString()),
+      coverImageLink: MediaUrlHelper.resolve(json['coverImageLink']?.toString()),
       clicks: json['clicks'] ?? 0,
       createdAt: json['createdAt']?.toString() ?? '',
       updatedAt: json['updatedAt']?.toString() ?? '',
     );
   }
+
+  /// Details-page banner: the wide cover, falling back to the card image.
+  String get bannerImage => coverImageLink.isNotEmpty ? coverImageLink : imageLink;
 
   /// Category name in the active locale (Bangla when set, else English).
   String get localizedName => LocalizedText.pick(name, nameBn);

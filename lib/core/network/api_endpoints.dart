@@ -4,6 +4,9 @@ class ApiEndpoints {
   // Auth
   static const String register = '/auth/register';
   static const String login = '/auth/login';
+  static const String forgotPassword = '/auth/forgot-password';
+  static const String verifyResetCode = '/auth/verify-reset-code';
+  static const String resetPassword = '/auth/reset-password';
 
   // Users
   static const String users = '/users';
@@ -12,6 +15,7 @@ class ApiEndpoints {
   // Profile
   static const String profileMe = '/profile/me';
   static const String profileUpdate = '/profile/update';
+  static const String profileDelete = '/profile/delete';
   // Upload
   static const String upload = '/upload';
 

@@ -1,4 +1,6 @@
 import 'package:kaj_ache/core/utils/app_services.dart';
+import 'package:kaj_ache/core/utils/translation_keys.dart';
+import 'package:kaj_ache/app/routes/app_routes.dart';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -21,6 +23,7 @@ class ProfileController extends GetxController {
 
   final formKey = GlobalKey<FormState>();
   final RxBool isLoading = true.obs;
+  final RxBool isDeleting = false.obs;
 
   late TextEditingController fullNameController;
   late TextEditingController emailController;
@@ -175,6 +178,30 @@ class ProfileController extends GetxController {
       AppServices.showApiError(e);
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  /// Schedules deletion (API signs the account out and drops its push
+  /// tokens), then clears the local session.
+  Future<void> deleteMyAccount() async {
+    final confirmed = await AppServices.showConfirm(
+      title: TKeys.deleteAccount.tr,
+      message: TKeys.deleteAccountConfirm.tr,
+      confirmText: TKeys.deleteAccount.tr,
+      cancelText: TKeys.cancel.tr,
+    );
+    if (confirmed != true) return;
+
+    try {
+      isDeleting.value = true;
+      await _repository.deleteMyAccount();
+      await AppServices.clearSession(unregisterPush: false);
+      Get.offAllNamed(AppRoutes.login);
+      AppServices.showSuccess(TKeys.deleteAccountScheduled.tr);
+    } catch (e) {
+      AppServices.showApiError(e);
+    } finally {
+      isDeleting.value = false;
     }
   }
 

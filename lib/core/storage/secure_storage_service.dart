@@ -28,6 +28,11 @@ class SecureStorageService extends GetxService {
   Future<String?> getToken() async =>
       _storage.read(key: _keyToken);
 
+  Future<void> deleteToken() async {
+    await _storage.delete(key: _keyToken);
+    ApiClient.clearCachedToken();
+  }
+
   Future<void> saveRefreshToken(String token) async =>
       _storage.write(key: _keyRefreshToken, value: token);
 

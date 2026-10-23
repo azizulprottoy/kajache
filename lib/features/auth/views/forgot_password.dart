@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../app/routes/app_routes.dart';
+import '../../../core/error/api_error.dart';
+import '../../../core/utils/app_services.dart';
 import '../../../core/utils/translation_keys.dart';
 import '../../../shared/widgets/success_model.dart';
+import '../arguments/otp_argument.dart';
+import '../repository/auth_repository.dart';
 
 class ForgotPassword extends StatefulWidget {
   const ForgotPassword({super.key});
@@ -23,6 +27,24 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   bool obscureConfirmPassword = true;
   bool isLoading = false;
 
+  final _repository = AuthRepository();
+  // Email + verified code from the OTP page
+  ResetPasswordArgument? _resetArgument;
+
+  @override
+  void initState() {
+    super.initState();
+    final args = Get.arguments;
+    if (args is ResetPasswordArgument) {
+      _resetArgument = args;
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        Get.offNamed(AppRoutes.forgotPasswordEmail);
+      });
+    }
+  }
+
   @override
   void dispose() {
     newPasswordController.dispose();
@@ -33,16 +55,31 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   void _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
+    final reset = _resetArgument;
+    if (reset == null) return;
+
     setState(() {
       isLoading = true;
     });
 
-    await Future.delayed(const Duration(seconds: 1));
+    try {
+      await _repository.resetPassword(
+        reset.email,
+        reset.code,
+        newPasswordController.text,
+      );
+    } catch (e) {
+      AppServices.showError(apiErrorMessage(e, fallback: 'Could not reset the password'));
+      return;
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
 
-    setState(() {
-      isLoading = false;
-    });
-
+    if (!mounted) return;
     showDialog(
       context: context,
       builder: (_) => SuccessModal(
@@ -57,9 +94,6 @@ class _ForgotPasswordState extends State<ForgotPassword> {
         },
       ),
     );
-
-    // TODO: navigate to login page
-
   }
 
   @override

@@ -215,14 +215,15 @@ class InstantServicePage extends GetView<InstantServiceController> {
                     child: Obx(
                       () => DropdownButtonFormField<String>(
                         value: controller.selectedTime.value,
-                        hint: Text(TKeys.pickTime.tr),
+                        isExpanded: true,
+                        hint: Text(TKeys.pickTime.tr, maxLines: 1, overflow: TextOverflow.ellipsis),
                         decoration: InputDecoration(
                           labelText: TKeys.timeSlot.tr,
                           prefixIcon: const Icon(Icons.access_time_outlined),
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
                         ),
                         items: controller.timeSlots
-                            .map((time) => DropdownMenuItem<String>(value: time, child: Text(time)))
+                            .map((time) => DropdownMenuItem<String>(value: time, child: Text(time, maxLines: 1, overflow: TextOverflow.ellipsis)))
                             .toList(),
                         onChanged: (value) => controller.selectedTime.value = value,
                       ),

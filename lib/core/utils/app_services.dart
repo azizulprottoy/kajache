@@ -151,6 +151,7 @@ class AppServices {
   /// Local-storage keys that belong to the signed-in user. App preferences
   /// (onboarding, theme, language) are kept across logins.
   static const _userKeys = [
+    'remember_me',
     'user_id',
     'user_email',
     'username',

@@ -64,6 +64,8 @@ const Map<String, String> bnBD = {
   TKeys.whatService:       'আপনার কী সেবা দরকার?',
   TKeys.popularServices:   'জনপ্রিয় সেবাসমূহ',
   TKeys.allCategories:     'সব ক্যাটাগরি',
+  TKeys.allServices:       'সব সার্ভিস',
+  TKeys.searchServices:    'সার্ভিস খুঁজুন (যেমন: প্লাম্বিং, এসি)',
 
   // Technician Dashboard
   TKeys.dashboardSubtitle: 'আপনার সেবা পরিচালনা করুন এবং কর্মক্ষমতা পর্যবেক্ষণ করুন।',
@@ -217,6 +219,8 @@ const Map<String, String> bnBD = {
   TKeys.payConfirm:             'পরিশোধ ও নিশ্চিত করুন',
   TKeys.minimumPrice:           'সর্বনিম্ন মূল্য',
   TKeys.startingPrice:          'শুরুর মূল্য',
+  TKeys.aboutService:           'সার্ভিস সম্পর্কে',
+  TKeys.comments:               'মন্তব্য',
   TKeys.bidsStartFrom:          'টেকনিশিয়ানদের বিড শুরু',
   TKeys.pinOnMap:               'ম্যাপে লোকেশন দিন',
   TKeys.bookingTitle:          'অনুরোধের শিরোনাম *',
@@ -455,4 +459,12 @@ const Map<String, String> bnBD = {
   TKeys.earnByReview:           'সার্ভিস রিভিউ লিখুন',
   TKeys.earnByRating:           'টেকনিশিয়ানকে রেটিং দিন',
   TKeys.pts:                    'পয়েন্ট',
+  TKeys.rememberMe:             'আমাকে মনে রাখুন',
+  TKeys.forgotPasswordInfo:     'আপনার অ্যাকাউন্টের ইমেইল দিন, আমরা একটি ৬-সংখ্যার কোড পাঠাব।',
+  TKeys.sendCode:               'কোড পাঠান',
+  TKeys.resetCodeSent:          'ইমেইলটি নিবন্ধিত থাকলে একটি কোড পাঠানো হয়েছে।',
+  TKeys.invalidEmail:           'সঠিক ইমেইল দিন',
+  TKeys.deleteAccount:          'আমার অ্যাকাউন্ট মুছুন',
+  TKeys.deleteAccountConfirm:   'আপনার অ্যাকাউন্ট ও প্রোফাইল ৬০ দিন পর স্থায়ীভাবে মুছে ফেলা হবে এবং এখনই আপনাকে সাইন আউট করা হবে। বাতিল করতে এর আগে আবার সাইন ইন করুন।',
+  TKeys.deleteAccountScheduled: 'অ্যাকাউন্ট মুছে ফেলার জন্য নির্ধারিত হয়েছে। বাতিল করতে ৬০ দিনের মধ্যে সাইন ইন করুন।',
 };

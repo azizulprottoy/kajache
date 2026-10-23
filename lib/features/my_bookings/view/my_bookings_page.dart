@@ -152,23 +152,28 @@ class MyBookingPage extends GetView<MyBookingController> {
                                     ),
                                   ),
                                   const SizedBox(width: 8),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 10,
-                                      vertical: 6,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: statusInfo.color.withValues(
-                                        alpha: 0.12,
+                                  ConstrainedBox(
+                                    constraints: const BoxConstraints(maxWidth: 120),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                        vertical: 6,
                                       ),
-                                      borderRadius: BorderRadius.circular(30),
-                                    ),
-                                    child: Text(
-                                      statusInfo.label,
-                                      style: theme.textTheme.labelSmall
-                                          ?.copyWith(
-                                        color: statusInfo.color,
-                                        fontWeight: FontWeight.w700,
+                                      decoration: BoxDecoration(
+                                        color: statusInfo.color.withValues(
+                                          alpha: 0.12,
+                                        ),
+                                        borderRadius: BorderRadius.circular(30),
+                                      ),
+                                      child: Text(
+                                        statusInfo.label,
+                                        style: theme.textTheme.labelSmall
+                                            ?.copyWith(
+                                          color: statusInfo.color,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
                                   ),
